@@ -1,0 +1,27 @@
+name: GoldorNetworkUHC
+main: com.goldornetwork.uhc.UHC
+author: g0ldmanpox
+description: This is property of GoldorNetwork.
+version: 1.1
+commands:
+   start:
+      description: Use this to start the match!
+      usage: /<command> 
+   cancel:
+      description: Use this to cancel the match!
+      usage: /<command> 
+   create:
+      description: Use this to create a team!
+      usage: /<command> 
+   join:
+      description: Use this to either join a team or join the FFA!
+      usage: /<command> [team] 
+      aliases: [j]
+   invite:
+      description: Use this to either join a team or join the FFA!
+      usage: /<command> [player]  
+      aliases: [i]
+   uninvite:
+      description: Use this to either join a team or join the FFA!
+      usage: /<command> [player]
+      aliases: [ui]      
