@@ -12,7 +12,7 @@ public class DealDamage implements Runnable {
 	private static DealDamage instance = new DealDamage();
 	private List<UUID> playersToDamage = new ArrayList<UUID>();
 	double damageAmount;
-		public static DealDamage getInstance(){
+		public static DealDamage getInstance() {
 		return instance;
 	}
 			
@@ -25,7 +25,6 @@ public class DealDamage implements Runnable {
 		for(UUID u : playersToDamage){
 			Bukkit.getServer().getPlayer(u).damage(damageAmount);
 		}
-		
 	};
 	
 	
