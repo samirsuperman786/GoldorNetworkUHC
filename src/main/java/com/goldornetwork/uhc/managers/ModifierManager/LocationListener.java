@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.DealDamage;
 
 public class LocationListener implements Runnable {
 
@@ -13,6 +14,7 @@ public class LocationListener implements Runnable {
 	private TeamManager teamM = TeamManager.getInstance();
 	private TimerManager timerM = TimerManager.getInstance();
 	private ModifierManager modM = ModifierManager.getInstance();
+	private DealDamage dealD = DealDamage.getInstance();
 	public static LocationListener getInstance(){
 		return instance;
 	}
@@ -26,7 +28,7 @@ public class LocationListener implements Runnable {
 					for(UUID u : teamM.getPlayersInGame()){
 						if(Bukkit.getServer().getPlayer(u).isOnline()){
 							if(Bukkit.getServer().getPlayer(u).getLocation().getBlockY()<=100){
-								Bukkit.getServer().getPlayer(u).damage(1);
+								dealD.addPlayerToTick(Bukkit.getServer().getPlayer(u), 1);
 							}
 						}
 					}
