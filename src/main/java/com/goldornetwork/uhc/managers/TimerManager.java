@@ -9,9 +9,9 @@ public class TimerManager implements Runnable {
 	private static TimerManager instance = new TimerManager();
 	MessageSender ms = new MessageSender();
 
-	private int timeTillMatchStart = -2;
+	private int timeTillMatchStart;
 	
-	private int timeTillPVPStart=-2;
+	private int timeTillPVPStart;
 	private boolean startMatch;
 	
 	private boolean hasMatchBegun;
@@ -24,6 +24,15 @@ public class TimerManager implements Runnable {
 	
 	public static TimerManager getInstance(){
 		return instance;
+	}
+	public void setup(){
+		timeTillMatchStart=-2;
+		timeTillPVPStart=-2;
+		startMatch=false;
+		hasMatchBegun=false;
+		matchStart=false;
+		startPVPTimer=false;
+		isPVPEnabled=false;
 	}
 	
 	public void startMatch(boolean start, int timeTillMatchStarts, int timeTillPVPStarts){

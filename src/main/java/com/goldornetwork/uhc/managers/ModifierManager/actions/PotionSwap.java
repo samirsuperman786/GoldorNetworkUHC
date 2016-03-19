@@ -23,6 +23,11 @@ public class PotionSwap implements Runnable {
 	public static PotionSwap getInstance(){
 		return instance;
 	}
+	public void setup(){
+		enablePotionSwap=false;
+		latePotionPlayers.clear();
+	}
+	
 	
 	public void enablePotionSwap(boolean val){
 		this.enablePotionSwap=val;
@@ -33,6 +38,10 @@ public class PotionSwap implements Runnable {
 	public void lateGiveAPlayerAPotion(Player p){
 		p.addPotionEffect(new PotionEffect(getRandomPotion(), 6000, 1));
 	}
+	public void lateGiveAPlayerAPotion(Player p, int durationInSeconds){
+		p.addPotionEffect(new PotionEffect(getRandomPotion(), durationInSeconds*20, 1));
+	}
+	
 	public void removePlayerFromLateGive(Player p){
 		latePotionPlayers.remove(p.getUniqueId());
 	}

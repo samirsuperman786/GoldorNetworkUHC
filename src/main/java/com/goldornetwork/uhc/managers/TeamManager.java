@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.management.timer.TimerNotification;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -22,7 +24,7 @@ import com.goldornetwork.uhc.utils.MessageSender;
 public class TeamManager {
 	
 	private MessageSender ms = new MessageSender();
-	
+	private TimerManager timerM = TimerManager.getInstance();
 //
 	private int playersPerTeam;
 	private int FFATeamSize;
@@ -58,6 +60,7 @@ public class TeamManager {
 		playersInGame.clear();
 		observers.clear();
 		listOfAvailableTeams.clear();
+		freezedPlayers.clear();
 		teamOfPlayer.clear();
 		colorOfTeam.clear();
 		playersOnCurrentTeam.clear();
@@ -67,7 +70,7 @@ public class TeamManager {
 	
 	
 	
-	private void initializeTeams(int numberOfTeams){
+	public void initializeTeams(int numberOfTeams){
 
 
 		for(int i =0; i<numberOfTeams; i++){
@@ -202,12 +205,15 @@ public class TeamManager {
 				}
 			}
 		}
-		for(UUID u : getPlayersOnATeam(getTeamOfPlayer(p))){
-			if(Bukkit.getServer().getPlayer(u).isOnline()){
-				ms.alertMessage(Bukkit.getPlayer(u), ChatColor.RED, "Your team has been disbanded");
-				removePlayerFromTeam(Bukkit.getServer().getPlayer(u));
+		if(timerM.hasCountDownEnded()==false){
+			for(UUID u : getPlayersOnATeam(getTeamOfPlayer(p))){
+				if(Bukkit.getServer().getPlayer(u).isOnline()){
+					ms.alertMessage(Bukkit.getPlayer(u), ChatColor.RED, "Your team has been disbanded");
+					removePlayerFromTeam(Bukkit.getServer().getPlayer(u));
+				}
 			}
 		}
+		
 		
 		
 		
@@ -337,12 +343,23 @@ public class TeamManager {
 		p.setGameMode(GameMode.SPECTATOR);
 		p.setDisplayName(ChatColor.AQUA + "[Observer] " + p.getName()+ ChatColor.WHITE);
 	}
+	public ChatColor getColorOfPlayer(Player p){
+		if(isFFAEnabled){
+			return ChatColor.YELLOW;
+		}
+		else if(isTeamsEnabled){
+			return colorOfTeam.get(getTeamOfPlayer(p).toLowerCase());
+		}
+		else{
+			return ChatColor.GRAY;
+		}
+	
+	}
 	public ChatColor getColorOfTeam(String team){
 		return colorOfTeam.get(team.toLowerCase());
-		
 	}
 	
-	private List<UUID> getPlayersOnATeam(String team){
+	public List<UUID> getPlayersOnATeam(String team){
 		List<UUID> players = null;
 		if(teamOfPlayer.containsValue(team.toLowerCase())){
 			for(Map.Entry<UUID, String>  entry : teamOfPlayer.entrySet()){
@@ -353,7 +370,9 @@ public class TeamManager {
 		}
 		return players;
 	}
-	
+	public List<String> getListOfTeams(){
+		return listOfAvailableTeams;
+	}
 	private void increaseTeamSize(String team, Integer numberToIncrease){
 		playersOnCurrentTeam.replace(team.toLowerCase(), playersOnCurrentTeam.get(team.toLowerCase()) + numberToIncrease);
 	}
@@ -365,7 +384,7 @@ public class TeamManager {
 	
 	
 	private void displayName(Player p, String team){
-		p.setDisplayName(getColorOfTeam(team) + "["  + team + "] " + p.getName() + ChatColor.WHITE);
+		p.setDisplayName(getColorOfPlayer(p) + "["  + team + "] " + p.getName() + ChatColor.WHITE);
 	}
 	
 	

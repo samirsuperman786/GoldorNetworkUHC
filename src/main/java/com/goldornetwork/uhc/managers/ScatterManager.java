@@ -26,7 +26,7 @@ public class ScatterManager implements Runnable {
 	
 	private boolean scatterComplete;
 	
-	private int radius = 200;//todo remove
+	private int radius;//todo remove
 	
 	private Map<String, List<UUID>> teamToScatter = new HashMap<String, List<UUID>>();
 	
@@ -43,7 +43,19 @@ public class ScatterManager implements Runnable {
 	}
 	
 	public void setup(){
-		
+		//TODO make below false
+		getUHCWorld().setPVP(true);
+		getUHCWorld().setGameRuleValue("doMobSpawning", "false");
+		startScattering=false;
+		scatterTeam=false;
+		scatterFFA=false;
+		scatterComplete=false;
+		radius=1000;
+		teamToScatter.clear();
+		locationsOfTeamSpawn.clear();
+		lateScatters.clear();
+		nameOfTeams.clear();
+		FFAToScatter.clear();
 		WorldBorder wb = getUHCWorld().getWorldBorder();
 			wb.setCenter(getUHCWorld().getSpawnLocation());
 			wb.setSize(radius*2);
@@ -65,7 +77,6 @@ public class ScatterManager implements Runnable {
 		this.radius = radius;
 		scatterFFA=false;
 		scatterTeam=true;
-		
 	}
 	
 	public void scatterFFA(List<UUID> p, Integer radius){
@@ -104,7 +115,6 @@ public class ScatterManager implements Runnable {
 	public boolean isScatteringComplete(){
 		return scatterComplete;
 	}
-	
 	public World getUHCWorld(){
 		return Bukkit.getServer().getWorld("lol");
 	}

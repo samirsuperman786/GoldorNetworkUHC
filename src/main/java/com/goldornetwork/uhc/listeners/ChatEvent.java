@@ -1,6 +1,7 @@
 package com.goldornetwork.uhc.listeners;
 
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
@@ -16,7 +17,7 @@ public class ChatEvent implements Listener{
 	}
 
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onChatEvent(AsyncPlayerChatEvent e){
 		e.setFormat("%s: %s");
 	}

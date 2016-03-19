@@ -56,7 +56,7 @@ public class JoinCommand implements CommandExecutor {
 				if(teamM.isValidTeam(args[0])){
 					if(teamM.isPlayerInvitedToTeam(p,args[0].toLowerCase())){
 						if(teamM.isTeamRoomToJoin(args[0].toLowerCase())){
-							ms.alertMessage(p, ChatColor.GREEN, "You have joined team " + teamM.getColorOfTeam(args[0].toLowerCase() + args[0]));
+							ms.alertMessage(p, ChatColor.GREEN, "You have joined team " + teamM.getColorOfTeam(args[0].toLowerCase()) + args[0]);
 							teamM.addPlayerToTeam(p, args[0].toLowerCase());
 							return true;
 						}

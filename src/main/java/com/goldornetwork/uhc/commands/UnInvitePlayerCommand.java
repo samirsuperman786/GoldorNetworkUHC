@@ -59,7 +59,7 @@ public class UnInvitePlayerCommand implements CommandExecutor {
 		else{
 			teamM.unInvitePlayer(p, Bukkit.getServer().getPlayer(args[0]));
 			ms.alertMessage(p, ChatColor.GREEN, "You have uninvited " + Bukkit.getServer().getPlayer(args[0]).getName());
-			ms.alertMessage(Bukkit.getServer().getPlayer(args[0]), ChatColor.RED, "You have been uninvited to team " + teamM.getColorOfTeam(teamM.getTeamOfPlayer(p)) + teamM.getTeamOfPlayer(p) + ChatColor.RED + "by" + teamM.getColorOfTeam(teamM.getTeamOfPlayer(p) + p.getName()));
+			ms.alertMessage(Bukkit.getServer().getPlayer(args[0]), ChatColor.RED, "You have been uninvited to team " + teamM.getColorOfPlayer(p) + teamM.getTeamOfPlayer(p) + ChatColor.RED + "by" + teamM.getColorOfPlayer(p) + p.getName());
 			return true;
 		}
 		

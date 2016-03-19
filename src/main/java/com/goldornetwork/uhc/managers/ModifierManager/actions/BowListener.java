@@ -24,6 +24,11 @@ public class BowListener implements Listener {
 	public static BowListener getInstance(){
 		return instance;
 	}
+	
+	public void setup(){
+		enableSwitcheroo=false;
+		enableRewardingLongshots=false;
+	}
 	public void enableSwitcheroo(boolean val){
 		this.enableSwitcheroo = val;
 	}
