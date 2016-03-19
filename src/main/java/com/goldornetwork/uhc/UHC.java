@@ -17,7 +17,8 @@ import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.ModifierManager.LocationListener;
 import com.goldornetwork.uhc.managers.ModifierManager.ModifierManager;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.DealDamage;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.BowListener;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.PotionSwap;
 
 public class UHC extends JavaPlugin {
 
@@ -44,7 +45,7 @@ public class UHC extends JavaPlugin {
 		Bukkit.getServer().getScheduler().runTaskTimer(this, TimerManager.getInstance(), 0L, 20L);
 		Bukkit.getServer().getScheduler().runTaskTimer(this, SpectatorRegionManager.getInstance(), 0L, 40L);
 		Bukkit.getServer().getScheduler().runTaskTimer(this, LocationListener.getInstance(), 0L, 20L);
-		Bukkit.getServer().getScheduler().runTaskTimer(this, DealDamage.getInstance(), 0L, 600L);
+		Bukkit.getServer().getScheduler().runTaskTimer(this, PotionSwap.getInstance(), 0L, 6000L);
 	}
 	
 	private void registerCommands() {
@@ -59,6 +60,8 @@ public class UHC extends JavaPlugin {
 		new ChatEvent(this);
 		new JoinEvent(this);
 		Bukkit.getServer().getPluginManager().registerEvents(BreakEvent.getInstance(), this);
+		Bukkit.getServer().getPluginManager().registerEvents(BowListener.getInstance(), this);
+		
 	}
 
 	

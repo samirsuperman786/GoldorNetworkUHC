@@ -4,12 +4,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.goldornetwork.uhc.managers.ModifierManager.actions.BowListener;
+
 public class ModifierManager {
 
 	private static ModifierManager instance = new ModifierManager();
+	//instances of managers
+	private BowListener bowListener = BowListener.getInstance();
+	
+	//
+	
 	private Map<String, List<String>> options = new HashMap<String, List<String>>();
 	private Map<Enum<Gamemodes>, Boolean> gameModesThatAreEnabled = new HashMap<Enum<Gamemodes>, Boolean> ();
 	private int numberOfGamemodesToEnable = 3;
+	
 	
 	
 	public static ModifierManager getInstance(){
@@ -40,11 +48,11 @@ public class ModifierManager {
 			case SKYHIGH: //after pvp has started, all players must be at or above y=101, for every 30 seconds they are not, they take 1 heart of damage
 					break;		//they receive a diamond shovel, snowballs, pumpkin
 					
-			case SWITCHEROO: //when someone shoots a bow and hits someone, they switch places with that person
+			case SWITCHEROO: switcheroo();//when someone shoots a bow and hits someone, they switch places with that person
 					break;
-			case REWARDINGLONGSHOTS: //get rewards for hitting someone
+			case REWARDINGLONGSHOTS: rewardingLongShots();//get rewards for hitting someone
 					break;
-			case POTIONSWAP: //new potion effects every 5 minutes
+			case POTIONSWAP: potionSwap(); //new potion effects every 5 minutes
 					break;
 			case LIVEWITHREGRET: //If you die before pvp, you respawn with a random debuff
 					break;
@@ -73,6 +81,16 @@ public class ModifierManager {
 	}
 	
 	private void SkyHigh(){
+		
+	}
+	private void switcheroo(){
+		bowListener.enableSwitcheroo(true);
+	}
+	private void rewardingLongShots(){
+		bowListener.enableRewardingLongshots(true);
+	}
+	
+	private void potionSwap(){
 		
 	}
 	

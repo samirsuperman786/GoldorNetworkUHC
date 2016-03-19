@@ -11,6 +11,7 @@ import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.PotionSwap;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class JoinEvent implements Listener{
@@ -19,7 +20,7 @@ public class JoinEvent implements Listener{
 	private TimerManager timerM =  TimerManager.getInstance();
 	private ScatterManager scatterM = ScatterManager.getInstance();
 	private MessageSender ms = new MessageSender();
-	
+	private PotionSwap potionS = PotionSwap.getInstance();
 	
 	public JoinEvent(UHC plugin){
 		Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
@@ -29,6 +30,10 @@ public class JoinEvent implements Listener{
 	public void onJoin(PlayerJoinEvent e){
 		Player p = e.getPlayer();
 		if(timerM.hasMatchStarted()){
+			if(potionS.getLatePotionPlayers().contains(p.getUniqueId())){
+				potionS.lateGiveAPlayerAPotion(p);
+				potionS.removePlayerFromLateGive(p);
+			}
 			if(teamM.isFFAEnabled()){
 				if(scatterM.getLateScatters().contains(p.getUniqueId())){
 					scatterM.lateScatterAPlayerInFFA(p);

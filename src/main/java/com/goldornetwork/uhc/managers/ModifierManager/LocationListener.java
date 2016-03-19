@@ -28,7 +28,10 @@ public class LocationListener implements Runnable {
 					for(UUID u : teamM.getPlayersInGame()){
 						if(Bukkit.getServer().getPlayer(u).isOnline()){
 							if(Bukkit.getServer().getPlayer(u).getLocation().getBlockY()<=100){
-								dealD.addPlayerToTick(Bukkit.getServer().getPlayer(u), 1);
+								//TODO add damage tick
+							}
+							else if(Bukkit.getServer().getPlayer(u).getLocation().getBlockY()>=101){
+								//TODO remove damage tick
 							}
 						}
 					}
