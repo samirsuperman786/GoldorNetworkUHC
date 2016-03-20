@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
+
 import com.goldornetwork.uhc.managers.ModifierManager.actions.BowListener;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.DeathEvent;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.KingsManager;
@@ -78,7 +80,7 @@ public class ModifierManager {
 					break;
 			case KINGS: kings(true); //player on team gets op effect and if he dies, teamates get debuff
 					break;
-			case KILLSWITCH: //you take your victim's inventory when you kill them
+			case KILLSWITCH: killSwitch(true); //you take your victim's inventory when you kill them
 					break;
 			case THEHOBBIT:  //everyone gets a golden nugget, and when clicked you get invis for 30 sec and its gone
 					break;
@@ -112,6 +114,7 @@ public class ModifierManager {
 	
 	private void potionSwap(boolean val){
 		potionS.enablePotionSwap(val);
+		
 	}
 	private void liveWithRegret(boolean val){
 		

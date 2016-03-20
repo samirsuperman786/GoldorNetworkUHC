@@ -8,6 +8,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
@@ -17,6 +18,7 @@ import org.bukkit.entity.Player;
 public class ScatterManager implements Runnable {
 	
 	private static ScatterManager instance = new ScatterManager();
+	private ChunkGenerator chunkG = ChunkGenerator.getInstance();
 	
 	private boolean startScattering;
 	
@@ -59,7 +61,7 @@ public class ScatterManager implements Runnable {
 		WorldBorder wb = getUHCWorld().getWorldBorder();
 			wb.setCenter(getUHCWorld().getSpawnLocation());
 			wb.setSize(radius*2);
-			wb.setSize(50, 120);
+			//wb.setSize(50, 120); use this to shrink border
 			wb.setDamageBuffer(0);
 			wb.setDamageAmount(.5);
 			wb.setWarningTime(15);
@@ -69,6 +71,9 @@ public class ScatterManager implements Runnable {
 					e.remove();
 				}
 			}
+			chunkG.loadGenerator(getUHCWorld(), getUHCWorld().getWorldBorder().getCenter(), 1008, 5);
+		
+			
 			
 	}
 	

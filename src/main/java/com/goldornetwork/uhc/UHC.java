@@ -11,6 +11,7 @@ import com.goldornetwork.uhc.commands.StartCommand;
 import com.goldornetwork.uhc.listeners.BreakEvent;
 import com.goldornetwork.uhc.listeners.ChatEvent;
 import com.goldornetwork.uhc.listeners.JoinEvent;
+import com.goldornetwork.uhc.managers.ChunkGenerator;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.SpectatorRegionManager;
 import com.goldornetwork.uhc.managers.TeamManager;
@@ -38,6 +39,17 @@ public class UHC extends JavaPlugin {
 		setup();
 		registerListeners();
 		registerCommands();
+		registerTimers();
+	}
+
+	private void registerTimers() {
+		Bukkit.getServer().getScheduler().runTaskTimer(this, ScatterManager.getInstance(), 0L, 20L);
+		Bukkit.getServer().getScheduler().runTaskTimer(this, TimerManager.getInstance(), 0L, 20L);
+		Bukkit.getServer().getScheduler().runTaskTimer(this, SpectatorRegionManager.getInstance(), 0L, 40L);
+		Bukkit.getServer().getScheduler().runTaskTimer(this, LocationListener.getInstance(), 0L, 20L);
+		Bukkit.getServer().getScheduler().runTaskTimer(this, PotionSwap.getInstance(), 0L, 6000L);
+		Bukkit.getServer().getScheduler().runTaskTimer(this, ChunkGenerator.getInstance(), 0L, 40L);
+		
 	}
 
 	private void setup() {
@@ -54,11 +66,7 @@ public class UHC extends JavaPlugin {
 		ScatterManager.getInstance().setup();
 		JoinEvent.getInstance().setup();
 		BreakEvent.getInstance().setup();
-		Bukkit.getServer().getScheduler().runTaskTimer(this, ScatterManager.getInstance(), 0L, 20L);
-		Bukkit.getServer().getScheduler().runTaskTimer(this, TimerManager.getInstance(), 0L, 20L);
-		Bukkit.getServer().getScheduler().runTaskTimer(this, SpectatorRegionManager.getInstance(), 0L, 40L);
-		Bukkit.getServer().getScheduler().runTaskTimer(this, LocationListener.getInstance(), 0L, 20L);
-		Bukkit.getServer().getScheduler().runTaskTimer(this, PotionSwap.getInstance(), 0L, 6000L);
+		
 	}
 	
 	private void registerCommands() {
