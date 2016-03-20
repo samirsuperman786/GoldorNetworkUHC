@@ -71,7 +71,7 @@ public class ScatterManager implements Runnable {
 					e.remove();
 				}
 			}
-			chunkG.loadGenerator(getUHCWorld(), getUHCWorld().getWorldBorder().getCenter(), 1008, 5);
+			//chunkG.loadGenerator(getUHCWorld(), getUHCWorld().getWorldBorder().getCenter(), 1008, 5);
 		
 			
 			

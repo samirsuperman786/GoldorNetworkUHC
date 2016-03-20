@@ -17,7 +17,7 @@ import com.goldornetwork.uhc.utils.MessageSender;
 
 
 
-//TODO remove player from team
+//TODO kick player from team
 
 
 

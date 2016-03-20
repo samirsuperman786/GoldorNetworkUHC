@@ -67,7 +67,7 @@ public class ModifierManager {
 		
 			switch(gamemode){
 			
-			case SKYHIGH: //after pvp has started, all players must be at or above y=101, for every 30 seconds they are not, they take 1 heart of damage
+			case SKYHIGH: skyHigh(true);//after pvp has started, all players must be at or above y=101, for every 30 seconds they are not, they take 1 heart of damage
 					break;		//they receive a diamond shovel, snowballs, pumpkin
 					
 			case SWITCHEROO: switcheroo(true);//when someone shoots a bow and hits someone, they switch places with that person
@@ -102,7 +102,7 @@ public class ModifierManager {
 		
 	}
 	
-	private void SkyHigh(){
+	private void skyHigh(boolean val){
 		
 	}
 	private void switcheroo(boolean val){

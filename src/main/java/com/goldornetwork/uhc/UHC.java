@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.goldornetwork.uhc.commands.CancelCommand;
+import com.goldornetwork.uhc.commands.ChunkGenerateCommand;
 import com.goldornetwork.uhc.commands.CreateCommand;
 import com.goldornetwork.uhc.commands.InvitePlayerCommand;
 import com.goldornetwork.uhc.commands.JoinCommand;
@@ -48,7 +49,7 @@ public class UHC extends JavaPlugin {
 		Bukkit.getServer().getScheduler().runTaskTimer(this, SpectatorRegionManager.getInstance(), 0L, 40L);
 		Bukkit.getServer().getScheduler().runTaskTimer(this, LocationListener.getInstance(), 0L, 20L);
 		Bukkit.getServer().getScheduler().runTaskTimer(this, PotionSwap.getInstance(), 0L, 6000L);
-		Bukkit.getServer().getScheduler().runTaskTimer(this, ChunkGenerator.getInstance(), 0L, 40L);
+		Bukkit.getServer().getScheduler().runTaskTimer(this, ChunkGenerator.getInstance(), 0L, 20L);
 		
 	}
 
@@ -75,6 +76,7 @@ public class UHC extends JavaPlugin {
 		getCommand("create").setExecutor(new CreateCommand());
 		getCommand("join").setExecutor(new JoinCommand());
 		getCommand("invite").setExecutor(new InvitePlayerCommand());
+		getCommand("render").setExecutor(new ChunkGenerateCommand());
 	}
 
 	private void registerListeners() {
