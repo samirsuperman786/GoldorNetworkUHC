@@ -76,25 +76,16 @@ public class DeathEvent implements Listener {
 			p.getWorld().strikeLightningEffect(p.getLocation());
 			if(enableLiveWithRegret){
 				if(timerM.isPVPEnabled()==false){
-					if(numberOfDeaths.get(p.getUniqueId())==0){
+					if(numberOfDeaths.containsKey(p.getUniqueId())==false){
+						numberOfDeaths.put(p.getUniqueId(), 1);
+						p.setHealth(p.getMaxHealth());
+						potionS.giveAPlayerARandomPotion(p, Integer.MAX_VALUE);
+						e.setDeathMessage(teamM.getColorOfPlayer(p) + p.getName() + ChatColor.GRAY + " has died and respawned with debuffs.");
 						if(teamM.isTeamsEnabled()){
-							p.setHealth(p.getMaxHealth());
 							scatterM.lateScatterAPlayerInATeam(teamM.getTeamOfPlayer(p), p);
-							potionS.lateGiveAPlayerAPotion(p, Integer.MAX_VALUE);
-							e.setDeathMessage(teamM.getColorOfPlayer(p) + p.getName() + ChatColor.GRAY + " has died and respawned with debuffs.");
-							if(numberOfDeaths.containsKey(p.getUniqueId())){
-								numberOfDeaths.replace(p.getUniqueId(), (numberOfDeaths.get(p.getUniqueId())+1));
-							}
-							else{
-								numberOfDeaths.put(p.getUniqueId(), 1);
-							}
-
 						}
 						else if(teamM.isFFAEnabled()){
-							p.setHealth(p.getMaxHealth());
-							scatterM.lateScatterAPlayerInFFA(p);
-							potionS.lateGiveAPlayerAPotion(p, Integer.MAX_VALUE);
-							e.setDeathMessage(teamM.getColorOfPlayer(p) + p.getName() + ChatColor.GRAY + " has died and respawned with debuffs.");						}
+							scatterM.lateScatterAPlayerInFFA(p);					}
 						else{
 							playerDied(p, e);
 						}

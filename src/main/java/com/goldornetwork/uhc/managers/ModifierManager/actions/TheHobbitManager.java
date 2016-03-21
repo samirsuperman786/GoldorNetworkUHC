@@ -32,6 +32,7 @@ public class TheHobbitManager implements Listener{
 	public void enableTheHobbit(boolean val){
 		this.enableTheHobbit=val;
 	}
+	
 
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -41,14 +42,10 @@ public class TheHobbitManager implements Listener{
 			if(timerM.hasCountDownEnded()){
 				if(teamM.isPlayerInGame(p)){
 					if(p.getItemInHand().equals(Material.GOLD_NUGGET)){
-						if(p.getItemInHand().hasItemMeta()){
-							if(p.getItemInHand().getItemMeta().hasDisplayName()){
-								if(p.getItemInHand().getItemMeta().getDisplayName().equals("The Magic Ring of Invisibility")){
+						if(p.getItemInHand().getItemMeta().getDisplayName().equals("The Magic Ring of Invisibility")){
 									p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 30*20, 1));
 									p.getInventory().remove(p.getItemInHand());
 									ms.send(ChatColor.GOLD, p, "You have activated your invisibility ring!");
-								}
-							}
 						}
 					}
 				}

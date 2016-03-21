@@ -35,10 +35,11 @@ public class PotionSwap implements Runnable {
 	public List<UUID> getLatePotionPlayers(){
 		return latePotionPlayers;
 	}
-	public void lateGiveAPlayerAPotion(Player p){
+	public void giveAPlayerARandomPotion(Player p){
 		p.addPotionEffect(new PotionEffect(getRandomPotion(), 6000, 1));
+		p.getWorld().playEffect(p.getLocation(), Effect.POTION_BREAK, 10);
 	}
-	public void lateGiveAPlayerAPotion(Player p, int durationInSeconds){
+	public void giveAPlayerARandomPotion(Player p, int durationInSeconds){
 		p.addPotionEffect(new PotionEffect(getRandomPotion(), durationInSeconds*20, 1));
 	}
 	
@@ -78,6 +79,7 @@ public class PotionSwap implements Runnable {
 				break;
 		case 13: potion = PotionEffectType.WEAKNESS;
 				break;
+		default: Bukkit.getServer().getLogger().info("Unexpected error at executing PotionSwap");
 		
 		}
 		return potion;
@@ -89,9 +91,7 @@ public class PotionSwap implements Runnable {
 		if(enablePotionSwap){
 			for(UUID u : teamM.getPlayersInGame()){
 				if(Bukkit.getServer().getPlayer(u).isOnline()){
-					PotionEffectType potion = getRandomPotion();
-					Bukkit.getServer().getPlayer(u).addPotionEffect(new PotionEffect(potion, 6000, 1));
-					Bukkit.getServer().getPlayer(u).getWorld().playEffect(Bukkit.getServer().getPlayer(u).getLocation(), Effect.POTION_BREAK, 10);
+					giveAPlayerARandomPotion(Bukkit.getServer().getPlayer(u));
 				}
 				else{
 					latePotionPlayers.add(u);

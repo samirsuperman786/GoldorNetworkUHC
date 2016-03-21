@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
+
 import com.goldornetwork.uhc.listeners.JoinEvent;
 import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.BowListener;
@@ -102,7 +104,7 @@ public class ModifierManager {
 					break;
 			case TICKTOCK: //last player to have killed someone will regenerate 1 heart every minute
 					break;
-			
+			default: Bukkit.getServer().getLogger().info("Unexpected error at executing enableGamemode");
 		}
 		
 		
@@ -121,7 +123,7 @@ public class ModifierManager {
 	
 	private void potionSwap(boolean val){
 		potionS.enablePotionSwap(val);
-		
+		joinE.enablePotionSwap(val);
 	}
 	private void liveWithRegret(boolean val){
 		

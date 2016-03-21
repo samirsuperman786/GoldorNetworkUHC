@@ -32,7 +32,7 @@ public class JoinEvent implements Listener{
 	private boolean enableGoneFishing;
 	private boolean enableTheHobbit;
 	private boolean enableSkyHigh;
-	
+	private boolean enablePotionSwap;
 	public static JoinEvent getInstance(){
 		return instance;
 	}
@@ -51,15 +51,19 @@ public class JoinEvent implements Listener{
 	public void enableSkyHigh(boolean val){
 		this.enableSkyHigh=val;
 	}
-	
+	public void enablePotionSwap(boolean val){
+		this.enablePotionSwap=val;
+	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onJoin(PlayerJoinEvent e){
 		Player p = e.getPlayer();
 		if(timerM.hasMatchStarted()){
-			if(potionS.getLatePotionPlayers().contains(p.getUniqueId())){
-				potionS.lateGiveAPlayerAPotion(p);
-				potionS.removePlayerFromLateGive(p);
+			if(enablePotionSwap){
+				if(potionS.getLatePotionPlayers().contains(p.getUniqueId())){
+					potionS.giveAPlayerARandomPotion(p);
+					potionS.removePlayerFromLateGive(p);
+				}
 			}
 			if(enableGoneFishing){
 				if(timerM.getLateGoneFishing().contains(p.getUniqueId())){
@@ -92,7 +96,7 @@ public class JoinEvent implements Listener{
 				if(enableKings){
 					if(kingM.getLateKings().contains(p.getUniqueId())){
 						ms.send(ChatColor.GREEN, p, "You have received your king items!");
-						kingM.lateGiveAPlayerKingItems(p);
+						kingM.giveAPlayerKingItems(p);
 						kingM.removePlayerFromLateKings(p);
 					}
 				}

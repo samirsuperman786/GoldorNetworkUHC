@@ -14,10 +14,7 @@ public class ChunkGenerator implements Runnable{
 	private static ChunkGenerator instance = new ChunkGenerator();
 	private MessageSender ms = new MessageSender();
 	
-	//
-	private static Runtime rt = Runtime.getRuntime();
-	private static int fillMemoryTolerance = 500;
-	//
+	
 	private Location center;
 	private int radius;
 	private World world;
@@ -86,13 +83,7 @@ public class ChunkGenerator implements Runnable{
 		}
 	}
 	
-	public int availableMemory(){
-		return (int) ((rt.maxMemory() - rt.totalMemory() + rt.freeMemory())/1048576);
-	}
 	
-	public boolean availableMemoryTooLow(){
-		return availableMemory()< fillMemoryTolerance;
-	}
 	
 
 	@Override
@@ -112,9 +103,7 @@ public class ChunkGenerator implements Runnable{
 				if(duration %300 ==0){//updates every 5 minutes
 					ms.broadcast((getTimeTillCompleteInMinutes() - (chunksLeft/chunksPerRun))/60 + " minutes until \"" + world.getName() +"\" will finish rendering." );
 				}
-				if(availableMemoryTooLow()){ //pause here
-					return;
-				}
+				
 				else{
 					for(int c = 0; c< chunksPerRun; c++){
 						if(k <((radius/16) * (radius/16) *4)){

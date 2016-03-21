@@ -44,7 +44,7 @@ public class KingsManager {
 	public List<UUID> getLateKings(){
 		return lateKings;
 	}
-	public void lateGiveAPlayerKingItems(Player King){
+	public void giveAPlayerKingItems(Player King){
 		King.getInventory().addItem(new ItemStack(Material.DIAMOND_SWORD,1));
 		King.getInventory().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
 		King.getInventory().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
@@ -64,31 +64,35 @@ public class KingsManager {
 				enableKings = false;
 			}
 			else if(teamM.isTeamsEnabled()){
+				distibruteItemsToTeams();
 				
-				for(String team : teamM.getListOfTeams()){
-					Random random = new Random();
-					OfflinePlayer king = Bukkit.getServer().getOfflinePlayer(teamM.getPlayersOnATeam(team).get(random.nextInt(teamM.getPlayersOnATeam(team).size())));
-					for(UUID u : teamM.getPlayersOnATeam(team)){
-						if(Bukkit.getServer().getPlayer(u).isOnline()){
-							ms.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.GOLD, "Your king is " + teamM.getColorOfTeam(team) + king.getName());
-						}
-					}
-					if(king.isOnline()){
-						Player King = (Player) king;
-						King.getInventory().addItem(new ItemStack(Material.DIAMOND_SWORD,1));
-						King.getInventory().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-						King.getInventory().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
-						King.getInventory().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
-						King.getInventory().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-					}
-					else if(king.isOnline()==false){
-						lateKings.add(king.getUniqueId());
-					}
-				}
 			}
 		}
 		
 	}
+
+	private void distibruteItemsToTeams() {
+		
+		for(String team : teamM.getListOfTeams()){
+			Random random = new Random();
+			OfflinePlayer king = Bukkit.getServer().getOfflinePlayer(teamM.getPlayersOnATeam(team).get(random.nextInt(teamM.getPlayersOnATeam(team).size())));
+			for(UUID u : teamM.getPlayersOnATeam(team)){
+				if(Bukkit.getServer().getPlayer(u).isOnline()){
+					ms.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.GOLD, "Your king is " + teamM.getColorOfTeam(team) + king.getName());
+				}
+			}
+			if(king.isOnline()){
+				Player King = (Player) king;
+				giveAPlayerKingItems(King);
+			}
+			else if(king.isOnline()==false){
+				lateKings.add(king.getUniqueId());
+			}
+		}
+		
+	}
+	
+	
 	
 	
 	
