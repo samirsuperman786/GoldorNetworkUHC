@@ -22,8 +22,10 @@ import com.goldornetwork.uhc.managers.ModifierManager.ModifierManager;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.BowListener;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.DealDamage;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.DeathEvent;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.DisabledCrafting;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.KingsManager;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.PotionSwap;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.TheHobbitManager;
 
 public class UHC extends JavaPlugin {
 
@@ -64,7 +66,6 @@ public class UHC extends JavaPlugin {
 		ModifierManager.getInstance().setup();
 		TimerManager.getInstance().setup();
 		TeamManager.getInstance().setup();
-		ScatterManager.getInstance().setup();
 		JoinEvent.getInstance().setup();
 		BreakEvent.getInstance().setup();
 		
@@ -85,6 +86,8 @@ public class UHC extends JavaPlugin {
 		Bukkit.getServer().getPluginManager().registerEvents(BreakEvent.getInstance(), this);
 		Bukkit.getServer().getPluginManager().registerEvents(BowListener.getInstance(), this);
 		Bukkit.getServer().getPluginManager().registerEvents(DeathEvent.getInstance(), this);
+		Bukkit.getServer().getPluginManager().registerEvents(TheHobbitManager.getInstance(), this);
+		Bukkit.getServer().getPluginManager().registerEvents(DisabledCrafting.getInstance(), this);
 	}
 
 	

@@ -26,9 +26,13 @@ public class JoinEvent implements Listener{
 	private MessageSender ms = new MessageSender();
 	private PotionSwap potionS = PotionSwap.getInstance();
 	private KingsManager kingM = KingsManager.getInstance();
-	private boolean enableKings;
 	
-
+	
+	private boolean enableKings;
+	private boolean enableGoneFishing;
+	private boolean enableTheHobbit;
+	private boolean enableSkyHigh;
+	
 	public static JoinEvent getInstance(){
 		return instance;
 	}
@@ -38,6 +42,16 @@ public class JoinEvent implements Listener{
 	public void enableKings(boolean val){
 		this.enableKings= val;
 	}
+	public void enableGoneFishing(boolean val){
+		this.enableGoneFishing = val;
+	}
+	public void enableTheHobbit(boolean val){
+		this.enableTheHobbit=val;
+	}
+	public void enableSkyHigh(boolean val){
+		this.enableSkyHigh=val;
+	}
+	
 	
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onJoin(PlayerJoinEvent e){
@@ -47,6 +61,27 @@ public class JoinEvent implements Listener{
 				potionS.lateGiveAPlayerAPotion(p);
 				potionS.removePlayerFromLateGive(p);
 			}
+			if(enableGoneFishing){
+				if(timerM.getLateGoneFishing().contains(p.getUniqueId())){
+					timerM.lateGiveAPlayerGoneFishingItems(p);
+					timerM.removeAPlayerFromLateGoneFishing(p);
+				}
+			}
+			if(enableTheHobbit){
+				if(timerM.getLateHobbits().contains(p.getUniqueId())){
+					timerM.lateGiveAPlayerHobbitItems(p);
+					timerM.removePlayerFromLateHobbits(p);
+				}
+			}
+			if(enableSkyHigh){
+				if(timerM.getLateSkyHigh().contains(p.getUniqueId())){
+					timerM.lateGiveAPlayerSkyHighItems(p);
+					timerM.removePlayerFromLateSkyHigh(p);
+				}
+			}
+		
+			
+			
 			if(teamM.isFFAEnabled()){
 				if(scatterM.getLateScatters().contains(p.getUniqueId())){
 					scatterM.lateScatterAPlayerInFFA(p);
@@ -56,6 +91,7 @@ public class JoinEvent implements Listener{
 			else if(teamM.isTeamsEnabled()){
 				if(enableKings){
 					if(kingM.getLateKings().contains(p.getUniqueId())){
+						ms.send(ChatColor.GREEN, p, "You have received your king items!");
 						kingM.lateGiveAPlayerKingItems(p);
 						kingM.removePlayerFromLateKings(p);
 					}

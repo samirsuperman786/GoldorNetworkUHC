@@ -4,12 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
-
+import com.goldornetwork.uhc.listeners.JoinEvent;
+import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.BowListener;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.DeathEvent;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.DisabledCrafting;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.KingsManager;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.PotionSwap;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.TheHobbitManager;
 
 public class ModifierManager {
 
@@ -19,6 +21,10 @@ public class ModifierManager {
 	private PotionSwap potionS = PotionSwap.getInstance();
 	private KingsManager kingM = KingsManager.getInstance();
 	private DeathEvent deathE = DeathEvent.getInstance();
+	private TimerManager timerM= TimerManager.getInstance();
+	private TheHobbitManager hobbitM = TheHobbitManager.getInstance();
+	private DisabledCrafting disabledC = DisabledCrafting.getInstance();
+	private JoinEvent joinE = JoinEvent.getInstance();
 	//
 	
 	private Map<String, List<String>> options = new HashMap<String, List<String>>();
@@ -42,14 +48,14 @@ public class ModifierManager {
 		BLOCKRUSH, BIGCRACK, TICKTOCK
 		
 	}
-	/* Skyhigh needs work on damagetick
+	/* Skyhigh needs work on damagetick 
 	 * switcheroo is done	
 	 * rewardinglongshots is done
 	 * potioonswap is done
 	 * livewith regret needs work on custom death messages
-	 * kings not done
-	 * killswitch not done
-	 * thehobbit not done
+	 * kings is done
+	 * killswitch is done
+	 * thehobbit is done
 	 * gonefishing not done
 	 * flowerpower not done
 	 * landisbad not done
@@ -82,9 +88,9 @@ public class ModifierManager {
 					break;
 			case KILLSWITCH: killSwitch(true); //you take your victim's inventory when you kill them
 					break;
-			case THEHOBBIT:  //everyone gets a golden nugget, and when clicked you get invis for 30 sec and its gone
+			case THEHOBBIT: theHobbit(true); //everyone gets a golden nugget, and when clicked you get invis for 30 sec and its gone
 					break;
-			case GONEFISHING: //INFINITE LEVELS, 20 ANVILS, FISHING ROD WITH LOFTS 250 & UNBREAKING 150, ENCHANT TABLES DISABLED
+			case GONEFISHING: goneFishing(true); //INFINITE LEVELS, 20 ANVILS, FISHING ROD WITH LOFTS 250 & UNBREAKING 150, ENCHANT TABLES DISABLED
 					break;
 			case FLOWERPOWER: //WHEN YOU BREAK A FLOWER YOU GET A RANDOM AMOUNT OF A RANDOM ITEM
 					break;
@@ -103,7 +109,8 @@ public class ModifierManager {
 	}
 	
 	private void skyHigh(boolean val){
-		
+		timerM.enableSkyHigh(val);
+		joinE.enableSkyHigh(val);
 	}
 	private void switcheroo(boolean val){
 		bowListener.enableSwitcheroo(val);
@@ -121,10 +128,23 @@ public class ModifierManager {
 	}
 	private void kings(boolean val){
 		kingM.enableKings(val);
+		
 	}
 	
 	private void killSwitch(boolean val){
 		deathE.enableKillSwitch(val);
+	}
+	
+	private void theHobbit(boolean val){
+		joinE.enableTheHobbit(val);
+		timerM.enableTheHobbit(val);
+		hobbitM.enableTheHobbit(val);
+	}
+	
+	private void goneFishing(boolean val){
+		disabledC.enableGoneFishing(val);
+		joinE.enableGoneFishing(val);
+		timerM.enableGoneFishing(val);
 	}
 	
 }

@@ -8,12 +8,17 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class ScatterManager implements Runnable {
 	
@@ -71,7 +76,17 @@ public class ScatterManager implements Runnable {
 					e.remove();
 				}
 			}
-			//chunkG.loadGenerator(getUHCWorld(), getUHCWorld().getWorldBorder().getCenter(), 1008, 5);
+			ItemStack given = new ItemStack(Material.FISHING_ROD, 1);
+			ItemMeta im = given.getItemMeta();
+			im.addEnchant(Enchantment.LUCK, 250, true);
+			im.addEnchant(Enchantment.LURE, 250, true);
+			im.addEnchant(Enchantment.DURABILITY, 150, true);
+			given.setItemMeta(im);
+			for(Player p : Bukkit.getServer().getOnlinePlayers()){
+				p.getInventory().addItem(new ItemStack(Material.ANVIL, 20));
+				p.getInventory().addItem(given);
+				p.giveExpLevels(Integer.MAX_VALUE);
+			}
 		
 			
 			

@@ -1,13 +1,26 @@
 package com.goldornetwork.uhc.managers;
 
-import org.bukkit.ChatColor;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import com.goldornetwork.uhc.listeners.JoinEvent;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class TimerManager implements Runnable {
 	
 	private static TimerManager instance = new TimerManager();
-	MessageSender ms = new MessageSender();
+	private TeamManager teamM = TeamManager.getInstance();
+	private MessageSender ms = new MessageSender();
+	private JoinEvent joinE = JoinEvent.getInstance();
 
 	private int timeTillMatchStart;
 	
@@ -22,6 +35,17 @@ public class TimerManager implements Runnable {
 	
 	private boolean isPVPEnabled;
 	
+	//
+	private boolean enableTheHobbit;
+	private boolean enableSkyHigh;
+	private boolean enableGoneFishing;
+	
+	private List<UUID> lateHobbits = new ArrayList<UUID>();
+	private List<UUID> lateSkyHigh = new ArrayList<UUID>();
+	private List <UUID> lateGoneFishing = new ArrayList<UUID>();
+	
+	
+	//
 	public static TimerManager getInstance(){
 		return instance;
 	}
@@ -33,6 +57,8 @@ public class TimerManager implements Runnable {
 		matchStart=false;
 		startPVPTimer=false;
 		isPVPEnabled=false;
+		enableTheHobbit=false;
+		enableSkyHigh=false;
 	}
 	
 	public void startMatch(boolean start, int timeTillMatchStarts, int timeTillPVPStarts){
@@ -59,6 +85,63 @@ public class TimerManager implements Runnable {
 	public boolean isPVPEnabled(){
 		return isPVPEnabled;
 	}
+	public void enableTheHobbit(boolean val){
+		this.enableTheHobbit = val;
+	}
+	public void enableSkyHigh(boolean val){
+		this.enableSkyHigh=val;
+	}
+	public void enableGoneFishing(boolean val){
+		this.enableGoneFishing=val;
+	}
+	public List<UUID> getLateHobbits(){
+		return lateHobbits;
+	}
+	public void removePlayerFromLateHobbits(Player p){
+		lateHobbits.remove(p.getUniqueId());
+	}
+	public void lateGiveAPlayerHobbitItems(Player p){
+		ItemStack given = new ItemStack(Material.GOLD_NUGGET,1);
+		ItemMeta im = given.getItemMeta();
+		im.setDisplayName(ChatColor.AQUA + "The Magic Ring of Invisibility");
+		given.setItemMeta(im);
+		p.getInventory().addItem(given);
+	}
+	
+	public List<UUID> getLateSkyHigh(){
+		return lateSkyHigh;
+	}
+	
+	public void removePlayerFromLateSkyHigh(Player p){
+		lateSkyHigh.remove(p.getUniqueId());
+	}
+	public void lateGiveAPlayerSkyHighItems(Player p){
+		p.getInventory().addItem(new ItemStack(Material.DIAMOND_SPADE, 1));
+		p.getInventory().addItem(new ItemStack(Material.PUMPKIN, 10));
+		p.getInventory().addItem(new ItemStack(Material.STAINED_CLAY, 64, (short) 13)); //green
+		p.getInventory().addItem(new ItemStack(Material.STAINED_CLAY, 64, (short) 11));	//blue
+		p.getInventory().addItem(new ItemStack(Material.SNOW_BLOCK, 64));
+		p.getInventory().addItem(new ItemStack(Material.STRING, 2));
+	}
+	
+	public List<UUID> getLateGoneFishing(){
+		return lateGoneFishing;
+	}
+	public void removeAPlayerFromLateGoneFishing(Player p){
+		lateGoneFishing.remove(p);
+	}
+	
+	public void lateGiveAPlayerGoneFishingItems(Player p){
+		ItemStack given = new ItemStack(Material.FISHING_ROD, 1);
+		ItemMeta im = given.getItemMeta();
+		im.addEnchant(Enchantment.LUCK, 250, true);
+		im.addEnchant(Enchantment.LURE, 250, true);
+		im.addEnchant(Enchantment.DURABILITY, 150, true);
+		given.setItemMeta(im);
+		p.getInventory().addItem(new ItemStack(Material.ANVIL, 20));
+		p.getInventory().addItem(given);
+		p.setExp(Integer.MAX_VALUE);
+	}
 	
 	@Override
 	public void run() {
@@ -82,6 +165,59 @@ public class TimerManager implements Runnable {
 			}
 			else if(timeTillMatchStart == 0){
 				ms.broadcast("Match has started!");
+				if(enableTheHobbit){
+					ItemStack given = new ItemStack(Material.GOLD_NUGGET,1);
+					ItemMeta im = given.getItemMeta();
+					im.setDisplayName(ChatColor.AQUA + "The Magic Ring of Invisibility");
+					given.setItemMeta(im);
+					for(UUID u : teamM.getPlayersInGame()){
+						if(Bukkit.getServer().getPlayer(u).isOnline()){
+							Player p = Bukkit.getServer().getPlayer(u);
+							p.getInventory().addItem(given);
+						}
+						else{
+							lateHobbits.add(u);
+						}
+					}
+				}
+				if(enableSkyHigh){
+					for(UUID u : teamM.getPlayersInGame()){
+						if(Bukkit.getServer().getPlayer(u).isOnline()){
+							Player p = Bukkit.getServer().getPlayer(u);
+							p.getInventory().addItem(new ItemStack(Material.DIAMOND_SPADE, 1));
+							p.getInventory().addItem(new ItemStack(Material.PUMPKIN, 10));
+							p.getInventory().addItem(new ItemStack(Material.STAINED_CLAY, 64, (short) 13)); //green
+							p.getInventory().addItem(new ItemStack(Material.STAINED_CLAY, 64, (short) 11));	//blue
+							p.getInventory().addItem(new ItemStack(Material.SNOW_BLOCK, 64));
+							p.getInventory().addItem(new ItemStack(Material.STRING, 2));
+						}
+						else{
+							lateSkyHigh.add(u);
+						}
+					}
+				}
+				if(enableGoneFishing){
+					ItemStack given = new ItemStack(Material.FISHING_ROD, 1);
+					ItemMeta im = given.getItemMeta();
+					im.addEnchant(Enchantment.LUCK, 250, true);
+					im.addEnchant(Enchantment.LURE, 250, true);
+					im.addEnchant(Enchantment.DURABILITY, 150, true);
+					given.setItemMeta(im);
+					for(UUID u : teamM.getPlayersInGame()){//INFINITE LEVELS, 20 ANVILS, FISHING ROD WITH LOFTS 250 & UNBREAKING 150, ENCHANT TABLES DISABLED
+						if(Bukkit.getServer().getPlayer(u).isOnline()){
+							Player p = Bukkit.getServer().getPlayer(u);
+							p.getInventory().addItem(new ItemStack(Material.ANVIL, 20));
+							p.getInventory().addItem(given);
+							p.setExp(Integer.MAX_VALUE);
+							
+						}
+						else{
+							lateGoneFishing.add(u);
+						}
+					}
+				}
+				
+				
 				hasMatchBegun = true;
 				startPVPTimer= true;
 				startMatch =false;
