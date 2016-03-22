@@ -27,6 +27,9 @@ public class BreakEvent implements Listener{
 	public static BreakEvent getInstance(){
 		return instance;
 	}
+	public void setup(){
+		amountOfDiamondsMined.clear();
+	}
 	
 	
 	

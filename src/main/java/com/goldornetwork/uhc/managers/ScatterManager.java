@@ -8,15 +8,22 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class ScatterManager implements Runnable {
 	
 	private static ScatterManager instance = new ScatterManager();
+	private ChunkGenerator chunkG = ChunkGenerator.getInstance();
 	
 	private boolean startScattering;
 	
@@ -26,7 +33,7 @@ public class ScatterManager implements Runnable {
 	
 	private boolean scatterComplete;
 	
-	private int radius = 200;//todo remove
+	private int radius;//todo remove
 	
 	private Map<String, List<UUID>> teamToScatter = new HashMap<String, List<UUID>>();
 	
@@ -43,11 +50,23 @@ public class ScatterManager implements Runnable {
 	}
 	
 	public void setup(){
-		
+		//TODO make below false
+		getUHCWorld().setPVP(true);
+		getUHCWorld().setGameRuleValue("doMobSpawning", "false");
+		startScattering=false;
+		scatterTeam=false;
+		scatterFFA=false;
+		scatterComplete=false;
+		radius=1000;
+		teamToScatter.clear();
+		locationsOfTeamSpawn.clear();
+		lateScatters.clear();
+		nameOfTeams.clear();
+		FFAToScatter.clear();
 		WorldBorder wb = getUHCWorld().getWorldBorder();
 			wb.setCenter(getUHCWorld().getSpawnLocation());
 			wb.setSize(radius*2);
-			wb.setSize(50, 120);
+			//wb.setSize(50, 120); use this to shrink border
 			wb.setDamageBuffer(0);
 			wb.setDamageAmount(.5);
 			wb.setWarningTime(15);
@@ -57,6 +76,19 @@ public class ScatterManager implements Runnable {
 					e.remove();
 				}
 			}
+			ItemStack given = new ItemStack(Material.FISHING_ROD, 1);
+			ItemMeta im = given.getItemMeta();
+			im.addEnchant(Enchantment.LUCK, 250, true);
+			im.addEnchant(Enchantment.LURE, 250, true);
+			im.addEnchant(Enchantment.DURABILITY, 150, true);
+			given.setItemMeta(im);
+			for(Player p : Bukkit.getServer().getOnlinePlayers()){
+				p.getInventory().addItem(new ItemStack(Material.ANVIL, 20));
+				p.getInventory().addItem(given);
+				p.giveExpLevels(Integer.MAX_VALUE);
+			}
+		
+			
 			
 	}
 	
@@ -65,7 +97,6 @@ public class ScatterManager implements Runnable {
 		this.radius = radius;
 		scatterFFA=false;
 		scatterTeam=true;
-		
 	}
 	
 	public void scatterFFA(List<UUID> p, Integer radius){
@@ -104,7 +135,6 @@ public class ScatterManager implements Runnable {
 	public boolean isScatteringComplete(){
 		return scatterComplete;
 	}
-	
 	public World getUHCWorld(){
 		return Bukkit.getServer().getWorld("lol");
 	}

@@ -60,7 +60,7 @@ public class InvitePlayerCommand implements CommandExecutor{
 		}
 		else {
 			teamM.invitePlayer(p, Bukkit.getServer().getPlayer(args[0]));
-			ms.alertMessage(Bukkit.getServer().getPlayer(args[0]), ChatColor.GREEN, "You have been invited to team " + teamM.getColorOfTeam(teamM.getTeamOfPlayer(p)) + teamM.getTeamOfPlayer(p) + ChatColor.GREEN + " by " + teamM.getColorOfTeam(teamM.getTeamOfPlayer(p) + p.getName()));
+			ms.alertMessage(Bukkit.getServer().getPlayer(args[0]), ChatColor.GREEN, "You have been invited to team " + teamM.getColorOfPlayer(p) + teamM.getTeamOfPlayer(p) + ChatColor.GREEN + " by " + teamM.getColorOfPlayer(p) + p.getName());
 			ms.alertMessage(p, ChatColor.GREEN, "You have invited player " + Bukkit.getServer().getPlayer(args[0]).getName());
 			return true;
 		}
