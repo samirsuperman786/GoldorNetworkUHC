@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.inventory.ItemStack;
 
+import com.goldornetwork.uhc.listeners.BreakEvent;
 import com.goldornetwork.uhc.listeners.JoinEvent;
 import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.BowListener;
@@ -27,6 +29,7 @@ public class ModifierManager {
 	private TheHobbitManager hobbitM = TheHobbitManager.getInstance();
 	private DisabledCrafting disabledC = DisabledCrafting.getInstance();
 	private JoinEvent joinE = JoinEvent.getInstance();
+	private BreakEvent breakE = BreakEvent.getInstance();
 	//
 	
 	private Map<String, List<String>> options = new HashMap<String, List<String>>();
@@ -58,8 +61,8 @@ public class ModifierManager {
 	 * kings is done
 	 * killswitch is done
 	 * thehobbit is done
-	 * gonefishing not done
-	 * flowerpower not done
+	 * gonefishing is pretty much done TODO edit server config
+	 * flowerpower almost done TODO add more restrictions on drops
 	 * landisbad not done
 	 * blockrush not done
 	 * bigcrack not dome
@@ -94,7 +97,7 @@ public class ModifierManager {
 					break;
 			case GONEFISHING: goneFishing(true); //INFINITE LEVELS, 20 ANVILS, FISHING ROD WITH LOFTS 250 & UNBREAKING 150, ENCHANT TABLES DISABLED
 					break;
-			case FLOWERPOWER: //WHEN YOU BREAK A FLOWER YOU GET A RANDOM AMOUNT OF A RANDOM ITEM
+			case FLOWERPOWER: flowerPower(true);//WHEN YOU BREAK A FLOWER YOU GET A RANDOM AMOUNT OF A RANDOM ITEM
 					break;
 			case LANDISBAD: //overpowered mobs spawn on land, the only safe place is underwater, NO Breathing damage		
 					break;
@@ -147,6 +150,10 @@ public class ModifierManager {
 		disabledC.enableGoneFishing(val);
 		joinE.enableGoneFishing(val);
 		timerM.enableGoneFishing(val);
+		breakE.addDisallowedItems(new ItemStack(125));//enchant table
+	}
+	private void flowerPower(boolean val){
+		breakE.enableFlowerPower(val);
 	}
 	
 }

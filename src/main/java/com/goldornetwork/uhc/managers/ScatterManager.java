@@ -127,6 +127,10 @@ public class ScatterManager implements Runnable {
 	public void lateScatterAPlayerInATeam(String team, Player p){
 		p.teleport(locationsOfTeamSpawn.get(team.toLowerCase()));
 	}
+	public void removePlayerFromLateScatters(Player p){
+		lateScatters.remove(p.getUniqueId());
+	}
+	
 	
 	public List<UUID> getLateScatters(){
 		return this.lateScatters;

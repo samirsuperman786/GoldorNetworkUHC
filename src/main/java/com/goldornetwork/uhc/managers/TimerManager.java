@@ -20,7 +20,6 @@ public class TimerManager implements Runnable {
 	private static TimerManager instance = new TimerManager();
 	private TeamManager teamM = TeamManager.getInstance();
 	private MessageSender ms = new MessageSender();
-	private JoinEvent joinE = JoinEvent.getInstance();
 
 	private int timeTillMatchStart;
 	
