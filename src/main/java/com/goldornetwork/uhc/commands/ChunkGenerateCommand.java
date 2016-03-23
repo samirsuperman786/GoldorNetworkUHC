@@ -14,11 +14,12 @@ import com.goldornetwork.uhc.utils.MessageSender;
 
 public class ChunkGenerateCommand implements CommandExecutor{
 
+	//instances
 	private TimerManager timerM = TimerManager.getInstance();
 	private MessageSender ms = new MessageSender();
 	private ChunkGenerator chunkG = ChunkGenerator.getInstance();
-	
-	
+
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		if(!(sender.hasPermission("uhc.generate"))){
@@ -48,7 +49,7 @@ public class ChunkGenerateCommand implements CommandExecutor{
 						else{
 							return false;
 						}
-						
+
 					}
 					else{
 						if(Integer.valueOf(args[1])!=null){
@@ -62,7 +63,7 @@ public class ChunkGenerateCommand implements CommandExecutor{
 							return false;
 						}
 					}
-				
+
 				}
 				else{
 					ms.send(ChatColor.RED, sender, "World " + args[0] + " does not exist!" );
@@ -72,14 +73,14 @@ public class ChunkGenerateCommand implements CommandExecutor{
 			else{
 				return false;
 			}
-		
+
 		}
 		else{
 			return false;
 		}
-		
-	
-		
+
+
+
 	}
 
 }

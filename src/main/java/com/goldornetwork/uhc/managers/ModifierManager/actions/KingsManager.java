@@ -15,17 +15,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.goldornetwork.uhc.listeners.JoinEvent;
-import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
+import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class KingsManager {
 
 	private static KingsManager instance = new KingsManager();
-	private ScatterManager scatterM = ScatterManager.getInstance();
 	private TeamManager teamM = TeamManager.getInstance();
 	private MessageSender ms = new MessageSender();
 	private JoinEvent joinE = JoinEvent.getInstance();
+	private TimerManager timerM = TimerManager.getInstance();
 	
 	private Map<String, UUID> listOfKings = new HashMap<String, UUID>();
 	private List<UUID> lateKings = new ArrayList<UUID>();
@@ -64,17 +64,17 @@ public class KingsManager {
 				enableKings = false;
 			}
 			else if(teamM.isTeamsEnabled()){
-				distibruteItemsToTeams();
-				
+				timerM.enableKings(val);
 			}
 		}
 		
 	}
 
-	private void distibruteItemsToTeams() {
+	public void distibruteItemsToTeams() {
 		
 		for(String team : teamM.getListOfTeams()){
 			Random random = new Random();
+			//selecting a random king
 			OfflinePlayer king = Bukkit.getServer().getOfflinePlayer(teamM.getPlayersOnATeam(team).get(random.nextInt(teamM.getPlayersOnATeam(team).size())));
 			for(UUID u : teamM.getPlayersOnATeam(team)){
 				if(Bukkit.getServer().getPlayer(u).isOnline()){

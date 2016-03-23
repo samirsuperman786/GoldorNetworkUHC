@@ -9,9 +9,11 @@ import com.goldornetwork.uhc.commands.CreateCommand;
 import com.goldornetwork.uhc.commands.InvitePlayerCommand;
 import com.goldornetwork.uhc.commands.JoinCommand;
 import com.goldornetwork.uhc.commands.StartCommand;
+import com.goldornetwork.uhc.commands.UnInvitePlayerCommand;
 import com.goldornetwork.uhc.listeners.BreakEvent;
 import com.goldornetwork.uhc.listeners.ChatEvent;
 import com.goldornetwork.uhc.listeners.JoinEvent;
+import com.goldornetwork.uhc.listeners.LeaveEvent;
 import com.goldornetwork.uhc.managers.ChunkGenerator;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.SpectatorRegionManager;
@@ -20,22 +22,22 @@ import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.ModifierManager.LocationListener;
 import com.goldornetwork.uhc.managers.ModifierManager.ModifierManager;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.BowListener;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.DealDamage;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.DeathEvent;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.DisabledCrafting;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.KingsManager;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.LandIsBadManager;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.PotionSwap;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.TheHobbitManager;
 
 public class UHC extends JavaPlugin {
 
 	public static UHC plugin;
-	
+
 	@Override
 	public void onDisable(){
-		
+
 	}
-	
+
 	@Override
 	public void onEnable(){
 		plugin = this;
@@ -52,7 +54,8 @@ public class UHC extends JavaPlugin {
 		Bukkit.getServer().getScheduler().runTaskTimer(this, LocationListener.getInstance(), 0L, 20L);
 		Bukkit.getServer().getScheduler().runTaskTimer(this, PotionSwap.getInstance(), 0L, 6000L);
 		Bukkit.getServer().getScheduler().runTaskTimer(this, ChunkGenerator.getInstance(), 0L, 20L);
-		
+		Bukkit.getServer().getScheduler().runTaskTimer(this, LandIsBadManager.getInstance(), 0L, 20L);
+
 	}
 
 	private void setup() {
@@ -68,15 +71,15 @@ public class UHC extends JavaPlugin {
 		TeamManager.getInstance().setup();
 		JoinEvent.getInstance().setup();
 		BreakEvent.getInstance().setup();
-		
 	}
-	
+
 	private void registerCommands() {
 		getCommand("start").setExecutor(new StartCommand());
 		getCommand("cancel").setExecutor(new CancelCommand());
 		getCommand("create").setExecutor(new CreateCommand());
 		getCommand("join").setExecutor(new JoinCommand());
 		getCommand("invite").setExecutor(new InvitePlayerCommand());
+		getCommand("uninvite").setExecutor(new UnInvitePlayerCommand());
 		getCommand("render").setExecutor(new ChunkGenerateCommand());
 	}
 
@@ -88,14 +91,15 @@ public class UHC extends JavaPlugin {
 		Bukkit.getServer().getPluginManager().registerEvents(DeathEvent.getInstance(), this);
 		Bukkit.getServer().getPluginManager().registerEvents(TheHobbitManager.getInstance(), this);
 		Bukkit.getServer().getPluginManager().registerEvents(DisabledCrafting.getInstance(), this);
+		Bukkit.getServer().getPluginManager().registerEvents(LeaveEvent.getInstace(), this);
 	}
 
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
 }

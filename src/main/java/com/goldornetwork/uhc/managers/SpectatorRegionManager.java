@@ -16,7 +16,7 @@ public class SpectatorRegionManager implements Runnable {
 	private TimerManager timerM = TimerManager.getInstance();
 	private ScatterManager scatterM = ScatterManager.getInstance();
 	
-	int bufferBlocks = 20;
+	int bufferBlocks = 15;
 	 
 	
 	Location center = scatterM.getUHCWorld().getWorldBorder().getCenter();

@@ -269,7 +269,6 @@ public class TeamManager {
 		boolean foundTeam = false;
 		for(Map.Entry<String, Integer> entry :playersOnCurrentTeam.entrySet()){
 			if(entry.getValue()==0){
-				
 				addPlayerToTeam(p, entry.getKey());
 				ownerOfTeam.put(entry.getKey(), p.getUniqueId());
 				foundTeam= true;
@@ -277,10 +276,13 @@ public class TeamManager {
 			}
 			
 		}
-		 if(foundTeam == false){
+		if(foundTeam==true){
+			 return true;
+		 }
+		else{
 			return false;
 		}
-		return true;
+		
 	}
 	
 	public boolean isTeamRoomToJoin(String team){
@@ -336,7 +338,14 @@ public class TeamManager {
 		
 	}
 	
-	
+	public boolean isPlayerOwner(Player p){
+		if(ownerOfTeam.containsValue(p.getUniqueId())){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
 	
 	public void addPlayerToObservers(Player p){
 		observers.add(p.getUniqueId());

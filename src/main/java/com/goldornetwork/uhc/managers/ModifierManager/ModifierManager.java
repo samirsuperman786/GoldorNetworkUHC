@@ -64,8 +64,8 @@ public class ModifierManager {
 	 * gonefishing is pretty much done TODO edit server config
 	 * flowerpower almost done TODO add more restrictions on drops
 	 * landisbad not done
-	 * blockrush not done
-	 * bigcrack not dome
+	 * blockrush is done
+	 * bigcrack not done
 	 * ticktock not done
 	 */
 	
@@ -101,7 +101,7 @@ public class ModifierManager {
 					break;
 			case LANDISBAD: //overpowered mobs spawn on land, the only safe place is underwater, NO Breathing damage		
 					break;
-			case BLOCKRUSH: //first player to break a unique block receives 1 diamond
+			case BLOCKRUSH: blockRush(true);//first player to break a unique block receives 1 diamond
 					break;
 			case BIGCRACK: //entire meetup area will be void and players must bridge over it
 					break;
@@ -154,6 +154,9 @@ public class ModifierManager {
 	}
 	private void flowerPower(boolean val){
 		breakE.enableFlowerPower(val);
+	}
+	private void blockRush(boolean val){
+		breakE.enableBlockRush(val);
 	}
 	
 }

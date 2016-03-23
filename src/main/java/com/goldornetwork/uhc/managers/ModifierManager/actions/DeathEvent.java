@@ -72,7 +72,7 @@ public class DeathEvent implements Listener {
 	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerDeath(PlayerDeathEvent e){
 		Player p = e.getEntity();
-		if(teamM.isPlayerInGame(p)==true){
+		if(teamM.isPlayerInGame(p)==true && timerM.hasCountDownEnded()){
 			p.getWorld().strikeLightningEffect(p.getLocation());
 			if(enableLiveWithRegret){
 				if(timerM.isPVPEnabled()==false){

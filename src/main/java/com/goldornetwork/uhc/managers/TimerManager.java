@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.goldornetwork.uhc.listeners.JoinEvent;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.KingsManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class TimerManager implements Runnable {
@@ -20,7 +21,9 @@ public class TimerManager implements Runnable {
 	private static TimerManager instance = new TimerManager();
 	private TeamManager teamM = TeamManager.getInstance();
 	private MessageSender ms = new MessageSender();
-
+	private KingsManager kingM = KingsManager.getInstance();
+	
+	
 	private int timeTillMatchStart;
 	
 	private int timeTillPVPStart;
@@ -38,6 +41,7 @@ public class TimerManager implements Runnable {
 	private boolean enableTheHobbit;
 	private boolean enableSkyHigh;
 	private boolean enableGoneFishing;
+	private boolean enableKings;
 	
 	private List<UUID> lateHobbits = new ArrayList<UUID>();
 	private List<UUID> lateSkyHigh = new ArrayList<UUID>();
@@ -58,6 +62,7 @@ public class TimerManager implements Runnable {
 		isPVPEnabled=false;
 		enableTheHobbit=false;
 		enableSkyHigh=false;
+		enableKings=false;
 	}
 	
 	public void startMatch(boolean start, int timeTillMatchStarts, int timeTillPVPStarts){
@@ -84,6 +89,11 @@ public class TimerManager implements Runnable {
 	public boolean isPVPEnabled(){
 		return isPVPEnabled;
 	}
+	
+	public void enableKings(boolean val){
+		this.enableKings=val;
+	}
+	
 	public void enableTheHobbit(boolean val){
 		this.enableTheHobbit = val;
 	}
@@ -164,6 +174,7 @@ public class TimerManager implements Runnable {
 			}
 			else if(timeTillMatchStart == 0){
 				ms.broadcast("Match has started!");
+				
 				if(enableTheHobbit){
 					ItemStack given = new ItemStack(Material.GOLD_NUGGET,1);
 					ItemMeta im = given.getItemMeta();
@@ -215,7 +226,9 @@ public class TimerManager implements Runnable {
 						}
 					}
 				}
-				
+				if(enableKings){
+					kingM.distibruteItemsToTeams();
+				}
 				
 				hasMatchBegun = true;
 				startPVPTimer= true;

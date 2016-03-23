@@ -16,24 +16,26 @@ import com.goldornetwork.uhc.utils.MessageSender;
 
 public class JoinEvent implements Listener{
 
+	//instances
 	private static JoinEvent instance = new JoinEvent();
-	
 	private TeamManager teamM =  TeamManager.getInstance();
 	private TimerManager timerM =  TimerManager.getInstance();
 	private ScatterManager scatterM = ScatterManager.getInstance();
 	private MessageSender ms = new MessageSender();
 	private PotionSwap potionS = PotionSwap.getInstance();
 	private KingsManager kingM = KingsManager.getInstance();
-	
-	
+
+	//storage
 	private boolean enableKings;
 	private boolean enableGoneFishing;
 	private boolean enableTheHobbit;
 	private boolean enableSkyHigh;
 	private boolean enablePotionSwap;
+
 	public static JoinEvent getInstance(){
 		return instance;
 	}
+
 	public void setup(){
 		enableKings=false;
 		enableGoneFishing=false;
@@ -56,7 +58,7 @@ public class JoinEvent implements Listener{
 	public void enablePotionSwap(boolean val){
 		this.enablePotionSwap=val;
 	}
-	
+
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onJoin(PlayerJoinEvent e){
 		Player p = e.getPlayer();
@@ -101,14 +103,14 @@ public class JoinEvent implements Listener{
 							kingM.removePlayerFromLateKings(p);
 						}
 					}
-						
+
 					if(teamM.isPlayerInGame(p) && scatterM.getLateScatters().contains(p.getUniqueId())){
 						scatterM.lateScatterAPlayerInATeam(teamM.getTeamOfPlayer(p), p);
 						scatterM.removePlayerFromLateScatters(p);
 						ms.send(ChatColor.GREEN, p, "You have been late scattered to your team spawn!");
 					}
 				}
-	
+
 			}
 			else if(teamM.isPlayerInGame(p)==false){
 				if(p.getWorld().equals(scatterM.getUHCWorld())==false){
@@ -116,18 +118,18 @@ public class JoinEvent implements Listener{
 				}
 				if(teamM.isPlayerAnObserver(p)==false){
 					teamM.addPlayerToObservers(p);
-					
+
 				}
 				ms.send(ChatColor.AQUA, p, "You are now spectating the game");
-				
+
 			}
-		
-			
-			
-			
+
+
+
+
 		}
-		
+
 	}
-	
-	
+
+
 }
