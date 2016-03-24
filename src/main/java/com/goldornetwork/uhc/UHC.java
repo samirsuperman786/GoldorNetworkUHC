@@ -31,7 +31,7 @@ import com.goldornetwork.uhc.managers.ModifierManager.actions.TheHobbitManager;
 
 public class UHC extends JavaPlugin {
 
-	public static UHC plugin;
+	private static UHC plugin;
 
 	@Override
 	public void onDisable(){
@@ -46,16 +46,19 @@ public class UHC extends JavaPlugin {
 		registerCommands();
 		registerTimers();
 	}
+	
+	public static UHC getInstance(){
+		return plugin;
+	}
 
 	private void registerTimers() {
 		Bukkit.getServer().getScheduler().runTaskTimer(this, ScatterManager.getInstance(), 0L, 20L);
 		Bukkit.getServer().getScheduler().runTaskTimer(this, TimerManager.getInstance(), 0L, 20L);
 		Bukkit.getServer().getScheduler().runTaskTimer(this, SpectatorRegionManager.getInstance(), 0L, 40L);
 		Bukkit.getServer().getScheduler().runTaskTimer(this, LocationListener.getInstance(), 0L, 20L);
-		Bukkit.getServer().getScheduler().runTaskTimer(this, PotionSwap.getInstance(), 0L, 6000L);
 		Bukkit.getServer().getScheduler().runTaskTimer(this, ChunkGenerator.getInstance(), 0L, 20L);
 		Bukkit.getServer().getScheduler().runTaskTimer(this, LandIsBadManager.getInstance(), 0L, 20L);
-
+		LocationListener.getInstance().setup(plugin);
 	}
 
 	private void setup() {

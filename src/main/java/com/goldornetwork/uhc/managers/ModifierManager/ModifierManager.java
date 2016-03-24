@@ -3,6 +3,7 @@ package com.goldornetwork.uhc.managers.ModifierManager;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
@@ -31,6 +32,7 @@ public class ModifierManager {
 	private JoinEvent joinE = JoinEvent.getInstance();
 	private BreakEvent breakE = BreakEvent.getInstance();
 	//
+	Random random = new Random();
 	
 	private Map<String, List<String>> options = new HashMap<String, List<String>>();
 	private Map<Enum<Gamemodes>, Boolean> gameModesThatAreEnabled = new HashMap<Enum<Gamemodes>, Boolean> ();
@@ -53,7 +55,7 @@ public class ModifierManager {
 		BLOCKRUSH, BIGCRACK, TICKTOCK
 		
 	}
-	/* Skyhigh needs work on damagetick 
+	/* Skyhigh is done
 	 * switcheroo is done	
 	 * rewardinglongshots is done
 	 * potioonswap is done
@@ -73,6 +75,17 @@ public class ModifierManager {
 		return gameModesThatAreEnabled;
 	}
 	
+	public void generateOptions(){
+		boolean optionsFound=false;
+		int ignore = numberOfGamemodesToEnable;
+		while(optionsFound=false){
+				Gamemodes gamemode = getRandom();
+				//TODo finish
+		}
+	}
+	private Gamemodes getRandom(){
+		return Gamemodes.values()[(int) (Math.random()*Gamemodes.values().length)];
+	}
 	
 	public void enableGamemode(Gamemodes gamemode){
 		

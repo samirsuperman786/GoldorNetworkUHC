@@ -11,9 +11,11 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitTask;
 
-import com.goldornetwork.uhc.listeners.JoinEvent;
+import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.KingsManager;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.PotionSwap;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class TimerManager implements Runnable {
@@ -22,11 +24,12 @@ public class TimerManager implements Runnable {
 	private TeamManager teamM = TeamManager.getInstance();
 	private MessageSender ms = new MessageSender();
 	private KingsManager kingM = KingsManager.getInstance();
-	
+	private PotionSwap potionS = PotionSwap.getInstance();
 	
 	private int timeTillMatchStart;
 	
 	private int timeTillPVPStart;
+	
 	private boolean startMatch;
 	
 	private boolean hasMatchBegun;
@@ -42,6 +45,7 @@ public class TimerManager implements Runnable {
 	private boolean enableSkyHigh;
 	private boolean enableGoneFishing;
 	private boolean enableKings;
+	private boolean enablePotionSwap;
 	
 	private List<UUID> lateHobbits = new ArrayList<UUID>();
 	private List<UUID> lateSkyHigh = new ArrayList<UUID>();
@@ -53,21 +57,23 @@ public class TimerManager implements Runnable {
 		return instance;
 	}
 	public void setup(){
+		hasMatchBegun=false;
 		timeTillMatchStart=-2;
 		timeTillPVPStart=-2;
 		startMatch=false;
-		hasMatchBegun=false;
 		matchStart=false;
 		startPVPTimer=false;
 		isPVPEnabled=false;
 		enableTheHobbit=false;
 		enableSkyHigh=false;
 		enableKings=false;
+		enablePotionSwap=false;
 	}
 	
 	public void startMatch(boolean start, int timeTillMatchStarts, int timeTillPVPStarts){
 		timeTillMatchStart = timeTillMatchStarts;
 		this.timeTillPVPStart= timeTillPVPStarts;
+		hasMatchBegun=false;
 		isPVPEnabled= false;
 		matchStart = true;
 		startMatch =true;
@@ -83,13 +89,20 @@ public class TimerManager implements Runnable {
 	}
 	
 	public boolean hasCountDownEnded(){
-		return hasMatchBegun;
+		if(hasMatchBegun){
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 	
 	public boolean isPVPEnabled(){
 		return isPVPEnabled;
 	}
-	
+	public void enablePotionSwap(boolean val){
+		this.enablePotionSwap=val;
+	}
 	public void enableKings(boolean val){
 		this.enableKings=val;
 	}
@@ -229,6 +242,28 @@ public class TimerManager implements Runnable {
 				if(enableKings){
 					kingM.distibruteItemsToTeams();
 				}
+				if(enablePotionSwap){
+					UHC.getInstance().getServer().getScheduler().runTaskTimer(UHC.getInstance(), new Runnable(){
+
+						@Override
+						public void run() {
+							for(UUID u : teamM.getPlayersInGame()){
+								if(Bukkit.getServer().getPlayer(u).isOnline()){
+									potionS.giveAPlayerARandomPotion(Bukkit.getServer().getPlayer(u));
+								}
+								else{
+									potionS.addAPlayerToLateGive(u);
+								}
+								
+							}
+							
+						}
+						
+					}, 0L, 6000L);
+
+						
+				}
+				
 				
 				hasMatchBegun = true;
 				startPVPTimer= true;

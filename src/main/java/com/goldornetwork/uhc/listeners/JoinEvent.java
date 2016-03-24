@@ -61,72 +61,72 @@ public class JoinEvent implements Listener{
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onJoin(PlayerJoinEvent e){
-		Player p = e.getPlayer();
-		if(timerM.hasMatchStarted()){
-			if(teamM.isPlayerInGame(p)){
-				if(enablePotionSwap){
-					if(potionS.getLatePotionPlayers().contains(p.getUniqueId())){
-						potionS.giveAPlayerARandomPotion(p);
-						potionS.removePlayerFromLateGive(p);
+		if(timerM.hasCountDownEnded()){
+			if(scatterM.isScatteringComplete()){
+				Player p = e.getPlayer();
+				if(teamM.isPlayerInGame(p)){
+					if(enablePotionSwap){
+						if(potionS.getLatePotionPlayers().contains(p.getUniqueId())){
+							potionS.giveAPlayerARandomPotion(p);
+							potionS.removePlayerFromLateGive(p);
+						}
 					}
-				}
-				if(enableGoneFishing){
-					if(timerM.getLateGoneFishing().contains(p.getUniqueId())){
-						timerM.lateGiveAPlayerGoneFishingItems(p);
-						timerM.removeAPlayerFromLateGoneFishing(p);
+					if(enableGoneFishing){
+						if(timerM.getLateGoneFishing().contains(p.getUniqueId())){
+							timerM.lateGiveAPlayerGoneFishingItems(p);
+							timerM.removeAPlayerFromLateGoneFishing(p);
+						}
 					}
-				}
-				if(enableTheHobbit){
-					if(timerM.getLateHobbits().contains(p.getUniqueId())){
-						timerM.lateGiveAPlayerHobbitItems(p);
-						timerM.removePlayerFromLateHobbits(p);
+					if(enableTheHobbit){
+						if(timerM.getLateHobbits().contains(p.getUniqueId())){
+							timerM.lateGiveAPlayerHobbitItems(p);
+							timerM.removePlayerFromLateHobbits(p);
+						}
 					}
-				}
-				if(enableSkyHigh){
-					if(timerM.getLateSkyHigh().contains(p.getUniqueId())){
-						timerM.lateGiveAPlayerSkyHighItems(p);
-						timerM.removePlayerFromLateSkyHigh(p);
-					}
-				}
-
-				if(teamM.isFFAEnabled()){
-					if(scatterM.getLateScatters().contains(p.getUniqueId())){
-						scatterM.lateScatterAPlayerInFFA(p);
-						ms.send(ChatColor.GREEN, p, "You have been late scattered!");
-					}
-				}
-				else if(teamM.isTeamsEnabled()){
-					if(enableKings){
-						if(kingM.getLateKings().contains(p.getUniqueId())){
-							ms.send(ChatColor.GREEN, p, "You have received your king items!");
-							kingM.giveAPlayerKingItems(p);
-							kingM.removePlayerFromLateKings(p);
+					if(enableSkyHigh){
+						if(timerM.getLateSkyHigh().contains(p.getUniqueId())){
+							timerM.lateGiveAPlayerSkyHighItems(p);
+							timerM.removePlayerFromLateSkyHigh(p);
 						}
 					}
 
-					if(teamM.isPlayerInGame(p) && scatterM.getLateScatters().contains(p.getUniqueId())){
-						scatterM.lateScatterAPlayerInATeam(teamM.getTeamOfPlayer(p), p);
-						scatterM.removePlayerFromLateScatters(p);
-						ms.send(ChatColor.GREEN, p, "You have been late scattered to your team spawn!");
+					if(teamM.isFFAEnabled()){
+						if(scatterM.getLateScatters().contains(p.getUniqueId())){
+							scatterM.lateScatterAPlayerInFFA(p);
+							scatterM.removePlayerFromLateScatters(p);
+							ms.send(ChatColor.GREEN, p, "You have been late scattered!");
+						}
 					}
-				}
+					else if(teamM.isTeamsEnabled()){
+						if(enableKings){
+							if(kingM.getLateKings().contains(p.getUniqueId())){
+								ms.send(ChatColor.GREEN, p, "You have received your king items!");
+								kingM.giveAPlayerKingItems(p);
+								kingM.removePlayerFromLateKings(p);
+							}
+						}
 
+						if(teamM.isPlayerInGame(p) && scatterM.getLateScatters().contains(p.getUniqueId())){
+							scatterM.lateScatterAPlayerInATeam(teamM.getTeamOfPlayer(p), p);
+							scatterM.removePlayerFromLateScatters(p);
+							ms.send(ChatColor.GREEN, p, "You have been late scattered to your team spawn!");
+						}
+					}
+
+				}
+				else if(teamM.isPlayerInGame(p)==false){
+					if(p.getWorld().equals(scatterM.getUHCWorld())==false){
+						p.teleport(scatterM.getUHCWorld().getSpawnLocation());
+					}
+					if(teamM.isPlayerAnObserver(p)==false){
+						teamM.addPlayerToObservers(p);
+
+					}
+					ms.send(ChatColor.AQUA, p, "You are now spectating the game");
+
+				}
 			}
-			else if(teamM.isPlayerInGame(p)==false){
-				if(p.getWorld().equals(scatterM.getUHCWorld())==false){
-					p.teleport(scatterM.getUHCWorld().getSpawnLocation());
-				}
-				if(teamM.isPlayerAnObserver(p)==false){
-					teamM.addPlayerToObservers(p);
-
-				}
-				ms.send(ChatColor.AQUA, p, "You are now spectating the game");
-
-			}
-
-
-
-
+			
 		}
 
 	}

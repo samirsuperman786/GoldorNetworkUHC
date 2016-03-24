@@ -15,13 +15,13 @@ import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
 
-public class PotionSwap implements Runnable {
+public class PotionSwap{
 //TODO give new effect to offline players through onjoinevent
 	private static PotionSwap instance = new PotionSwap();
 	private TeamManager teamM = TeamManager.getInstance();
 	private TimerManager timerM = TimerManager.getInstance();
 	private ScatterManager scatterM = ScatterManager.getInstance();
-	private boolean enablePotionSwap = true;
+	private boolean enablePotionSwap;
 	private List<UUID> latePotionPlayers = new ArrayList<UUID>();
 	
 	
@@ -47,7 +47,9 @@ public class PotionSwap implements Runnable {
 	public void giveAPlayerARandomPotion(Player p, int durationInSeconds){
 		p.addPotionEffect(new PotionEffect(getRandomPotion(), durationInSeconds*20, 1));
 	}
-	
+	public void addAPlayerToLateGive(UUID u){
+		this.latePotionPlayers.add(u);
+	}
 	public void removePlayerFromLateGive(Player p){
 		latePotionPlayers.remove(p.getUniqueId());
 	}
@@ -91,24 +93,6 @@ public class PotionSwap implements Runnable {
 	}
 	
 	
-	@Override
-	public void run() {
-		if(timerM.hasCountDownEnded() && scatterM.isScatteringComplete()){
-			if(enablePotionSwap){
-				for(UUID u : teamM.getPlayersInGame()){
-					if(Bukkit.getServer().getPlayer(u).isOnline()){
-						giveAPlayerARandomPotion(Bukkit.getServer().getPlayer(u));
-					}
-					else{
-						latePotionPlayers.add(u);
-					}
-					
-				}
-			}
-		}
-		
-		
-	}
 
 	
 	
