@@ -16,12 +16,19 @@ import com.goldornetwork.uhc.utils.MessageSender;
 
 public class BowListener implements Listener {
 
+	//instances
 	private static BowListener instance = new BowListener();
 	private MessageSender ms = new MessageSender();
-	private TeamManager teamM = new TeamManager();
+	private TeamManager teamM = TeamManager.getInstance();
 	private TimerManager timerM = TimerManager.getInstance();
+	private Switcheroo switcherooM = new Switcheroo();
+	private RewardingLongshots rewardingLongshotsM = new RewardingLongshots();
+	
+	//storage
 	private boolean enableSwitcheroo;
 	private boolean enableRewardingLongshots;
+	
+	
 	public static BowListener getInstance(){
 		return instance;
 	}
@@ -47,37 +54,11 @@ public class BowListener implements Listener {
 					Player target = (Player) e.getEntity();
 					Player shooter = (Player) arrow.getShooter();
 					if(teamM.isPlayerInGame(target)&& teamM.isPlayerInGame(shooter) && timerM.hasCountDownEnded()){
-						Location targetLocation = target.getLocation();
-						Location shooterLocation = shooter.getLocation();
-						int distance = (int) shooterLocation.distance(targetLocation);
 						if(enableSwitcheroo){
-							target.teleport(shooterLocation);
-							shooter.teleport(targetLocation);
-							if(teamM.isFFAEnabled()){
-								ms.send(ChatColor.RED, target, "You have switched places with " + ChatColor.YELLOW + shooter.getName());
-								ms.send(ChatColor.RED, shooter, "You have switched places with " + ChatColor.YELLOW + target.getName());
-							}
-							else if(teamM.isTeamsEnabled()){
-								ms.send(ChatColor.RED, target, "You have switched places with " + teamM.getTeamOfPlayer(shooter)+ shooter.getName());
-								ms.send(ChatColor.RED, shooter, "You have switched places with " + teamM.getTeamOfPlayer(target)+ target.getName());
-							}
+							switcherooM.run(target, shooter);
 						}
 						if(enableRewardingLongshots){
-							if(distance > 60 && distance < 100){
-								shooter.getInventory().addItem(new ItemStack(Material.GOLD_INGOT,1));
-								ms.send(ChatColor.GREEN, shooter, "You hit " + target.getName() + " at a distance of " + ChatColor.GRAY + distance + ChatColor.GREEN + " blocks!");
-								ms.send(ChatColor.RED, target, "You got shot from a distance of " + ChatColor.GRAY + distance + ChatColor.RED + " blocks!");
-							}
-							else if(distance>= 100 && distance < 160){
-								shooter.getInventory().addItem(new ItemStack(Material.DIAMOND,1));
-								ms.send(ChatColor.GREEN, shooter, "You hit " + target.getName() + " at a distance of " + ChatColor.GRAY + distance + ChatColor.GREEN + " blocks!");
-								ms.send(ChatColor.RED, target, "You got shot from a distance of " + ChatColor.GRAY + distance + ChatColor.RED + " blocks!");
-							}
-							else if(distance>= 160){
-								shooter.getInventory().addItem(new ItemStack(Material.DIAMOND,2));
-								ms.send(ChatColor.GREEN, shooter, "You hit " + target.getName() + " at a distance of " + ChatColor.GRAY + distance + ChatColor.GREEN + " blocks!");
-								ms.send(ChatColor.RED, target, "You got shot from a distance of " + ChatColor.GRAY + distance + ChatColor.RED + " blocks!");
-							}
+							rewardingLongshotsM.run(target, shooter);
 						}
 					}
 					

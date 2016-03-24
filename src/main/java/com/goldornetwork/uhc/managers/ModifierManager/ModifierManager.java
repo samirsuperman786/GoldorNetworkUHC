@@ -19,9 +19,9 @@ import com.goldornetwork.uhc.managers.ModifierManager.actions.PotionSwap;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.TheHobbitManager;
 
 public class ModifierManager {
-
+	
+	//instances
 	private static ModifierManager instance = new ModifierManager();
-	//instances of managers
 	private BowListener bowListener = BowListener.getInstance();
 	private PotionSwap potionS = PotionSwap.getInstance();
 	private KingsManager kingM = KingsManager.getInstance();
@@ -31,13 +31,12 @@ public class ModifierManager {
 	private DisabledCrafting disabledC = DisabledCrafting.getInstance();
 	private JoinEvent joinE = JoinEvent.getInstance();
 	private BreakEvent breakE = BreakEvent.getInstance();
-	//
 	Random random = new Random();
 	
+	//storage
 	private Map<String, List<String>> options = new HashMap<String, List<String>>();
 	private Map<Enum<Gamemodes>, Boolean> gameModesThatAreEnabled = new HashMap<Enum<Gamemodes>, Boolean> ();
 	private int numberOfGamemodesToEnable = 3;
-	
 	
 	
 	public static ModifierManager getInstance(){
@@ -58,7 +57,7 @@ public class ModifierManager {
 	/* Skyhigh is done
 	 * switcheroo is done	
 	 * rewardinglongshots is done
-	 * potioonswap is done
+	 * potionswap is done
 	 * livewith regret needs work on custom death messages
 	 * kings is done
 	 * killswitch is done
@@ -138,7 +137,7 @@ public class ModifierManager {
 	}
 	
 	private void potionSwap(boolean val){
-		potionS.enablePotionSwap(val);
+		timerM.enablePotionSwap(val);
 		joinE.enablePotionSwap(val);
 	}
 	private void liveWithRegret(boolean val){

@@ -11,17 +11,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.goldornetwork.uhc.managers.ScatterManager;
+import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.TimerManager;
 
 public class PotionSwap{
 //TODO give new effect to offline players through onjoinevent
+	
+	//instances
 	private static PotionSwap instance = new PotionSwap();
 	private TeamManager teamM = TeamManager.getInstance();
-	private TimerManager timerM = TimerManager.getInstance();
-	private ScatterManager scatterM = ScatterManager.getInstance();
-	private boolean enablePotionSwap;
+	
+	//storage
 	private List<UUID> latePotionPlayers = new ArrayList<UUID>();
 	
 	
@@ -29,14 +29,25 @@ public class PotionSwap{
 		return instance;
 	}
 	public void setup(){
-		enablePotionSwap=false;
 		latePotionPlayers.clear();
 	}
-	
-	
-	public void enablePotionSwap(boolean val){
-		this.enablePotionSwap=val;
+	public void run(){
+		UHC.getInstance().getServer().getScheduler().runTaskTimer(UHC.getInstance(), new Runnable(){
+			@Override
+			public void run() {
+				for(UUID u : teamM.getPlayersInGame()){
+					if(Bukkit.getServer().getPlayer(u).isOnline()){
+						giveAPlayerARandomPotion(Bukkit.getServer().getPlayer(u));
+					}
+					else{
+						addAPlayerToLateGive(u);
+					}
+				}
+			}
+			
+		}, 0L, 6000L); //5 minutes
 	}
+	
 	public List<UUID> getLatePotionPlayers(){
 		return latePotionPlayers;
 	}

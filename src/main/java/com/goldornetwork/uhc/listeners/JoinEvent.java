@@ -10,8 +10,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.GoneFishing;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.KingsManager;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.PotionSwap;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.SkyHigh;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.TheHobbitManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class JoinEvent implements Listener{
@@ -24,7 +27,9 @@ public class JoinEvent implements Listener{
 	private MessageSender ms = new MessageSender();
 	private PotionSwap potionS = PotionSwap.getInstance();
 	private KingsManager kingM = KingsManager.getInstance();
-
+	private SkyHigh skyHighM = SkyHigh.getInstance();
+	private GoneFishing goneFishingM = GoneFishing.getInstance();
+	private TheHobbitManager hobbitM = TheHobbitManager.getInstance();
 	//storage
 	private boolean enableKings;
 	private boolean enableGoneFishing;
@@ -62,7 +67,6 @@ public class JoinEvent implements Listener{
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onJoin(PlayerJoinEvent e){
 		if(timerM.hasCountDownEnded()){
-			if(scatterM.isScatteringComplete()){
 				Player p = e.getPlayer();
 				if(teamM.isPlayerInGame(p)){
 					if(enablePotionSwap){
@@ -72,21 +76,21 @@ public class JoinEvent implements Listener{
 						}
 					}
 					if(enableGoneFishing){
-						if(timerM.getLateGoneFishing().contains(p.getUniqueId())){
-							timerM.lateGiveAPlayerGoneFishingItems(p);
-							timerM.removeAPlayerFromLateGoneFishing(p);
+						if(goneFishingM.getLateGoneFishing().contains(p.getUniqueId())){
+							goneFishingM.giveAPlayerGoneFishingItems(p);
+							goneFishingM.removeAPlayerFromLateGoneFishing(p);
 						}
 					}
 					if(enableTheHobbit){
-						if(timerM.getLateHobbits().contains(p.getUniqueId())){
-							timerM.lateGiveAPlayerHobbitItems(p);
-							timerM.removePlayerFromLateHobbits(p);
+						if(hobbitM.getLateHobbits().contains(p.getUniqueId())){
+							hobbitM.giveAPlayerHobbitItems(p);
+							hobbitM.removePlayerFromLateHobbits(p);
 						}
 					}
 					if(enableSkyHigh){
-						if(timerM.getLateSkyHigh().contains(p.getUniqueId())){
-							timerM.lateGiveAPlayerSkyHighItems(p);
-							timerM.removePlayerFromLateSkyHigh(p);
+						if(skyHighM.getLateSkyHigh().contains(p.getUniqueId())){
+							skyHighM.giveAPlayerSkyHighItems(p);
+							skyHighM.removePlayerFromLateSkyHigh(p);
 						}
 					}
 
@@ -100,9 +104,9 @@ public class JoinEvent implements Listener{
 					else if(teamM.isTeamsEnabled()){
 						if(enableKings){
 							if(kingM.getLateKings().contains(p.getUniqueId())){
-								ms.send(ChatColor.GREEN, p, "You have received your king items!");
 								kingM.giveAPlayerKingItems(p);
 								kingM.removePlayerFromLateKings(p);
+								ms.send(ChatColor.GREEN, p, "You have received your king items!");
 							}
 						}
 
@@ -125,7 +129,7 @@ public class JoinEvent implements Listener{
 					ms.send(ChatColor.AQUA, p, "You are now spectating the game");
 
 				}
-			}
+			
 			
 		}
 

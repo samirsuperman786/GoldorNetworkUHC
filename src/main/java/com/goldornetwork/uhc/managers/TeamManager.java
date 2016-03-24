@@ -23,18 +23,17 @@ import com.goldornetwork.uhc.utils.MessageSender;
 
 public class TeamManager {
 	
+	//instances
+	private static TeamManager teamM = new TeamManager();
 	private MessageSender ms = new MessageSender();
 	private TimerManager timerM = TimerManager.getInstance();
-//
+
+	//storage
 	private int playersPerTeam;
 	private int FFATeamSize;
 	private boolean isFFAEnabled;
 	private boolean isTeamsEnabled;
 	
-	
-//	
-	
-//
 	private List<UUID> playersInGame = new ArrayList<UUID>();
 	private List<UUID> observers = new ArrayList<UUID>();
 	private List<String> listOfAvailableTeams = new ArrayList<String>();
@@ -46,11 +45,7 @@ public class TeamManager {
 	private Map<String, UUID> ownerOfTeam = new HashMap<String, UUID>();
 	private Map<UUID, UUID> invitedPlayers = new HashMap<UUID, UUID>();
 	
-	
-//
-	
-	private static TeamManager teamM = new TeamManager();
-//
+
 	public static TeamManager getInstance(){
 		return teamM;
 	}

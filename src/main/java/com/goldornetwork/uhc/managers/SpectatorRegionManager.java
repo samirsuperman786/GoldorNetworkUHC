@@ -11,14 +11,13 @@ public class SpectatorRegionManager implements Runnable {
 
 	private static SpectatorRegionManager instance = new SpectatorRegionManager();
 	
-
+	//instances
 	private TeamManager teamM = TeamManager.getInstance();
 	private TimerManager timerM = TimerManager.getInstance();
 	private ScatterManager scatterM = ScatterManager.getInstance();
 	
+	//storage
 	int bufferBlocks = 15;
-	 
-	
 	Location center = scatterM.getUHCWorld().getWorldBorder().getCenter();
 	
 	public static SpectatorRegionManager getInstance(){

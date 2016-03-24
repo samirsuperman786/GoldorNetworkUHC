@@ -22,7 +22,7 @@ import com.goldornetwork.uhc.utils.MessageSender;
 
 public class DeathEvent implements Listener {
 
-
+	//instances
 	private static DeathEvent instance = new DeathEvent();
 	private TeamManager teamM =  TeamManager.getInstance();
 	private TimerManager timerM =  TimerManager.getInstance();
@@ -30,9 +30,11 @@ public class DeathEvent implements Listener {
 	private PotionSwap potionS = PotionSwap.getInstance();
 	private MessageSender ms = new MessageSender();
 
+	//gamemodes
 	private boolean enableLiveWithRegret;
-	
 	private boolean enableKillSwitch;
+	
+	//storage
 	private Map<UUID, Integer> numberOfDeaths = new HashMap<UUID, Integer>();
 
 

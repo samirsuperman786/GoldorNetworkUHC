@@ -27,6 +27,7 @@ import com.goldornetwork.uhc.managers.ModifierManager.actions.DisabledCrafting;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.KingsManager;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.LandIsBadManager;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.PotionSwap;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.SkyHigh;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.TheHobbitManager;
 
 public class UHC extends JavaPlugin {
@@ -58,15 +59,13 @@ public class UHC extends JavaPlugin {
 		Bukkit.getServer().getScheduler().runTaskTimer(this, LocationListener.getInstance(), 0L, 20L);
 		Bukkit.getServer().getScheduler().runTaskTimer(this, ChunkGenerator.getInstance(), 0L, 20L);
 		Bukkit.getServer().getScheduler().runTaskTimer(this, LandIsBadManager.getInstance(), 0L, 20L);
-		LocationListener.getInstance().setup(plugin);
+		
 	}
 
 	private void setup() {
 		TeamManager.getInstance().setup();
 		ScatterManager.getInstance().setup();
 		ModifierManager.getInstance().setup();
-		PotionSwap.getInstance().setup();
-		KingsManager.getInstance().setup();
 		DeathEvent.getInstance().setup();
 		BowListener.getInstance().setup();
 		ModifierManager.getInstance().setup();
@@ -74,6 +73,8 @@ public class UHC extends JavaPlugin {
 		TeamManager.getInstance().setup();
 		JoinEvent.getInstance().setup();
 		BreakEvent.getInstance().setup();
+		SkyHigh.getInstance().setup(plugin);
+		LocationListener.getInstance().setup();
 	}
 
 	private void registerCommands() {

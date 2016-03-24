@@ -21,15 +21,18 @@ import com.goldornetwork.uhc.utils.MessageSender;
 
 public class KingsManager {
 
+	//instances
 	private static KingsManager instance = new KingsManager();
 	private TeamManager teamM = TeamManager.getInstance();
 	private MessageSender ms = new MessageSender();
 	private JoinEvent joinE = JoinEvent.getInstance();
 	private TimerManager timerM = TimerManager.getInstance();
 	
+	//storage
 	private Map<String, UUID> listOfKings = new HashMap<String, UUID>();
 	private List<UUID> lateKings = new ArrayList<UUID>();
 	private boolean enableKings;
+	
 	
 	public static KingsManager getInstance(){
 		return instance;

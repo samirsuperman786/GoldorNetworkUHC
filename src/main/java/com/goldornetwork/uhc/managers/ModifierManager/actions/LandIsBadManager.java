@@ -1,18 +1,20 @@
 package com.goldornetwork.uhc.managers.ModifierManager.actions;
 
 import com.goldornetwork.uhc.managers.ScatterManager;
-import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
 
 public class LandIsBadManager implements Runnable{
 
+	//instances
 	private static LandIsBadManager instance = new LandIsBadManager();
-	private TeamManager teamM = TeamManager.getInstance();
+	//private TeamManager teamM = TeamManager.getInstance();
 	private ScatterManager scatterM = ScatterManager.getInstance();
 	private TimerManager timerM = TimerManager.getInstance();
 	
+	//storage
 	private int counter;
 	private boolean enableLandIsBad;
+	
 	
 	public static LandIsBadManager getInstance(){
 		return instance;
