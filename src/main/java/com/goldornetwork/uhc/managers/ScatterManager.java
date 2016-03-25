@@ -13,6 +13,10 @@ import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+import com.goldornetwork.uhc.listeners.MoveEvent;
 
 public class ScatterManager implements Runnable {
 
@@ -20,14 +24,15 @@ public class ScatterManager implements Runnable {
 
 	//instances
 	private static ScatterManager instance = new ScatterManager();
-	private BoardManager sb = BoardManager.getInstance();
-
+	private TeamManager teamM = TeamManager.getInstance();
+	private MoveEvent moveE = MoveEvent.getInstace();
+	
 	//storage
 	private boolean startScattering;
 	private boolean scatterTeam;
 	private boolean scatterFFA;
 	private boolean scatterComplete;
-	private int radius;//todo remove
+	private int radius;
 
 	//storage
 	private Map<String, List<UUID>> teamToScatter = new HashMap<String, List<UUID>>();
@@ -41,8 +46,8 @@ public class ScatterManager implements Runnable {
 	}
 
 	public void setup(){
-		//TODO make below false
-		getUHCWorld().setPVP(true);
+		radius = 1000;
+		getUHCWorld().setPVP(false);
 		getUHCWorld().setGameRuleValue("doMobSpawning", "false");
 		startScattering=false;
 		scatterTeam=false;
@@ -67,26 +72,27 @@ public class ScatterManager implements Runnable {
 				e.remove();
 			}
 		}
-		//TESt code here
+		//Test code here
 
 
 
 
 	}
 
-	public void scatterTeam(String team, List<UUID> p, Integer radius){
-		teamToScatter.put(team.toLowerCase(), p);
-		this.radius = radius;
+	public void scatterTeams(){
+		for(String team : teamM.getListOfTeams()){
+			teamToScatter.put(team, teamM.getPlayersOnATeam(team));
+		}
+		moveE.freezePlayers();
 		scatterFFA=false;
 		scatterTeam=true;
 	}
 
-	public void scatterFFA(List<UUID> p, Integer radius){
-		FFAToScatter.addAll(p);
-		this.radius = radius;
+	public void scatterFFA(){
+		FFAToScatter.addAll(teamM.getPlayersInGame());
+		moveE.freezePlayers();
 		scatterTeam=false;
 		scatterFFA = true;
-
 	}
 
 	public int getRadius(){
@@ -96,7 +102,6 @@ public class ScatterManager implements Runnable {
 	public void lateScatterAPlayerInFFA(Player p){
 		Location location = new Location(getUHCWorld(), 0, 0, 0);
 		Random random = new Random();
-
 		int x = random.nextInt((radius*2) - (-radius*2) +1) + (-radius*2);
 		int z = random.nextInt((radius*2) - (-radius*2) +1) + (-radius*2);
 		location.setX(x);
@@ -161,10 +166,9 @@ public class ScatterManager implements Runnable {
 				nameOfTeams.remove(nameOfTeams.size());
 
 				if(teamToScatter.isEmpty()){
-					getUHCWorld().setGameRuleValue("doMobSpawning", "true");
+					setupStartingOptions();
 					scatterComplete=true;
 					scatterTeam = false;
-
 				}
 
 			}
@@ -189,7 +193,7 @@ public class ScatterManager implements Runnable {
 				FFAToScatter.remove(FFAToScatter.size());
 
 				if(FFAToScatter.isEmpty()){
-					getUHCWorld().setGameRuleValue("doMobSpawning", "true");
+					setupStartingOptions();
 					scatterComplete=true;
 					scatterFFA=false;
 				}
@@ -204,6 +208,12 @@ public class ScatterManager implements Runnable {
 
 
 
+	}
+
+	private void setupStartingOptions() {
+		moveE.unfreezePlayers();
+		getUHCWorld().setGameRuleValue("doMobSpawning", "true");
+		
 	}
 
 }

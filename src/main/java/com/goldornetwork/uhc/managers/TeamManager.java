@@ -52,6 +52,8 @@ public class TeamManager {
 	
 	
 	public void setup(){
+		isFFAEnabled=false;
+		isTeamsEnabled=false;
 		playersInGame.clear();
 		observers.clear();
 		listOfAvailableTeams.clear();
@@ -325,13 +327,7 @@ public class TeamManager {
 		
 	}
 	
-	public void freezeAllPlayers(){
-		//
-	}
 	
-	public void unFreezeAllPlayers(){
-		
-	}
 	
 	public boolean isPlayerOwner(Player p){
 		if(ownerOfTeam.containsValue(p.getUniqueId())){

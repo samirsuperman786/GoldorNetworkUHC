@@ -64,11 +64,11 @@ public class JoinEvent implements Listener{
 		this.enablePotionSwap=val;
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onJoin(PlayerJoinEvent e){
-		if(timerM.hasCountDownEnded()){
-				Player p = e.getPlayer();
-				if(teamM.isPlayerInGame(p)){
+		Player p = e.getPlayer();
+			if(timerM.hasCountDownEnded()){
+				if(teamM.isPlayerInGame(e.getPlayer())){
 					if(enablePotionSwap){
 						if(potionS.getLatePotionPlayers().contains(p.getUniqueId())){
 							potionS.giveAPlayerARandomPotion(p);
@@ -118,7 +118,7 @@ public class JoinEvent implements Listener{
 					}
 
 				}
-				else if(teamM.isPlayerInGame(p)==false){
+				else if(teamM.isPlayerInGame(e.getPlayer())==false){
 					if(p.getWorld().equals(scatterM.getUHCWorld())==false){
 						p.teleport(scatterM.getUHCWorld().getSpawnLocation());
 					}
@@ -129,9 +129,11 @@ public class JoinEvent implements Listener{
 					ms.send(ChatColor.AQUA, p, "You are now spectating the game");
 
 				}
+			}
+				
 			
 			
-		}
+		
 
 	}
 

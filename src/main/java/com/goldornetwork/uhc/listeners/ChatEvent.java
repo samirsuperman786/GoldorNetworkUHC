@@ -16,7 +16,7 @@ public class ChatEvent implements Listener{
 	}
 
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onChatEvent(AsyncPlayerChatEvent e){
 		e.setFormat("%s: %s");
 	}

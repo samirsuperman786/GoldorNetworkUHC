@@ -14,6 +14,7 @@ import com.goldornetwork.uhc.listeners.BreakEvent;
 import com.goldornetwork.uhc.listeners.ChatEvent;
 import com.goldornetwork.uhc.listeners.JoinEvent;
 import com.goldornetwork.uhc.listeners.LeaveEvent;
+import com.goldornetwork.uhc.listeners.MoveEvent;
 import com.goldornetwork.uhc.managers.ChunkGenerator;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.SpectatorRegionManager;
@@ -42,9 +43,9 @@ public class UHC extends JavaPlugin {
 	@Override
 	public void onEnable(){
 		plugin = this;
-		setup();
 		registerListeners();
 		registerCommands();
+		setup();
 		registerTimers();
 	}
 	
@@ -58,23 +59,20 @@ public class UHC extends JavaPlugin {
 		Bukkit.getServer().getScheduler().runTaskTimer(this, SpectatorRegionManager.getInstance(), 0L, 40L);
 		Bukkit.getServer().getScheduler().runTaskTimer(this, LocationListener.getInstance(), 0L, 20L);
 		Bukkit.getServer().getScheduler().runTaskTimer(this, ChunkGenerator.getInstance(), 0L, 20L);
-		Bukkit.getServer().getScheduler().runTaskTimer(this, LandIsBadManager.getInstance(), 0L, 20L);
 		
 	}
 
 	private void setup() {
 		TeamManager.getInstance().setup();
 		ScatterManager.getInstance().setup();
-		ModifierManager.getInstance().setup();
+		ModifierManager.getInstance().setup(plugin);
 		DeathEvent.getInstance().setup();
 		BowListener.getInstance().setup();
-		ModifierManager.getInstance().setup();
 		TimerManager.getInstance().setup();
-		TeamManager.getInstance().setup();
 		JoinEvent.getInstance().setup();
 		BreakEvent.getInstance().setup();
-		SkyHigh.getInstance().setup(plugin);
 		LocationListener.getInstance().setup();
+		MoveEvent.getInstace().setup();
 	}
 
 	private void registerCommands() {
@@ -96,6 +94,8 @@ public class UHC extends JavaPlugin {
 		Bukkit.getServer().getPluginManager().registerEvents(TheHobbitManager.getInstance(), this);
 		Bukkit.getServer().getPluginManager().registerEvents(DisabledCrafting.getInstance(), this);
 		Bukkit.getServer().getPluginManager().registerEvents(LeaveEvent.getInstace(), this);
+		Bukkit.getServer().getPluginManager().registerEvents(MoveEvent.getInstace(), this);
+	
 	}
 
 

@@ -23,13 +23,14 @@ public class TimerManager implements Runnable {
 	
 	//instances
 	private static TimerManager instance = new TimerManager();
-	private TeamManager teamM = TeamManager.getInstance();
 	private MessageSender ms = new MessageSender();
 	private KingsManager kingM = KingsManager.getInstance();
 	private PotionSwap potionS = PotionSwap.getInstance();
 	private SkyHigh skyHighM = SkyHigh.getInstance();
 	private GoneFishing goneFishingM = GoneFishing.getInstance();
 	private TheHobbitManager hobbitM = TheHobbitManager.getInstance();
+	private ScatterManager scatterM = ScatterManager.getInstance();
+	private TeamManager teamM = TeamManager.getInstance();
 	//storage
 	private int timeTillMatchStart;
 	private int timeTillPVPStart;
@@ -64,10 +65,6 @@ public class TimerManager implements Runnable {
 		enableSkyHigh=false;
 		enableKings=false;
 		enablePotionSwap=false;
-		kingM.setup();
-		potionS.setup();
-		goneFishingM.setup();
-		hobbitM.setup();
 	}
 	
 	public void startMatch(boolean start, int timeTillMatchStarts, int timeTillPVPStarts){
@@ -81,7 +78,6 @@ public class TimerManager implements Runnable {
 	
 	public void cancelMatch(){
 		timeTillMatchStart=-1;
-		
 	}
 	
 	public boolean hasMatchStarted(){
@@ -124,11 +120,11 @@ public class TimerManager implements Runnable {
 	public void run() {
 		if(startMatch){
 			if(timeTillMatchStart >0){
-				if(timeTillMatchStart>60 && timeTillMatchStart%60 ==0){
+				if(timeTillMatchStart>=60 && timeTillMatchStart%60 ==0){
 					ms.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart/60 + ChatColor.RED + " minutes");
 				}
 					
-				else if(timeTillMatchStart <= 60 && timeTillMatchStart >=30 &&timeTillMatchStart%10==0){
+				else if(timeTillMatchStart <60 && timeTillMatchStart >=30 &&timeTillMatchStart%10==0){
 					ms.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart + ChatColor.RED + " seconds");
 				}
 				else if(timeTillMatchStart <=30 && timeTillMatchStart >=5 && timeTillMatchStart %5==0){
@@ -159,7 +155,12 @@ public class TimerManager implements Runnable {
 					potionS.run();
 				}
 				
-				
+				if(teamM.isFFAEnabled()){
+					scatterM.scatterFFA();
+				}
+				else if(teamM.isTeamsEnabled()){
+					scatterM.scatterTeams();
+				}
 				hasMatchBegun = true;
 				startPVPTimer= true;
 				startMatch =false;
@@ -169,6 +170,7 @@ public class TimerManager implements Runnable {
 		
 		else if(timeTillMatchStart == -1){
 			ms.broadcast("Match canceled");
+			matchStart=false;
 			timeTillMatchStart =-2; //-2 will act as a null value
 		}
 		
@@ -193,8 +195,13 @@ public class TimerManager implements Runnable {
 			}
 			else if(timeTillPVPStart==0){
 				ms.broadcast("PVP has been enabled!");
+				scatterM.getUHCWorld().setPVP(true);
 				isPVPEnabled = true;
+				timeTillPVPStart=-2;
 				startPVPTimer= false;
+			}
+			else if(timeTillPVPStart==-2){
+				//nothing
 			}
 			
 		}

@@ -69,7 +69,7 @@ public class PotionSwap{
 	private PotionEffectType getRandomPotion(){
 		Random random = new Random();
 		PotionEffectType potion = null;
-		switch(random.nextInt(13)){
+		switch(random.nextInt(15)){
 		
 		case 1: potion = PotionEffectType.BLINDNESS;
 				break;
@@ -96,6 +96,10 @@ public class PotionSwap{
 		case 12: potion = PotionEffectType.WATER_BREATHING;
 				break;
 		case 13: potion = PotionEffectType.WEAKNESS;
+				break;
+		case 14: potion = PotionEffectType.INVISIBILITY;
+				break;
+		case 15: potion = PotionEffectType.INCREASE_DAMAGE;
 				break;
 		default: Bukkit.getServer().getLogger().info("Unexpected error at executing PotionSwap");
 		
