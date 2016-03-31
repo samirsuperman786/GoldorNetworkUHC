@@ -8,50 +8,46 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+import com.goldornetwork.uhc.listeners.MoveEvent;
 
 public class ScatterManager implements Runnable {
-	
+
+	//TODO check if spawn location is valid 
+
+	//instances
 	private static ScatterManager instance = new ScatterManager();
-	private ChunkGenerator chunkG = ChunkGenerator.getInstance();
+	private TeamManager teamM = TeamManager.getInstance();
+	private MoveEvent moveE = MoveEvent.getInstace();
 	
+	//storage
 	private boolean startScattering;
-	
 	private boolean scatterTeam;
-	
 	private boolean scatterFFA;
-	
 	private boolean scatterComplete;
-	
-	private int radius;//todo remove
-	
+	private int radius;
+
+	//storage
 	private Map<String, List<UUID>> teamToScatter = new HashMap<String, List<UUID>>();
-	
 	private Map<String, Location> locationsOfTeamSpawn = new HashMap<String, Location>();
-	
 	private List<UUID> lateScatters = new ArrayList<UUID>();
-	
 	private List<String> nameOfTeams = new ArrayList<String>();
-	
 	private List<UUID> FFAToScatter = new ArrayList<UUID>();
-	
+
 	public static ScatterManager getInstance(){
 		return instance;
 	}
-	
+
 	public void setup(){
-		//TODO make below false
-		getUHCWorld().setPVP(true);
+		radius = 1000;
+		getUHCWorld().setPVP(false);
 		getUHCWorld().setGameRuleValue("doMobSpawning", "false");
 		startScattering=false;
 		scatterTeam=false;
@@ -64,57 +60,48 @@ public class ScatterManager implements Runnable {
 		nameOfTeams.clear();
 		FFAToScatter.clear();
 		WorldBorder wb = getUHCWorld().getWorldBorder();
-			wb.setCenter(getUHCWorld().getSpawnLocation());
-			wb.setSize(radius*2);
-			//wb.setSize(50, 120); use this to shrink border
-			wb.setDamageBuffer(0);
-			wb.setDamageAmount(.5);
-			wb.setWarningTime(15);
-			wb.setWarningDistance(20);
-			for(Entity e : getUHCWorld().getEntities()){
-				if(!(e instanceof Player)){
-					e.remove();
-				}
+		wb.setCenter(getUHCWorld().getSpawnLocation());
+		wb.setSize(radius*2);
+		//wb.setSize(50, 120); use this to shrink border
+		wb.setDamageBuffer(0);
+		wb.setDamageAmount(.5);
+		wb.setWarningTime(15);
+		wb.setWarningDistance(20);
+		for(Entity e : getUHCWorld().getEntities()){
+			if(!(e instanceof Player)){
+				e.remove();
 			}
-			ItemStack given = new ItemStack(Material.FISHING_ROD, 1);
-			ItemMeta im = given.getItemMeta();
-			im.addEnchant(Enchantment.LUCK, 250, true);
-			im.addEnchant(Enchantment.LURE, 250, true);
-			im.addEnchant(Enchantment.DURABILITY, 150, true);
-			given.setItemMeta(im);
-			for(Player p : Bukkit.getServer().getOnlinePlayers()){
-				p.getInventory().addItem(new ItemStack(Material.ANVIL, 20));
-				p.getInventory().addItem(given);
-				p.giveExpLevels(Integer.MAX_VALUE);
-			}
-		
-			
-			
+		}
+		//Test code here
+
+
+
+
 	}
-	
-	public void scatterTeam(String team, List<UUID> p, Integer radius){
-		teamToScatter.put(team.toLowerCase(), p);
-		this.radius = radius;
+
+	public void scatterTeams(){
+		for(String team : teamM.getListOfTeams()){
+			teamToScatter.put(team, teamM.getPlayersOnATeam(team));
+		}
+		moveE.freezePlayers();
 		scatterFFA=false;
 		scatterTeam=true;
 	}
-	
-	public void scatterFFA(List<UUID> p, Integer radius){
-		FFAToScatter.addAll(p);
-		this.radius = radius;
+
+	public void scatterFFA(){
+		FFAToScatter.addAll(teamM.getPlayersInGame());
+		moveE.freezePlayers();
 		scatterTeam=false;
 		scatterFFA = true;
-		
 	}
-	
+
 	public int getRadius(){
 		return radius;
 	}
-	
+
 	public void lateScatterAPlayerInFFA(Player p){
 		Location location = new Location(getUHCWorld(), 0, 0, 0);
 		Random random = new Random();
-		
 		int x = random.nextInt((radius*2) - (-radius*2) +1) + (-radius*2);
 		int z = random.nextInt((radius*2) - (-radius*2) +1) + (-radius*2);
 		location.setX(x);
@@ -123,75 +110,79 @@ public class ScatterManager implements Runnable {
 		p.teleport(location);
 		p.setBedSpawnLocation(location);
 	}
-	
+
 	public void lateScatterAPlayerInATeam(String team, Player p){
 		p.teleport(locationsOfTeamSpawn.get(team.toLowerCase()));
 	}
-	
+	public void removePlayerFromLateScatters(Player p){
+		lateScatters.remove(p.getUniqueId());
+	}
+
+
 	public List<UUID> getLateScatters(){
 		return this.lateScatters;
 	}
-	
+
 	public boolean isScatteringComplete(){
 		return scatterComplete;
 	}
 	public World getUHCWorld(){
+		//TODO make a rotation list of viable UHC maps
 		return Bukkit.getServer().getWorld("lol");
 	}
-	
-	
+
+
 	@Override
 	public void run() {
 		if(startScattering){
 			if(scatterTeam){
-				//TODO make a rotation list of viable UHC maps
+
 				Location location = new Location(getUHCWorld(), 0, 0, 0);
 				Random random = new Random();
-				
+
 				int x = random.nextInt((radius*2) - (-radius*2) +1) + (-radius*2);
 				int z = random.nextInt((radius*2) - (-radius*2) +1) + (-radius*2);
 				location.setX(x);
 				location.setZ(z);
 				location.setY(getUHCWorld().getHighestBlockYAt(location.getBlockX(), location.getBlockZ()));
-				
+
 				for(UUID u : teamToScatter.get(nameOfTeams.get(nameOfTeams.size()))){
 					locationsOfTeamSpawn.put(nameOfTeams.get(nameOfTeams.size()).toLowerCase(), location);
 					Bukkit.getPlayer(u).setBedSpawnLocation(location);
 					if(Bukkit.getPlayer(u).isOnline()==false){
-						
+
 						lateScatters.add(u);
-						
+
 					}
 					else if(Bukkit.getPlayer(u).isOnline()==true){
-					
+
 						Bukkit.getPlayer(u).teleport(location);
-						
+
 					}
-					
-					
+
+
 				}
 				teamToScatter.remove(nameOfTeams.get(nameOfTeams.size()));
 				nameOfTeams.remove(nameOfTeams.size());
-				
+
 				if(teamToScatter.isEmpty()){
-					getUHCWorld().setGameRuleValue("doMobSpawning", "true");
+					setupStartingOptions();
 					scatterComplete=true;
 					scatterTeam = false;
-					
 				}
-				
+
 			}
 			else if(scatterFFA){
-				
+
 				Location location = new Location(getUHCWorld(), 0, 0, 0);
 				Random random = new Random();
-				
+
 				int x = random.nextInt((radius*2) - (-radius*2) +1) + (-radius*2);
 				int z = random.nextInt((radius*2) - (-radius*2) +1) + (-radius*2);
 				location.setX(x);
 				location.setZ(z);
 				location.setY(getUHCWorld().getHighestBlockYAt(location.getBlockX(), location.getBlockZ()));
-				
+
 				if(Bukkit.getPlayer(FFAToScatter.get(FFAToScatter.size())).isOnline()==false){
 					lateScatters.add(FFAToScatter.get(FFAToScatter.size()));
 				}
@@ -200,22 +191,28 @@ public class ScatterManager implements Runnable {
 				}
 				Bukkit.getPlayer(FFAToScatter.get(FFAToScatter.size())).setBedSpawnLocation(location);
 				FFAToScatter.remove(FFAToScatter.size());
-				
+
 				if(FFAToScatter.isEmpty()){
-					getUHCWorld().setGameRuleValue("doMobSpawning", "true");
+					setupStartingOptions();
 					scatterComplete=true;
 					scatterFFA=false;
 				}
-				
-				
+
+
 			}
-			
+
 		}
 		else{
 			//do nothing
 		}
-		
-	
+
+
+
+	}
+
+	private void setupStartingOptions() {
+		moveE.unfreezePlayers();
+		getUHCWorld().setGameRuleValue("doMobSpawning", "true");
 		
 	}
 

@@ -7,18 +7,17 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class InvitePlayerCommand implements CommandExecutor{
 
+	//instances
 	private TeamManager teamM = TeamManager.getInstance();
-	private ScatterManager scatterM = ScatterManager.getInstance();
 	private TimerManager timerM = TimerManager.getInstance();
 	private MessageSender ms = new MessageSender();
-	
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		Player p = (Player) sender;
@@ -26,13 +25,13 @@ public class InvitePlayerCommand implements CommandExecutor{
 			ms.noConsole(sender);
 			return true;
 		}
-	
-		else if(teamM.isTeamsEnabled()==false){
+
+		else if(teamM.isFFAEnabled()==true){
 			ms.send(ChatColor.RED, p, "Teams are not enabled!");
 			return true;
 		}
-		
-		else if(timerM.hasMatchStarted()){
+
+		else if(timerM.hasCountDownEnded()){
 			ms.send(ChatColor.RED, p, "Match has already started!");
 			return true;
 		}
@@ -40,8 +39,8 @@ public class InvitePlayerCommand implements CommandExecutor{
 			ms.send(ChatColor.RED, p, "You are not on a team!");
 			return true;
 		}
-		
-		else if(teamM.getOwnerOfTeam(teamM.getTeamOfPlayer(p))!=p.getUniqueId()){
+
+		else if(teamM.isPlayerOwner(p)==false){
 			ms.send(ChatColor.RED, p, "You are not the owner of the team!");
 			return true;
 		}
@@ -49,12 +48,12 @@ public class InvitePlayerCommand implements CommandExecutor{
 			ms.send(ChatColor.RED, p, "Please specify a player!");
 			return true;
 		}
-		
+
 		else if(teamM.isPlayerOnline(args[0])==false){
 			ms.send(ChatColor.RED, p, "Player " + args[0].toLowerCase() + " is not online!");
 			return true;
 		}
-		else if(teamM.getTeamOfPlayer(Bukkit.getServer().getPlayer(args[0])) != null){
+		else if(teamM.isPlayerInGame(Bukkit.getServer().getPlayer(args[0]))==true){
 			ms.send(ChatColor.RED, p, "Player " + args[0] + " is already on a team!");
 			return true;
 		}
@@ -64,13 +63,13 @@ public class InvitePlayerCommand implements CommandExecutor{
 			ms.alertMessage(p, ChatColor.GREEN, "You have invited player " + Bukkit.getServer().getPlayer(args[0]).getName());
 			return true;
 		}
-		
-		
-		
-		
-		
+
+
+
+
+
 	}
 
-	
-	
+
+
 }

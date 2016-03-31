@@ -23,18 +23,17 @@ import com.goldornetwork.uhc.utils.MessageSender;
 
 public class TeamManager {
 	
+	//instances
+	private static TeamManager teamM = new TeamManager();
 	private MessageSender ms = new MessageSender();
 	private TimerManager timerM = TimerManager.getInstance();
-//
+
+	//storage
 	private int playersPerTeam;
 	private int FFATeamSize;
 	private boolean isFFAEnabled;
 	private boolean isTeamsEnabled;
 	
-	
-//	
-	
-//
 	private List<UUID> playersInGame = new ArrayList<UUID>();
 	private List<UUID> observers = new ArrayList<UUID>();
 	private List<String> listOfAvailableTeams = new ArrayList<String>();
@@ -46,17 +45,15 @@ public class TeamManager {
 	private Map<String, UUID> ownerOfTeam = new HashMap<String, UUID>();
 	private Map<UUID, UUID> invitedPlayers = new HashMap<UUID, UUID>();
 	
-	
-//
-	
-	private static TeamManager teamM = new TeamManager();
-//
+
 	public static TeamManager getInstance(){
 		return teamM;
 	}
 	
 	
 	public void setup(){
+		isFFAEnabled=false;
+		isTeamsEnabled=false;
 		playersInGame.clear();
 		observers.clear();
 		listOfAvailableTeams.clear();
@@ -269,7 +266,6 @@ public class TeamManager {
 		boolean foundTeam = false;
 		for(Map.Entry<String, Integer> entry :playersOnCurrentTeam.entrySet()){
 			if(entry.getValue()==0){
-				
 				addPlayerToTeam(p, entry.getKey());
 				ownerOfTeam.put(entry.getKey(), p.getUniqueId());
 				foundTeam= true;
@@ -277,10 +273,13 @@ public class TeamManager {
 			}
 			
 		}
-		 if(foundTeam == false){
+		if(foundTeam==true){
+			 return true;
+		 }
+		else{
 			return false;
 		}
-		return true;
+		
 	}
 	
 	public boolean isTeamRoomToJoin(String team){
@@ -328,15 +327,16 @@ public class TeamManager {
 		
 	}
 	
-	public void freezeAllPlayers(){
-		//
+	
+	
+	public boolean isPlayerOwner(Player p){
+		if(ownerOfTeam.containsValue(p.getUniqueId())){
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
-	
-	public void unFreezeAllPlayers(){
-		
-	}
-	
-	
 	
 	public void addPlayerToObservers(Player p){
 		observers.add(p.getUniqueId());

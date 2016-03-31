@@ -11,27 +11,43 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
 
-public class PotionSwap implements Runnable {
+public class PotionSwap{
 //TODO give new effect to offline players through onjoinevent
+	
+	//instances
 	private static PotionSwap instance = new PotionSwap();
 	private TeamManager teamM = TeamManager.getInstance();
-	private boolean enablePotionSwap = true;
+	
+	//storage
 	private List<UUID> latePotionPlayers = new ArrayList<UUID>();
+	
 	
 	public static PotionSwap getInstance(){
 		return instance;
 	}
 	public void setup(){
-		enablePotionSwap=false;
 		latePotionPlayers.clear();
 	}
-	
-	
-	public void enablePotionSwap(boolean val){
-		this.enablePotionSwap=val;
+	public void run(){
+		UHC.getInstance().getServer().getScheduler().runTaskTimer(UHC.getInstance(), new Runnable(){
+			@Override
+			public void run() {
+				for(UUID u : teamM.getPlayersInGame()){
+					if(Bukkit.getServer().getPlayer(u).isOnline()){
+						giveAPlayerARandomPotion(Bukkit.getServer().getPlayer(u));
+					}
+					else{
+						addAPlayerToLateGive(u);
+					}
+				}
+			}
+			
+		}, 0L, 6000L); //5 minutes
 	}
+	
 	public List<UUID> getLatePotionPlayers(){
 		return latePotionPlayers;
 	}
@@ -42,7 +58,9 @@ public class PotionSwap implements Runnable {
 	public void giveAPlayerARandomPotion(Player p, int durationInSeconds){
 		p.addPotionEffect(new PotionEffect(getRandomPotion(), durationInSeconds*20, 1));
 	}
-	
+	public void addAPlayerToLateGive(UUID u){
+		this.latePotionPlayers.add(u);
+	}
 	public void removePlayerFromLateGive(Player p){
 		latePotionPlayers.remove(p.getUniqueId());
 	}
@@ -51,7 +69,7 @@ public class PotionSwap implements Runnable {
 	private PotionEffectType getRandomPotion(){
 		Random random = new Random();
 		PotionEffectType potion = null;
-		switch(random.nextInt(13)){
+		switch(random.nextInt(15)){
 		
 		case 1: potion = PotionEffectType.BLINDNESS;
 				break;
@@ -79,6 +97,10 @@ public class PotionSwap implements Runnable {
 				break;
 		case 13: potion = PotionEffectType.WEAKNESS;
 				break;
+		case 14: potion = PotionEffectType.INVISIBILITY;
+				break;
+		case 15: potion = PotionEffectType.INCREASE_DAMAGE;
+				break;
 		default: Bukkit.getServer().getLogger().info("Unexpected error at executing PotionSwap");
 		
 		}
@@ -86,21 +108,6 @@ public class PotionSwap implements Runnable {
 	}
 	
 	
-	@Override
-	public void run() {
-		if(enablePotionSwap){
-			for(UUID u : teamM.getPlayersInGame()){
-				if(Bukkit.getServer().getPlayer(u).isOnline()){
-					giveAPlayerARandomPotion(Bukkit.getServer().getPlayer(u));
-				}
-				else{
-					latePotionPlayers.add(u);
-				}
-				
-			}
-		}
-		
-	}
 
 	
 	

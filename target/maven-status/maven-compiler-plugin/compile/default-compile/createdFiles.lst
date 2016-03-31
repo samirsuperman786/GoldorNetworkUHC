@@ -1,7 +1,0 @@
-com\goldornetwork\uhc\listeners\JoinEvent.class
-com\goldornetwork\uhc\managers\ChunkGenerator.class
-com\goldornetwork\uhc\commands\UnInvitePlayerCommand.class
-com\goldornetwork\uhc\listeners\BreakEvent.class
-com\goldornetwork\uhc\managers\ModifierManager\LocationListener.class
-com\goldornetwork\uhc\listeners\LeaveEvent.class
-com\goldornetwork\uhc\listeners\ChatEvent.class

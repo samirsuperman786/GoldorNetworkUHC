@@ -11,15 +11,14 @@ import com.goldornetwork.uhc.UHC;
 
 public class ChatEvent implements Listener{
 
-	
 	public ChatEvent(UHC plugin){
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onChatEvent(AsyncPlayerChatEvent e){
 		e.setFormat("%s: %s");
 	}
-	
+
 }

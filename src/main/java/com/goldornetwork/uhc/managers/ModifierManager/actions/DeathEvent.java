@@ -22,18 +22,19 @@ import com.goldornetwork.uhc.utils.MessageSender;
 
 public class DeathEvent implements Listener {
 
-
+	//instances
 	private static DeathEvent instance = new DeathEvent();
 	private TeamManager teamM =  TeamManager.getInstance();
 	private TimerManager timerM =  TimerManager.getInstance();
 	private ScatterManager scatterM = ScatterManager.getInstance();
 	private PotionSwap potionS = PotionSwap.getInstance();
 	private MessageSender ms = new MessageSender();
-
+	private LiveWithRegret liveWithRegretM = LiveWithRegret.getInstance();
+	//gamemodes
 	private boolean enableLiveWithRegret;
-	
 	private boolean enableKillSwitch;
-	private Map<UUID, Integer> numberOfDeaths = new HashMap<UUID, Integer>();
+	
+	//storage
 
 
 	public static DeathEvent getInstance(){
@@ -42,7 +43,7 @@ public class DeathEvent implements Listener {
 
 	public void setup(){
 		enableLiveWithRegret =false;
-		numberOfDeaths.clear();
+		
 	}
 
 	public void enableLiveWithRegret(boolean val){
@@ -52,7 +53,7 @@ public class DeathEvent implements Listener {
 		this.enableKillSwitch = val;
 	}
 
-	private void playerDied(Player p, Event e){
+	public void playerDied(Player p, Event e){
 		p.setHealth(p.getMaxHealth());
 		teamM.addPlayerToObservers(p);
 		if(teamM.isTeamsEnabled()){
@@ -72,28 +73,17 @@ public class DeathEvent implements Listener {
 	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerDeath(PlayerDeathEvent e){
 		Player p = e.getEntity();
-		if(teamM.isPlayerInGame(p)==true){
+		if(teamM.isPlayerInGame(p)==true && timerM.hasCountDownEnded()){
 			p.getWorld().strikeLightningEffect(p.getLocation());
 			if(enableLiveWithRegret){
 				if(timerM.isPVPEnabled()==false){
-					if(numberOfDeaths.containsKey(p.getUniqueId())==false){
-						numberOfDeaths.put(p.getUniqueId(), 1);
-						p.setHealth(p.getMaxHealth());
-						potionS.giveAPlayerARandomPotion(p, Integer.MAX_VALUE);
-						e.setDeathMessage(teamM.getColorOfPlayer(p) + p.getName() + ChatColor.GRAY + " has died and respawned with debuffs.");
-						if(teamM.isTeamsEnabled()){
-							scatterM.lateScatterAPlayerInATeam(teamM.getTeamOfPlayer(p), p);
-						}
-						else if(teamM.isFFAEnabled()){
-							scatterM.lateScatterAPlayerInFFA(p);					}
-						else{
-							playerDied(p, e);
-						}
+					liveWithRegretM.run(p, e);
+					
+					if(teamM.isTeamsEnabled()){
+						scatterM.lateScatterAPlayerInATeam(teamM.getTeamOfPlayer(p), p);
 					}
-					else{
-						playerDied(p, e);
-					}
-
+					else if(teamM.isFFAEnabled()){
+						scatterM.lateScatterAPlayerInFFA(p);					}
 				}
 				else{
 					playerDied(p, e);

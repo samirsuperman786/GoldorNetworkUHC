@@ -3,22 +3,32 @@ package com.goldornetwork.uhc.managers.ModifierManager;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.inventory.ItemStack;
 
+import com.goldornetwork.uhc.UHC;
+import com.goldornetwork.uhc.listeners.BreakEvent;
 import com.goldornetwork.uhc.listeners.JoinEvent;
 import com.goldornetwork.uhc.managers.TimerManager;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.BlockRush;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.BowListener;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.DeathEvent;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.DisabledCrafting;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.FlowerPower;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.GoneFishing;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.KingsManager;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.LandIsBadManager;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.LiveWithRegret;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.PotionSwap;
+import com.goldornetwork.uhc.managers.ModifierManager.actions.SkyHigh;
 import com.goldornetwork.uhc.managers.ModifierManager.actions.TheHobbitManager;
 
 public class ModifierManager {
-
+	
+	//instances
 	private static ModifierManager instance = new ModifierManager();
-	//instances of managers
 	private BowListener bowListener = BowListener.getInstance();
 	private PotionSwap potionS = PotionSwap.getInstance();
 	private KingsManager kingM = KingsManager.getInstance();
@@ -27,19 +37,28 @@ public class ModifierManager {
 	private TheHobbitManager hobbitM = TheHobbitManager.getInstance();
 	private DisabledCrafting disabledC = DisabledCrafting.getInstance();
 	private JoinEvent joinE = JoinEvent.getInstance();
-	//
+	private BreakEvent breakE = BreakEvent.getInstance();
+	private FlowerPower flowerPowerM = FlowerPower.getInstance();
+	private GoneFishing goneFishingM = GoneFishing.getInstance();
+	private SkyHigh skyHighM = SkyHigh.getInstance();
+	private BlockRush blockRushM = BlockRush.getInstance();
+	private LiveWithRegret liveWithRegretM = LiveWithRegret.getInstance();
+	private LandIsBadManager landIsBadM = LandIsBadManager.getInstance();	
+	private LocationListener locationL = LocationListener.getInstance();
+	Random random = new Random();
 	
+	//storage
 	private Map<String, List<String>> options = new HashMap<String, List<String>>();
 	private Map<Enum<Gamemodes>, Boolean> gameModesThatAreEnabled = new HashMap<Enum<Gamemodes>, Boolean> ();
 	private int numberOfGamemodesToEnable = 3;
-	
-	
+	private UHC plugin;
 	
 	public static ModifierManager getInstance(){
 		return instance;
 	}
 	
-	public void setup(){
+	public void setup(UHC plugin){
+		this.plugin = plugin;
 		options.clear();
 		gameModesThatAreEnabled.clear();
 	}
@@ -47,22 +66,21 @@ public class ModifierManager {
 	public enum Gamemodes{
 		SKYHIGH, SWITCHEROO, REWARDINGLONGSHOTS, POTIONSWAP, LIVEWITHREGRET, 
 		KINGS, KILLSWITCH, THEHOBBIT, GONEFISHING, FLOWERPOWER, LANDISBAD, 
-		BLOCKRUSH, BIGCRACK, TICKTOCK
+		BLOCKRUSH, TICKTOCK
 		
 	}
-	/* Skyhigh needs work on damagetick 
+	/* Skyhigh is done
 	 * switcheroo is done	
 	 * rewardinglongshots is done
-	 * potioonswap is done
+	 * potionswap is done
 	 * livewith regret needs work on custom death messages
 	 * kings is done
 	 * killswitch is done
 	 * thehobbit is done
-	 * gonefishing not done
-	 * flowerpower not done
-	 * landisbad not done
-	 * blockrush not done
-	 * bigcrack not dome
+	 * gonefishing is pretty much done TODO edit server config
+	 * flowerpower almost done TODO add more restrictions on drops
+	 * landisbad is done
+	 * blockrush is done
 	 * ticktock not done
 	 */
 	
@@ -70,6 +88,17 @@ public class ModifierManager {
 		return gameModesThatAreEnabled;
 	}
 	
+	public void generateOptions(){
+		boolean optionsFound=false;
+		int ignore = numberOfGamemodesToEnable;
+		while(optionsFound=false){
+				Gamemodes gamemode = getRandom();
+				//TODo finish
+		}
+	}
+	private Gamemodes getRandom(){
+		return Gamemodes.values()[(int) (Math.random()*Gamemodes.values().length)];
+	}
 	
 	public void enableGamemode(Gamemodes gamemode){
 		
@@ -84,7 +113,7 @@ public class ModifierManager {
 					break;
 			case POTIONSWAP: potionSwap(true); //new potion effects every 5 minutes
 					break;
-			case LIVEWITHREGRET: //If you die before pvp, you respawn with a random debuff
+			case LIVEWITHREGRET: liveWithRegret(true); //If you die before pvp, you respawn with a random debuff
 					break;
 			case KINGS: kings(true); //player on team gets op effect and if he dies, teamates get debuff
 					break;
@@ -94,13 +123,11 @@ public class ModifierManager {
 					break;
 			case GONEFISHING: goneFishing(true); //INFINITE LEVELS, 20 ANVILS, FISHING ROD WITH LOFTS 250 & UNBREAKING 150, ENCHANT TABLES DISABLED
 					break;
-			case FLOWERPOWER: //WHEN YOU BREAK A FLOWER YOU GET A RANDOM AMOUNT OF A RANDOM ITEM
+			case FLOWERPOWER: flowerPower(true);//WHEN YOU BREAK A FLOWER YOU GET A RANDOM AMOUNT OF A RANDOM ITEM
 					break;
-			case LANDISBAD: //overpowered mobs spawn on land, the only safe place is underwater, NO Breathing damage		
+			case LANDISBAD: LandIsBad(true);//after pvp, players who are not underwater will take damage	
 					break;
-			case BLOCKRUSH: //first player to break a unique block receives 1 diamond
-					break;
-			case BIGCRACK: //entire meetup area will be void and players must bridge over it
+			case BLOCKRUSH: blockRush(true);//first player to break a unique block receives 1 diamond
 					break;
 			case TICKTOCK: //last player to have killed someone will regenerate 1 heart every minute
 					break;
@@ -111,8 +138,10 @@ public class ModifierManager {
 	}
 	
 	private void skyHigh(boolean val){
+		skyHighM.setup(plugin);
 		timerM.enableSkyHigh(val);
 		joinE.enableSkyHigh(val);
+		locationL.enableSkyHigh(val);
 	}
 	private void switcheroo(boolean val){
 		bowListener.enableSwitcheroo(val);
@@ -122,15 +151,17 @@ public class ModifierManager {
 	}
 	
 	private void potionSwap(boolean val){
-		potionS.enablePotionSwap(val);
+		potionS.setup();
+		timerM.enablePotionSwap(val);
 		joinE.enablePotionSwap(val);
 	}
 	private void liveWithRegret(boolean val){
-		
+		liveWithRegretM.setup();
+		deathE.enableLiveWithRegret(val);
 	}
 	private void kings(boolean val){
+		kingM.setup();
 		kingM.enableKings(val);
-		
 	}
 	
 	private void killSwitch(boolean val){
@@ -138,15 +169,30 @@ public class ModifierManager {
 	}
 	
 	private void theHobbit(boolean val){
+		hobbitM.setup();
 		joinE.enableTheHobbit(val);
 		timerM.enableTheHobbit(val);
 		hobbitM.enableTheHobbit(val);
 	}
 	
 	private void goneFishing(boolean val){
+		goneFishingM.setup();
 		disabledC.enableGoneFishing(val);
 		joinE.enableGoneFishing(val);
 		timerM.enableGoneFishing(val);
+		flowerPowerM.addDisallowedItems(new ItemStack(125));//enchant table
+	}
+	private void flowerPower(boolean val){
+		flowerPowerM.setup();
+		breakE.enableFlowerPower(val);
+	}
+	private void LandIsBad(boolean val){
+		landIsBadM.setup(plugin);
+		locationL.enableLandIsBad(val);
+	}
+	private void blockRush(boolean val){
+		blockRushM.setup();
+		breakE.enableBlockRush(val);
 	}
 	
 }

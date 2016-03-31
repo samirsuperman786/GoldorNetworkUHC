@@ -12,34 +12,39 @@ import com.goldornetwork.uhc.utils.MessageSender;
 
 public class CreateCommand implements CommandExecutor{
 
+	//instances
 	private TeamManager teamM = TeamManager.getInstance();
 	private TimerManager timerM = TimerManager.getInstance();
 	private MessageSender ms = new MessageSender();
-	
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		Player p = (Player) sender;
-		
+
 		if(!(sender instanceof Player)){
 			ms.noConsole(sender);
 			return true;
 		}
-		
-		
+
+
 		else if(teamM.isPlayerInGame(p)){
 			ms.send(ChatColor.RED, p, "You are already on a team!");
 			return true;
 		}
-		
-		else if(timerM.hasMatchStarted()){
+
+		else if(timerM.hasCountDownEnded()){
 			ms.send(ChatColor.RED, p, "Match has already started!");
+			return true;
+		}
+		else if(timerM.hasMatchStarted()==false){
+			ms.send(ChatColor.RED, sender, "Game has not started yet!");
 			return true;
 		}
 		else if(args.length==0){
 			if(teamM.isTeamsEnabled()){
 				if(teamM.createRandomTeam(p)==true){
 					ms.alertMessage(p, ChatColor.GREEN, "You have created a team, please use /invite");
-				
+
 				}
 				else{
 					ms.alertMessage(p, ChatColor.RED, "Teams are full!");
@@ -54,14 +59,14 @@ public class CreateCommand implements CommandExecutor{
 				return false;
 			}
 		}
-		
+
 		else{
 			return false;
 		}
-		
-		
-		
-		
+
+
+
+
 	}
 
 }

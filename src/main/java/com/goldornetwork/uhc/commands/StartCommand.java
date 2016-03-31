@@ -10,6 +10,7 @@ import com.goldornetwork.uhc.utils.MessageSender;
 
 public class StartCommand implements CommandExecutor{
 
+	//instances
 	private TimerManager timerM = TimerManager.getInstance();
 	private MessageSender ms = new MessageSender();
 	
@@ -27,7 +28,7 @@ public class StartCommand implements CommandExecutor{
 				return true;
 			}
 			else{
-				timerM.startMatch(true, 10*60, 40*60);
+				timerM.startMatch(true, 15*60, 40*60); 
 				ms.send(ChatColor.GREEN, sender, "You have started the match!");
 				return true;
 			}
