@@ -22,14 +22,10 @@ import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.ModifierManager.LocationListener;
 import com.goldornetwork.uhc.managers.ModifierManager.ModifierManager;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.BowListener;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.DeathEvent;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.DisabledCrafting;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.KingsManager;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.LandIsBadManager;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.PotionSwap;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.SkyHigh;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.TheHobbitManager;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.BowListener;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.DeathEvent;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.DisabledCrafting;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.TheHobbitManager;
 
 public class UHC extends JavaPlugin {
 
@@ -66,8 +62,8 @@ public class UHC extends JavaPlugin {
 		TeamManager.getInstance().setup();
 		ScatterManager.getInstance().setup();
 		ModifierManager.getInstance().setup(plugin);
-		DeathEvent.getInstance().setup();
-		BowListener.getInstance().setup();
+		//DeathEvent.getInstance().setup();
+		//BowListener.getInstance().setup();
 		TimerManager.getInstance().setup();
 		JoinEvent.getInstance().setup();
 		BreakEvent.getInstance().setup();
@@ -99,7 +95,7 @@ public class UHC extends JavaPlugin {
 	}
 
 
-	//can you read this?
+
 
 
 

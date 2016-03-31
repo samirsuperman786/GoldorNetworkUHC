@@ -1,22 +1,12 @@
 package com.goldornetwork.uhc.managers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import com.goldornetwork.uhc.managers.ModifierManager.actions.GoneFishing;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.KingsManager;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.PotionSwap;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.SkyHigh;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.TheHobbitManager;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.GoneFishing;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.KingsManager;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.PotionSwap;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.SkyHigh;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.TheHobbitManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class TimerManager implements Runnable {

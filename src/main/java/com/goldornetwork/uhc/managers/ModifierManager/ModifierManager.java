@@ -12,18 +12,18 @@ import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.listeners.BreakEvent;
 import com.goldornetwork.uhc.listeners.JoinEvent;
 import com.goldornetwork.uhc.managers.TimerManager;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.BlockRush;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.BowListener;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.DeathEvent;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.DisabledCrafting;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.FlowerPower;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.GoneFishing;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.KingsManager;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.LandIsBadManager;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.LiveWithRegret;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.PotionSwap;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.SkyHigh;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.TheHobbitManager;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.BlockRush;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.BowListener;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.DeathEvent;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.DisabledCrafting;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.FlowerPower;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.GoneFishing;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.KingsManager;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.LandIsBadManager;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.LiveWithRegret;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.PotionSwap;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.SkyHigh;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.TheHobbitManager;
 
 public class ModifierManager {
 	

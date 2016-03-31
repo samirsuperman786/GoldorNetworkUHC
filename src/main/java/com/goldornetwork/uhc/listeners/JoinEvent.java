@@ -10,11 +10,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.GoneFishing;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.KingsManager;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.PotionSwap;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.SkyHigh;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.TheHobbitManager;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.GoneFishing;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.KingsManager;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.PotionSwap;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.SkyHigh;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.TheHobbitManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class JoinEvent implements Listener{

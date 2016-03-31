@@ -1,8 +1,8 @@
 package com.goldornetwork.uhc.managers.ModifierManager;
 
 import com.goldornetwork.uhc.managers.TimerManager;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.LandIsBadManager;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.SkyHigh;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.LandIsBadManager;
+import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.SkyHigh;
 
 public class LocationListener implements Runnable {
 
