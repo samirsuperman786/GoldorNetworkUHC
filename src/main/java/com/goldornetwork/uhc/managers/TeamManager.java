@@ -13,6 +13,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
+import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 
@@ -24,7 +25,6 @@ import com.goldornetwork.uhc.utils.MessageSender;
 public class TeamManager {
 	
 	//instances
-	private TimerManager timerM;
 
 	//storage
 	private int playersPerTeam;
@@ -44,8 +44,8 @@ public class TeamManager {
 	private Map<UUID, UUID> invitedPlayers = new HashMap<UUID, UUID>();
 	
 
-	public TeamManager(TimerManager timerM) {
-		this.timerM=timerM;
+	public TeamManager() {
+		
 	}
 	
 	public void setup(){
@@ -199,7 +199,7 @@ public class TeamManager {
 				}
 			}
 		}
-		if(timerM.hasCountDownEnded()==false){
+		if(State.getState().equals(State.OPEN)){
 			for(UUID u : getPlayersOnATeam(getTeamOfPlayer(p))){
 				if(Bukkit.getServer().getPlayer(u).isOnline()){
 					MessageSender.alertMessage(Bukkit.getPlayer(u), ChatColor.RED, "Your team has been disbanded");

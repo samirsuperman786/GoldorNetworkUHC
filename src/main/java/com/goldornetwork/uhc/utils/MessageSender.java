@@ -25,6 +25,9 @@ public class MessageSender {
 	public static void noPerms(CommandSender sender){
 		sender.sendMessage(getPrefix() + ChatColor.RED + "No permission.");
 	}
+	public static void usageMessage(CommandSender sender, String usage){
+		sender.sendMessage(getPrefix() + ChatColor.RED + "Usage: " + usage);
+	}
 	
 	public static void noConsole(CommandSender sender){
 		sender.sendMessage(getPrefix() + ChatColor.RED + "Console cannot run this command!"); 
@@ -35,7 +38,7 @@ public class MessageSender {
 	}
 	
 	public static void sendToOPS(String msg){
-		Bukkit.broadcast(ChatColor.RED + "[ANTICHEAT] " + msg, Server.BROADCAST_CHANNEL_ADMINISTRATIVE);
+		Bukkit.broadcast(ChatColor.RED + "[OPS] " + msg, Server.BROADCAST_CHANNEL_ADMINISTRATIVE);
 	}
 	public static void broadcast(String msg){
 		Bukkit.getServer().broadcastMessage(getPrefix() + ChatColor.RED + msg);

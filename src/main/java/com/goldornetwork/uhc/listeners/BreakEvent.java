@@ -9,8 +9,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
-import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.BlockRush;
-import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.FlowerPower;
+import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.BlockRush;
+import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.FlowerPower;
 import com.goldornetwork.uhc.utils.AntiXray;
 
 public class BreakEvent implements Listener{

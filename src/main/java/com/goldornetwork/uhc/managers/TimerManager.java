@@ -1,12 +1,15 @@
 package com.goldornetwork.uhc.managers;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
-import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.GoneFishing;
-import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.KingsManager;
-import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.PotionSwap;
-import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.SkyHigh;
-import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.TheHobbitManager;
+import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
+import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.GoneFishing;
+import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.KingsManager;
+import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.PotionSwap;
+import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.SkyHigh;
+import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.TheHobbitManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class TimerManager implements Runnable {
@@ -41,16 +44,12 @@ public class TimerManager implements Runnable {
 	private boolean enablePotionSwap;
 	
 	
-	public TimerManager(KingsManager kingM, PotionSwap potionS, SkyHigh skyHighM, GoneFishing goneFishingM, TheHobbitManager hobbitM, ScatterManager scatterM, TeamManager teamM) {
-		this.kingM=kingM;
-		this.potionS=potionS;
-		this.skyHighM=skyHighM;
-		this.goneFishingM=goneFishingM;
-		this.hobbitM=hobbitM;
+	public TimerManager(ScatterManager scatterM, TeamManager teamM) {
 		this.scatterM=scatterM;
 		this.teamM=teamM;
 	}
 	public void setup(){
+		State.setState(State.NOT_RUNNING);
 		hasMatchBegun=false;
 		timeTillMatchStart=-2;
 		timeTillPVPStart=-2;
@@ -65,6 +64,7 @@ public class TimerManager implements Runnable {
 	}
 	
 	public void startMatch(boolean start, int timeTillMatchStarts, int timeTillPVPStarts){
+		State.setState(State.OPEN);
 		timeTillMatchStart = timeTillMatchStarts;
 		this.timeTillPVPStart= timeTillPVPStarts;
 		hasMatchBegun=false;
@@ -74,6 +74,7 @@ public class TimerManager implements Runnable {
 	}
 	
 	public void cancelMatch(){
+		State.setState(State.NOT_RUNNING);
 		timeTillMatchStart=-1;
 	}
 	
@@ -191,7 +192,9 @@ public class TimerManager implements Runnable {
 				timeTillPVPStart--;
 			}
 			else if(timeTillPVPStart==0){
+				State.setState(State.INGAME);
 				MessageSender.broadcast("PVP has been enabled!");
+				Bukkit.getPluginManager().callEvent(new GameStartEvent());
 				scatterM.getUHCWorld().setPVP(true);
 				isPVPEnabled = true;
 				timeTillPVPStart=-2;
