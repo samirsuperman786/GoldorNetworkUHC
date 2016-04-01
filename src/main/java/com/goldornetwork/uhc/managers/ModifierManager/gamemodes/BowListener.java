@@ -12,22 +12,20 @@ import com.goldornetwork.uhc.managers.TimerManager;
 public class BowListener implements Listener {
 
 	//instances
-	private TeamManager teamM = TeamManager.getInstance();
-	private TimerManager timerM = TimerManager.getInstance();
-	private Switcheroo switcherooM = Switcheroo.getInstance();
-	private RewardingLongshots rewardingLongshotsM = RewardingLongshots.getInstance();
+	private TeamManager teamM;
+	private TimerManager timerM;
+	private Switcheroo switcherooM;
+	private RewardingLongshots rewardingLongshotsM;
 	
 	//storage
 	private boolean enableSwitcheroo;
 	private boolean enableRewardingLongshots;
 	
-	private BowListener(){}
-	
-	private static class InstanceHolder{
-		private static final BowListener INSTANCE = new BowListener();
-	}
-	public static BowListener getInstance(){
-		return InstanceHolder.INSTANCE;
+	public BowListener(TeamManager teamM, TimerManager timerM, Switcheroo switcherooM, RewardingLongshots rewardingLongshotsM) {
+		this.teamM=teamM;
+		this.timerM=timerM;
+		this.switcherooM=switcherooM;
+		this.rewardingLongshotsM=rewardingLongshotsM;
 	}
 	
 	public void enableSwitcheroo(boolean val){

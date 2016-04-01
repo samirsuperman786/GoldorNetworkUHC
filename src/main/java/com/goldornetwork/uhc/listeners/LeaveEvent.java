@@ -15,13 +15,13 @@ public class LeaveEvent implements Listener{
 	//TODO if match has started and player leaves, spawn a chicken with their name, if afk for more than 5 mins then kill them and remove from team/game
 
 	//instances
-	private static LeaveEvent instance = new LeaveEvent();
-	private TeamManager teamM = TeamManager.getInstance();
-	private TimerManager timerM = TimerManager.getInstance();
-	private ScatterManager scatterM = ScatterManager.getInstance();
+	private TeamManager teamM;
+	private TimerManager timerM;
+	//private ScatterManager scatterM = ScatterManager.getInstance();
 
-	public static LeaveEvent getInstace(){
-		return instance;
+	public LeaveEvent(TeamManager teamM, TimerManager timerM) {
+		this.teamM=teamM;
+		this.timerM=timerM;
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)

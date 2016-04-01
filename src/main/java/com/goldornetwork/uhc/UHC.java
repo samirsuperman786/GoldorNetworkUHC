@@ -29,6 +29,10 @@ import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.TheHobbitManager
 
 public class UHC extends JavaPlugin {
 
+	/*
+	 * TODO add a is this enabled method for all modifiers instead of having inefficient booleans 
+	 * TODO create instances for managers and pass them through constructors
+	 */
 	private static UHC plugin;
 
 	@Override

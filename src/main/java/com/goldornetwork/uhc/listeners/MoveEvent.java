@@ -10,12 +10,11 @@ import com.goldornetwork.uhc.managers.TeamManager;
 
 public class MoveEvent implements Listener {
 
-	private static MoveEvent instance = new MoveEvent();
-	private TeamManager teamM = TeamManager.getInstance();
+	private TeamManager teamM;
 	private boolean freezeAll;
 	
-	public static MoveEvent getInstace(){
-		return instance;
+	public MoveEvent(TeamManager teamM) {
+		this.teamM=teamM;
 	}
 	public void setup(){
 		this.freezeAll=false;

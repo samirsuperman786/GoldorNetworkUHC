@@ -10,17 +10,18 @@ import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.TheHobbitManager
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class TimerManager implements Runnable {
-	
+	/*
+	 * TODO make a class that is triggered on match start event
+	 * 
+	 */
 	//instances
-	private static TimerManager instance = new TimerManager();
-	private MessageSender ms = new MessageSender();
-	private KingsManager kingM = KingsManager.getInstance();
-	private PotionSwap potionS = PotionSwap.getInstance();
-	private SkyHigh skyHighM = SkyHigh.getInstance();
-	private GoneFishing goneFishingM = GoneFishing.getInstance();
-	private TheHobbitManager hobbitM = TheHobbitManager.getInstance();
-	private ScatterManager scatterM = ScatterManager.getInstance();
-	private TeamManager teamM = TeamManager.getInstance();
+	private KingsManager kingM;
+	private PotionSwap potionS;
+	private SkyHigh skyHighM;
+	private GoneFishing goneFishingM;
+	private TheHobbitManager hobbitM;
+	private ScatterManager scatterM;
+	private TeamManager teamM;
 	//storage
 	private int timeTillMatchStart;
 	private int timeTillPVPStart;
@@ -40,8 +41,14 @@ public class TimerManager implements Runnable {
 	private boolean enablePotionSwap;
 	
 	
-	public static TimerManager getInstance(){
-		return instance;
+	public TimerManager(KingsManager kingM, PotionSwap potionS, SkyHigh skyHighM, GoneFishing goneFishingM, TheHobbitManager hobbitM, ScatterManager scatterM, TeamManager teamM) {
+		this.kingM=kingM;
+		this.potionS=potionS;
+		this.skyHighM=skyHighM;
+		this.goneFishingM=goneFishingM;
+		this.hobbitM=hobbitM;
+		this.scatterM=scatterM;
+		this.teamM=teamM;
 	}
 	public void setup(){
 		hasMatchBegun=false;
@@ -111,23 +118,23 @@ public class TimerManager implements Runnable {
 		if(startMatch){
 			if(timeTillMatchStart >0){
 				if(timeTillMatchStart>=60 && timeTillMatchStart%60 ==0){
-					ms.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart/60 + ChatColor.RED + " minutes");
+					MessageSender.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart/60 + ChatColor.RED + " minutes");
 				}
 					
 				else if(timeTillMatchStart <60 && timeTillMatchStart >=30 &&timeTillMatchStart%10==0){
-					ms.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart + ChatColor.RED + " seconds");
+					MessageSender.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart + ChatColor.RED + " seconds");
 				}
 				else if(timeTillMatchStart <=30 && timeTillMatchStart >=5 && timeTillMatchStart %5==0){
-					ms.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart + ChatColor.RED + " seconds");
+					MessageSender.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart + ChatColor.RED + " seconds");
 				}
 				else if(timeTillMatchStart <= 5 && timeTillMatchStart >0){
-					ms.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart + ChatColor.RED + " seconds");		
+					MessageSender.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart + ChatColor.RED + " seconds");		
 				}
 				timeTillMatchStart--;
 				
 			}
 			else if(timeTillMatchStart == 0){
-				ms.broadcast("Match has started!");
+				MessageSender.broadcast("Match has started!");
 				
 				if(enableTheHobbit){
 					hobbitM.distributeItems();
@@ -159,7 +166,7 @@ public class TimerManager implements Runnable {
 		}
 		
 		else if(timeTillMatchStart == -1){
-			ms.broadcast("Match canceled");
+			MessageSender.broadcast("Match canceled");
 			matchStart=false;
 			timeTillMatchStart =-2; //-2 will act as a null value
 		}
@@ -167,24 +174,24 @@ public class TimerManager implements Runnable {
 		else if(startPVPTimer = true){
 			if(timeTillPVPStart>0){
 				if(timeTillPVPStart >= (5*60) && timeTillPVPStart % (10*60) == 0){
-					ms.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart/60 + ChatColor.RED + " minutes");
+					MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart/60 + ChatColor.RED + " minutes");
 				}
 				else if(timeTillPVPStart<= (4*60) && timeTillPVPStart >= (1*60) && timeTillPVPStart % (1*60) ==0){
-					ms.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart/60 + ChatColor.RED + " minutes");
+					MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart/60 + ChatColor.RED + " minutes");
 				}
 				else if(timeTillPVPStart < 60 && timeTillPVPStart >=30 &&timeTillPVPStart%10==0){
-					ms.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart + ChatColor.RED + " seconds");
+					MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart + ChatColor.RED + " seconds");
 				}
 				else if(timeTillPVPStart <=30 && timeTillPVPStart >=5 && timeTillPVPStart %5==0){
-					ms.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart + ChatColor.RED + " seconds");
+					MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart + ChatColor.RED + " seconds");
 				}
 				else if(timeTillPVPStart <= 5 && timeTillPVPStart >0){
-					ms.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart + ChatColor.RED + " seconds");		
+					MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart + ChatColor.RED + " seconds");		
 				}
 				timeTillPVPStart--;
 			}
 			else if(timeTillPVPStart==0){
-				ms.broadcast("PVP has been enabled!");
+				MessageSender.broadcast("PVP has been enabled!");
 				scatterM.getUHCWorld().setPVP(true);
 				isPVPEnabled = true;
 				timeTillPVPStart=-2;

@@ -18,21 +18,15 @@ import com.goldornetwork.uhc.utils.MessageSender;
 public class LiveWithRegret {
 
 	//instances
-	private TeamManager teamM = TeamManager.getInstance();
-	private MessageSender ms = new MessageSender();
-	private DeathEvent deathE = DeathEvent.getInstance();
+	private TeamManager teamM;
+	private DeathEvent deathE;
 	
 	//storage
 	private Map<UUID, Integer> numberOfDeaths = new HashMap<UUID, Integer>();
 	
-	private LiveWithRegret(){}
-	
-	private static class InstanceHolder{
-		private static final LiveWithRegret INSTANCE = new LiveWithRegret();
-	}
-	public static LiveWithRegret getInstance(){
-		
-		return InstanceHolder.INSTANCE;
+	public LiveWithRegret(TeamManager teamM, DeathEvent deathE) {
+		this.teamM=teamM;
+		this.deathE=deathE;
 	}
 	public void setup(){
 		numberOfDeaths.clear();
@@ -46,7 +40,7 @@ public class LiveWithRegret {
 			numberOfDeaths.put(p.getUniqueId(), 1);
 			p.setHealth(p.getMaxHealth());
 			giveAPlayerARandomDebuff(p);
-			ms.broadcast(teamM.getColorOfPlayer(p) + p.getName() + " has died and respawned with debuffs.");
+			MessageSender.broadcast(teamM.getColorOfPlayer(p) + p.getName() + " has died and respawned with debuffs.");
 		}
 		else if(numberOfDeaths.containsKey(p.getUniqueId())){
 			if(numberOfDeaths.get(p.getUniqueId())>1){
@@ -60,19 +54,19 @@ public class LiveWithRegret {
 		Random random = new Random();
 		switch(random.nextInt(5)){
 		case 1: p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 1));
-				ms.alertMessage(p, ChatColor.GOLD, "You have respawned with a" + ChatColor.GRAY + " slowness debuff");
+				MessageSender.alertMessage(p, ChatColor.GOLD, "You have respawned with a" + ChatColor.GRAY + " slowness debuff");
 				break;
 		case 2: p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, Integer.MAX_VALUE, 1));
-				ms.alertMessage(p, ChatColor.GOLD, "You have respawned with a" + ChatColor.GRAY + " weakness debuff");
+				MessageSender.alertMessage(p, ChatColor.GOLD, "You have respawned with a" + ChatColor.GRAY + " weakness debuff");
 				break;
 		case 3: p.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, Integer.MAX_VALUE, 1));
-				ms.alertMessage(p, ChatColor.GOLD, "You have respawned with a" + ChatColor.GRAY + " hunger debuff");
+				MessageSender.alertMessage(p, ChatColor.GOLD, "You have respawned with a" + ChatColor.GRAY + " hunger debuff");
 				break;
 		case 4: p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 10*60*20, 1));
-				ms.alertMessage(p, ChatColor.GOLD, "You have respawned with a" + ChatColor.GRAY + " blindness debuff");
+				MessageSender.alertMessage(p, ChatColor.GOLD, "You have respawned with a" + ChatColor.GRAY + " blindness debuff");
 				break;
 		case 5: p.setHealth(10);
-				ms.alertMessage(p, ChatColor.GOLD, "You have respawned with a" + ChatColor.GRAY + "health debuff");
+				MessageSender.alertMessage(p, ChatColor.GOLD, "You have respawned with a" + ChatColor.GRAY + "health debuff");
 				break;
 		default: Bukkit.getServer().getLogger().info("Unexpected error at executing PotionSwap");
 		

@@ -15,23 +15,26 @@ import com.goldornetwork.uhc.utils.MessageSender;
 public class ChunkGenerateCommand implements CommandExecutor{
 
 	//instances
-	private TimerManager timerM = TimerManager.getInstance();
-	private MessageSender ms = new MessageSender();
-	private ChunkGenerator chunkG = ChunkGenerator.getInstance();
-
+	private TimerManager timerM;
+	private ChunkGenerator chunkG;
+	
+	public ChunkGenerateCommand(TimerManager timerM, ChunkGenerator chunkG) {
+		this.timerM=timerM;
+		this.chunkG=chunkG;
+	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		if(!(sender.hasPermission("uhc.generate"))){
-			ms.noPerms(sender);
+			MessageSender.noPerms(sender);
 			return true;
 		}
 		else if(timerM.hasMatchStarted()){
-			ms.send(ChatColor.RED, sender, "Cannot enter chunk generation mode during the match!");
+			MessageSender.send(ChatColor.RED, sender, "Cannot enter chunk generation mode during the match!");
 			return true;
 		}
 		else if(chunkG.isGenerating()==true){
-			ms.send(ChatColor.RED, sender, "Please cancel current generation first!");
+			MessageSender.send(ChatColor.RED, sender, "Please cancel current generation first!");
 			return true;
 		}
 		else if(args.length>0){
@@ -42,8 +45,8 @@ public class ChunkGenerateCommand implements CommandExecutor{
 						if(Integer.valueOf(args[1])!=null){
 							int radius = Integer.valueOf(args[1]);
 							chunkG.loadGenerator(world, world.getWorldBorder().getCenter(), radius);
-							ms.broadcast("Generating chunks with a radius of " + radius + " in world \"" + world.getName()  + "\" ETC : " + (chunkG.getTimeTillCompleteInMinutes()) + " minutes");
-							ms.broadcast("Warning- the server should be empty during the generation period.");
+							MessageSender.broadcast("Generating chunks with a radius of " + radius + " in world \"" + world.getName()  + "\" ETC : " + (chunkG.getTimeTillCompleteInMinutes()) + " minutes");
+							MessageSender.broadcast("Warning- the server should be empty during the generation period.");
 							return true;
 						}
 						else{
@@ -55,8 +58,8 @@ public class ChunkGenerateCommand implements CommandExecutor{
 						if(Integer.valueOf(args[1])!=null){
 							int radius = Integer.valueOf(args[1]);
 							chunkG.loadGenerator(world, new Location(world, 0, 0, 0) , radius);
-							ms.broadcast("Generating chunks with a radius of " + radius + " in world \"" + world.getName() + "\" ETC : " + (chunkG.getTimeTillCompleteInMinutes()) + " minutes");
-							ms.broadcast("Warning- the server should be empty during the generation period.");
+							MessageSender.broadcast("Generating chunks with a radius of " + radius + " in world \"" + world.getName() + "\" ETC : " + (chunkG.getTimeTillCompleteInMinutes()) + " minutes");
+							MessageSender.broadcast("Warning- the server should be empty during the generation period.");
 							return true;
 						}
 						else{
@@ -66,7 +69,7 @@ public class ChunkGenerateCommand implements CommandExecutor{
 
 				}
 				else{
-					ms.send(ChatColor.RED, sender, "World " + args[0] + " does not exist!" );
+					MessageSender.send(ChatColor.RED, sender, "World " + args[0] + " does not exist!" );
 					return true;
 				}
 			}

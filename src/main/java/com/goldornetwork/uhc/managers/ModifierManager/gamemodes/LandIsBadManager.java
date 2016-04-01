@@ -17,22 +17,16 @@ import com.goldornetwork.uhc.utils.MessageSender;
 public class LandIsBadManager{
 
 	//instances
-	private TeamManager teamM = TeamManager.getInstance();
-	private MessageSender ms = new MessageSender();
-	private LocationListener locationL = LocationListener.getInstance();
+	private TeamManager teamM;
+	private LocationListener locationL;
 	
 	//storage
 	private UHC plugin;
 	private Map<UUID, BukkitTask> playersToDamage= new HashMap<UUID, BukkitTask>();
 
-	private LandIsBadManager(){}
-	
-	private static class InstanceHolder{
-		private static final LandIsBadManager INSTANCE = new LandIsBadManager();
-	}
-	public static LandIsBadManager getInstance(){
-		
-		return InstanceHolder.INSTANCE;
+	public LandIsBadManager(TeamManager teamM, LocationListener locationL) {
+		this.teamM=teamM;
+		this.locationL=locationL;
 	}
 	public void setup(UHC plugin){
 		this.plugin = plugin;
@@ -49,7 +43,7 @@ public class LandIsBadManager{
 				if(p.getRemainingAir()!=p.getMaximumAir()){
 					p.setRemainingAir(p.getMaximumAir()-1);
 					if(playersToDamage.containsKey(u)){
-						ms.send(ChatColor.GREEN, Bukkit.getServer().getPlayer(u), "You are now breathing water");
+						MessageSender.send(ChatColor.GREEN, Bukkit.getServer().getPlayer(u), "You are now breathing water");
 						playersToDamage.get(u).cancel();
 						playersToDamage.remove(u);
 					}
@@ -60,7 +54,7 @@ public class LandIsBadManager{
 							@Override
 							public void run() {
 								Bukkit.getServer().getPlayer(u).damage(2);
-								ms.send(ChatColor.RED, Bukkit.getServer().getPlayer(u), "Get to water!");
+								MessageSender.send(ChatColor.RED, Bukkit.getServer().getPlayer(u), "Get to water!");
 							}
 
 						}, 0L, 200L);

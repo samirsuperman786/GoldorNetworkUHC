@@ -11,13 +11,10 @@ import org.bukkit.scoreboard.ScoreboardManager;
 
 public class BoardManager {
 
-	//TODO manage teammanager
+	private TeamManager teamM;
 
-	//instances
-	private static BoardManager instance = new BoardManager();
-
-	public static BoardManager getInstance(){
-		return instance;
+	public BoardManager(TeamManager teamM) {
+		this.teamM=teamM;
 	}
 
 	public void initializeScoreBoard(){

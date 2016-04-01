@@ -11,23 +11,24 @@ import com.goldornetwork.uhc.utils.MessageSender;
 public class CancelCommand implements CommandExecutor {
 
 	//instances
-	private MessageSender ms = new MessageSender();
-	private TimerManager timerM = TimerManager.getInstance();
+	private TimerManager timerM;
 
-
+	public CancelCommand(TimerManager timerM) {
+		this.timerM=timerM;
+	}
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		if(!(sender.hasPermission("uhc.start"))){
-			ms.noPerms(sender);
+			MessageSender.noPerms(sender);
 			return true;
 		}
 		else if(timerM.hasMatchStarted()){
-			ms.send(ChatColor.RED, sender, "Match has already started!");
+			MessageSender.send(ChatColor.RED, sender, "Match has already started!");
 			return true;
 		}
 		else{
 			timerM.cancelMatch();
-			ms.send(ChatColor.GREEN, sender, "You have canceled the match!");
+			MessageSender.send(ChatColor.GREEN, sender, "You have canceled the match!");
 			return true;
 		}
 

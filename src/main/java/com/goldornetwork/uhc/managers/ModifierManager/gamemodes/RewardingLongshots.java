@@ -12,20 +12,14 @@ import com.goldornetwork.uhc.utils.MessageSender;
 public class RewardingLongshots {
 	
 	//instances
-	private MessageSender ms = new MessageSender();
-	private TeamManager teamM = TeamManager.getInstance();
-	private BowListener bowListener = BowListener.getInstance();
+	private TeamManager teamM;
+	private BowListener bowListener;
 	
-	private RewardingLongshots(){}
-	
-	private static class InstanceHolder{
-		private static final RewardingLongshots INSTANCE = new RewardingLongshots();
+	public RewardingLongshots(TeamManager teamM, BowListener bowListener) {
+		this.teamM=teamM;
+		this.bowListener=bowListener;
 	}
 	
-	
-	public static RewardingLongshots getInstance(){
-		return InstanceHolder.INSTANCE;
-	}
 	public void setup(){
 		bowListener.enableRewardingLongshots(false);
 	}
@@ -52,8 +46,8 @@ public class RewardingLongshots {
 	}
 	
 	private void send(Player shooter, Player target, int distance){
-		ms.send(ChatColor.GREEN, shooter, "You hit " + teamM.getColorOfPlayer(target) + target.getName() + ChatColor.GREEN +  " at a distance of " + ChatColor.GRAY + distance + ChatColor.GREEN + " blocks!");
-		ms.send(ChatColor.RED, target, "You got shot from a distance of " + ChatColor.GRAY + distance + ChatColor.RED + " blocks!");
+		MessageSender.send(ChatColor.GREEN, shooter, "You hit " + teamM.getColorOfPlayer(target) + target.getName() + ChatColor.GREEN +  " at a distance of " + ChatColor.GRAY + distance + ChatColor.GREEN + " blocks!");
+		MessageSender.send(ChatColor.RED, target, "You got shot from a distance of " + ChatColor.GRAY + distance + ChatColor.RED + " blocks!");
 	}
 
 	

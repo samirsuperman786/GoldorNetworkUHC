@@ -15,19 +15,16 @@ import com.goldornetwork.uhc.managers.ScatterManager;
 public class BlockRush {
 
 	//instances
-	private ScatterManager scatterM = ScatterManager.getInstance();
-	private BreakEvent breakE = BreakEvent.getInstance();
+	private ScatterManager scatterM;
+	private BreakEvent breakE;
 	//storage
 	private List<Material> firstBlocksMined = new ArrayList<Material>();
 	
-	private BlockRush(){}
+	public BlockRush(ScatterManager scatterM, BreakEvent breakE) {
+		this.scatterM=scatterM;
+		this.breakE=breakE;
+	}
 	
-	private static class InstanceHolder{
-		private static final BlockRush INSTACE = new BlockRush();
-	}
-	public static BlockRush getInstance(){
-		return InstanceHolder.INSTACE;
-	}
 	public void setup(){
 		firstBlocksMined.clear();
 		breakE.enableBlockRush(false);

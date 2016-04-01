@@ -16,19 +16,13 @@ public class FlowerPower {
 
 	//instances
 	private Random random = new Random();
-	private MessageSender ms = new MessageSender();
-	private BreakEvent breakE = BreakEvent.getInstance();
+	private BreakEvent breakE;
 	
 	//storage
 	private List<ItemStack> disalloweditems = new ArrayList<ItemStack>();
 	
-	private FlowerPower(){}
-	
-	private static class InstanceHolder{
-		private static final FlowerPower INSTANCE = new FlowerPower();
-	}
-	public static FlowerPower getInstance(){
-		return InstanceHolder.INSTANCE;
+	public FlowerPower(BreakEvent breakE) {
+		this.breakE= breakE;
 	}
 	public void setup(){
 				breakE.enableFlowerPower(false);
@@ -69,7 +63,7 @@ public class FlowerPower {
 			int item = random.nextInt(356) + 1;
 			if(disalloweditems.contains(new ItemStack(item))==false && new ItemStack(item).getItemMeta()!=null){
 				int amount = random.nextInt(64);
-				ms.send(ChatColor.GREEN, p, "ID " + item);
+				MessageSender.send(ChatColor.GREEN, p, "ID " + item);
 				p.getWorld().dropItem(e.getBlock().getLocation(), new ItemStack(item, amount));
 				foundItem=true;
 			}

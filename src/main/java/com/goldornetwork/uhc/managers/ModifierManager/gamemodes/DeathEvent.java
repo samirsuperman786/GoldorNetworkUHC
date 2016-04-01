@@ -16,24 +16,23 @@ import com.goldornetwork.uhc.utils.MessageSender;
 public class DeathEvent implements Listener {
 
 	//instances
-	private TeamManager teamM =  TeamManager.getInstance();
-	private TimerManager timerM =  TimerManager.getInstance();
-	private ScatterManager scatterM = ScatterManager.getInstance();
-	private MessageSender ms = new MessageSender();
-	private LiveWithRegret liveWithRegretM = LiveWithRegret.getInstance();
-	private KillSwitch killSwitchM = KillSwitch.getInstance();
+	private TeamManager teamM;
+	private TimerManager timerM;
+	private ScatterManager scatterM;
+	private LiveWithRegret liveWithRegretM;
+	private KillSwitch killSwitchM;
 	//gamemodes
 	private boolean enableLiveWithRegret;
 	private boolean enableKillSwitch;
 	
-	//storage
 
-	private DeathEvent(){}
-	private static class InstanceHolder{
-		private static final DeathEvent INSTANCE = new DeathEvent();
-	}
-	public static DeathEvent getInstance(){
-		return InstanceHolder.INSTANCE;
+
+	public DeathEvent(TeamManager teamM, TimerManager timerM, ScatterManager scatterM, LiveWithRegret liveWithRegretM, KillSwitch killSwitchM) {
+		this.teamM=teamM;
+		this.timerM=timerM;
+		this.scatterM=scatterM;
+		this.liveWithRegretM=liveWithRegretM;
+		this.killSwitchM=killSwitchM;
 	}
 
 	public void enableLiveWithRegret(boolean val){

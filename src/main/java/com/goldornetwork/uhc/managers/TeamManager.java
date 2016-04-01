@@ -24,9 +24,7 @@ import com.goldornetwork.uhc.utils.MessageSender;
 public class TeamManager {
 	
 	//instances
-	private static TeamManager teamM = new TeamManager();
-	private MessageSender ms = new MessageSender();
-	private TimerManager timerM = TimerManager.getInstance();
+	private TimerManager timerM;
 
 	//storage
 	private int playersPerTeam;
@@ -46,10 +44,9 @@ public class TeamManager {
 	private Map<UUID, UUID> invitedPlayers = new HashMap<UUID, UUID>();
 	
 
-	public static TeamManager getInstance(){
-		return teamM;
+	public TeamManager(TimerManager timerM) {
+		this.timerM=timerM;
 	}
-	
 	
 	public void setup(){
 		isFFAEnabled=false;
@@ -196,7 +193,7 @@ public class TeamManager {
 			for(Map.Entry<UUID, UUID> entry: invitedPlayers.entrySet()){
 				if(entry.getValue()==p.getUniqueId()){
 					if(Bukkit.getServer().getPlayer(entry.getKey()).isOnline()){
-						ms.alertMessage(Bukkit.getServer().getPlayer(entry.getKey()),ChatColor.RED, "Your invitation to team " + getTeamOfPlayer(p) + " has been revoked!");
+						MessageSender.alertMessage(Bukkit.getServer().getPlayer(entry.getKey()),ChatColor.RED, "Your invitation to team " + getTeamOfPlayer(p) + " has been revoked!");
 					}
 					invitedPlayers.remove(entry.getKey());
 				}
@@ -205,7 +202,7 @@ public class TeamManager {
 		if(timerM.hasCountDownEnded()==false){
 			for(UUID u : getPlayersOnATeam(getTeamOfPlayer(p))){
 				if(Bukkit.getServer().getPlayer(u).isOnline()){
-					ms.alertMessage(Bukkit.getPlayer(u), ChatColor.RED, "Your team has been disbanded");
+					MessageSender.alertMessage(Bukkit.getPlayer(u), ChatColor.RED, "Your team has been disbanded");
 					removePlayerFromTeam(Bukkit.getServer().getPlayer(u));
 				}
 			}
@@ -297,7 +294,7 @@ public class TeamManager {
 	public void addPlayerToTeam(Player p, String team){
 		for(UUID u : getPlayersOnATeam(team.toLowerCase())){
 			if(Bukkit.getServer().getPlayer(u).isOnline()){
-				ms.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.GREEN, p.getName() + " has joined your team.");
+				MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.GREEN, p.getName() + " has joined your team.");
 			}
 		}
 		playersInGame.add(p.getUniqueId());

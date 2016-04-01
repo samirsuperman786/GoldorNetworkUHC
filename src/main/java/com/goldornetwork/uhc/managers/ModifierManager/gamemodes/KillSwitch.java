@@ -13,21 +13,16 @@ import com.goldornetwork.uhc.utils.MessageSender;
 
 public class KillSwitch {
 
-	private static volatile KillSwitch instance;
-	private MessageSender ms = new MessageSender();
-	private TeamManager teamM = TeamManager.getInstance();
-	private DeathEvent deathE = DeathEvent.getInstance();
-	private JoinEvent joinE = JoinEvent.getInstance();
-	private TimerManager timerM = TimerManager.getInstance();
+	private TeamManager teamM;
+	private DeathEvent deathE;
+	private JoinEvent joinE;
+	private TimerManager timerM;
 	
-	private KillSwitch(){}
-	
-	private static class InstanceHolder{
-		private static final KillSwitch INSTANCE = new KillSwitch();
-	}
-	public static KillSwitch getInstance(){
-		
-		return InstanceHolder.INSTANCE;
+	public KillSwitch(TeamManager teamM, DeathEvent deathE, JoinEvent joinE, TimerManager timerM) {
+		this.teamM= teamM;
+		this.deathE=deathE;
+		this.joinE=joinE;
+		this.timerM=timerM;
 	}
 	public void setup(){
 		deathE.enableKillSwitch(false);
@@ -45,7 +40,7 @@ public class KillSwitch {
 		killerInventory.clear();
 		killerInventory.setContents(targetInventory);
 		e.getDrops().clear();
-		ms.alertMessage(killer, ChatColor.GOLD, "You have switched inventories with " + teamM.getColorOfPlayer(target) + target.getName());
+		MessageSender.alertMessage(killer, ChatColor.GOLD, "You have switched inventories with " + teamM.getColorOfPlayer(target) + target.getName());
 		deathE.playerDied(target, e);
 	}
 	

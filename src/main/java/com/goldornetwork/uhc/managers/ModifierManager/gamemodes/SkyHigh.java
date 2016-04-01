@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.tools.DocumentationTool.Location;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -23,25 +25,21 @@ import com.goldornetwork.uhc.utils.MessageSender;
 public class SkyHigh {
 
 	//instances
-	private TeamManager teamM = TeamManager.getInstance();
-	private MessageSender ms = new MessageSender();
-	private TimerManager timerM = TimerManager.getInstance();
-	private JoinEvent joinE = JoinEvent.getInstance();
-	private LocationListener locationL = LocationListener.getInstance();
+	private TeamManager teamM;
+	private TimerManager timerM;
+	private JoinEvent joinE;
+	private LocationListener locationL;
 	
 	//storage
 	private Map<UUID, BukkitTask> playersToDamage= new HashMap<UUID, BukkitTask>();
 	private List<UUID> lateSkyHigh = new ArrayList<UUID>();
 	UHC plugin;
 	
-	private SkyHigh(){}
-	
-	private static class InstanceHolder{
-		private static final SkyHigh INSTANCE = new SkyHigh();
-	}
-	public static SkyHigh getInstance(){
-		
-		return InstanceHolder.INSTANCE;
+	public SkyHigh(TeamManager teamM, TimerManager timerM, JoinEvent joinE, LocationListener locationL) {
+		this.teamM=teamM;
+		this.timerM=timerM;
+		this.joinE=joinE;
+		this.locationL=locationL;
 	}
 	
 	public void setup(UHC plugin){
@@ -86,7 +84,7 @@ public class SkyHigh {
 							@Override
 							public void run() {
 								Bukkit.getServer().getPlayer(u).damage(2);
-								ms.send(ChatColor.RED, Bukkit.getServer().getPlayer(u), "You are below y = 101!");
+								MessageSender.send(ChatColor.RED, Bukkit.getServer().getPlayer(u), "You are below y = 101!");
 							}
 							
 						}, 0L, 600L);
@@ -97,7 +95,7 @@ public class SkyHigh {
 				}
 				else if(Bukkit.getServer().getPlayer(u).getLocation().getBlockY()>=101){
 					if(playersToDamage.containsKey(u)){
-						ms.send(ChatColor.GREEN, Bukkit.getServer().getPlayer(u), "You are now above y =100!");
+						MessageSender.send(ChatColor.GREEN, Bukkit.getServer().getPlayer(u), "You are now above y =100!");
 						playersToDamage.get(u).cancel();
 						playersToDamage.remove(u);
 					}

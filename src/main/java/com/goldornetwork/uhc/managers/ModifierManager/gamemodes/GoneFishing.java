@@ -18,21 +18,22 @@ import com.goldornetwork.uhc.managers.TimerManager;
 
 public class GoneFishing {
 
-	private TeamManager teamM = TeamManager.getInstance();
-	private DisabledCrafting disabledC = DisabledCrafting.getInstance();
-	private JoinEvent joinE = JoinEvent.getInstance();
-	private TimerManager timerM = TimerManager.getInstance();
-	private FlowerPower flowerPowerM = FlowerPower.getInstance();
+	private TeamManager teamM;
+	private DisabledCrafting disabledC;
+	private JoinEvent joinE;
+	private TimerManager timerM;
+	private FlowerPower flowerPowerM;
+	
 	private List <UUID> lateGoneFishing = new ArrayList<UUID>();
 	
-	private GoneFishing(){}
+	public GoneFishing(TeamManager teamM, DisabledCrafting disabledC, JoinEvent joinE, TimerManager timerM, FlowerPower flowerPowerM) {
+		this.teamM=teamM;
+		this.disabledC=disabledC;
+		this.joinE=joinE;
+		this.timerM=timerM;
+		this.flowerPowerM=flowerPowerM;
+	}
 	
-	private static class InstanceHolder{
-		private static final GoneFishing INSTANCE = new GoneFishing();
-	}
-	public static GoneFishing getInstance(){
-		return InstanceHolder.INSTANCE;
-	}
 	public void setup(){
 		lateGoneFishing.clear();
 		disabledC.enableGoneFishing(false);

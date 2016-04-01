@@ -53,6 +53,7 @@ public class ModifierManager {
 	private int numberOfGamemodesToEnable = 3;
 	private UHC plugin;
 	
+	//TODO work on constructor
 	public static ModifierManager getInstance(){
 		return instance;
 	}

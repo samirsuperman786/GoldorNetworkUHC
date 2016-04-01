@@ -11,25 +11,27 @@ import com.goldornetwork.uhc.utils.MessageSender;
 public class StartCommand implements CommandExecutor{
 
 	//instances
-	private TimerManager timerM = TimerManager.getInstance();
-	private MessageSender ms = new MessageSender();
+	private TimerManager timerM;
 	
+	public StartCommand(TimerManager timerM) {
+		this.timerM=timerM;
+	}
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		
 		if(!(sender.hasPermission("uhc.start"))){
-			ms.noPerms(sender);
+			MessageSender.noPerms(sender);
 			return true;
 		}
 		else if(args.length == 0){
 			if(timerM.hasMatchStarted()==true){
-				ms.send(ChatColor.RED, sender, "Match has already started!");
+				MessageSender.send(ChatColor.RED, sender, "Match has already started!");
 				return true;
 			}
 			else{
 				timerM.startMatch(true, 15*60, 40*60); 
-				ms.send(ChatColor.GREEN, sender, "You have started the match!");
+				MessageSender.send(ChatColor.GREEN, sender, "You have started the match!");
 				return true;
 			}
 		}

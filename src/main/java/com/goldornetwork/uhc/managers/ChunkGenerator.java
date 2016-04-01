@@ -8,8 +8,9 @@ import com.goldornetwork.uhc.utils.MessageSender;
 public class ChunkGenerator implements Runnable{
 
 	//instances
-	private static ChunkGenerator instance = new ChunkGenerator();
-	private MessageSender ms = new MessageSender();
+	public ChunkGenerator() {
+		
+	}
 
 	//storage
 	private Location center;
@@ -36,9 +37,6 @@ public class ChunkGenerator implements Runnable{
 	private int chunksLeft;
 	private int duration=0;
 
-	public static ChunkGenerator getInstance(){
-		return instance;
-	}
 
 	public void loadGenerator(World world, Location center, int radius){
 		this.world = world;
@@ -82,7 +80,7 @@ public class ChunkGenerator implements Runnable{
 	public void run() {
 		duration++;
 		if(isGeneratingDone){
-			ms.broadcast("Done Preloading Chunks!");
+			MessageSender.broadcast("Done Preloading Chunks!");
 			isGeneratingDone=false;
 		}
 		else if(startGenerating){
@@ -93,7 +91,7 @@ public class ChunkGenerator implements Runnable{
 				return;
 			}
 			if(duration %300 ==0){//updates every 5 minutes
-				ms.broadcast((getTimeTillCompleteInMinutes() - (chunksLeft/chunksPerRun))/60 + " minutes until \"" + world.getName() +"\" will finish rendering." );
+				MessageSender.broadcast((getTimeTillCompleteInMinutes() - (chunksLeft/chunksPerRun))/60 + " minutes until \"" + world.getName() +"\" will finish rendering." );
 			}
 
 			else{

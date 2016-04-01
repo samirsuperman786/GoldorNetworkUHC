@@ -7,16 +7,17 @@ import com.goldornetwork.uhc.managers.ModifierManager.gamemodes.SkyHigh;
 public class LocationListener implements Runnable {
 
 	//instances
-	private static LocationListener instance = new LocationListener();
-	private TimerManager timerM = TimerManager.getInstance();
-	private SkyHigh skyHighM = SkyHigh.getInstance();
-	private LandIsBadManager landIsBadM = LandIsBadManager.getInstance();
+	private TimerManager timerM;
+	private SkyHigh skyHighM;
+	private LandIsBadManager landIsBadM;
 	//storage
 	private boolean enableSkyHigh;
 	private boolean enableLandIsBad;
 	
-	public static LocationListener getInstance(){
-		return instance;
+	public LocationListener(TimerManager timerM, SkyHigh skyHighM, LandIsBadManager landIsBadM) {
+		this.timerM=timerM;
+		this.skyHighM=skyHighM;
+		this.landIsBadM=landIsBadM;
 	}
 	public void setup(){
 		enableSkyHigh=false;

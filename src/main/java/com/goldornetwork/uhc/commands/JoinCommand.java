@@ -13,39 +13,42 @@ import com.goldornetwork.uhc.utils.MessageSender;
 public class JoinCommand implements CommandExecutor {
 
 	//instances
-	private TeamManager teamM = TeamManager.getInstance();
-	private TimerManager timerM = TimerManager.getInstance();
-	private MessageSender ms = new MessageSender();
+	private TeamManager teamM;
+	private TimerManager timerM;
 
+	public JoinCommand(TeamManager teamM, TimerManager timerM) {
+		this.teamM=teamM;
+		this.timerM=timerM;
+	}
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		Player p = (Player) sender;
 		if(!(sender instanceof Player)){
-			ms.noConsole(sender);
+			MessageSender.noConsole(sender);
 			return true;
 		}
 		else if(timerM.hasMatchStarted()==false){
-			ms.send(ChatColor.RED, p, "Match has not started yet!");
+			MessageSender.send(ChatColor.RED, p, "Match has not started yet!");
 			return true;
 		}
 		else if(teamM.isPlayerInGame(p)&& !(args[0].equalsIgnoreCase("observers")) && !(args[0].equalsIgnoreCase("obs"))){
-			ms.send(ChatColor.RED, sender, "You are already on a team");
+			MessageSender.send(ChatColor.RED, sender, "You are already on a team");
 			return true;
 		}
 
 		else if(timerM.hasCountDownEnded() && !(args[0].equalsIgnoreCase("observers")) && !(args[0].equalsIgnoreCase("obs"))){
-			ms.send(ChatColor.RED, p, "Match has already started!");
+			MessageSender.send(ChatColor.RED, p, "Match has already started!");
 			return true;
 		}
 		else if(args.length == 0){
 			if(teamM.isFFAEnabled()){
 				if(teamM.isFFARoomToJoin()){
 					teamM.addPlayerToFFA(p);
-					ms.alertMessage(p, ChatColor.GREEN, "You have joined the FFA");
+					MessageSender.alertMessage(p, ChatColor.GREEN, "You have joined the FFA");
 					return true;
 				}
 				else{
-					ms.alertMessage(p, ChatColor.RED, "No room to join sorry!");
+					MessageSender.alertMessage(p, ChatColor.RED, "No room to join sorry!");
 					return true;
 				}
 
@@ -58,11 +61,11 @@ public class JoinCommand implements CommandExecutor {
 			if(args[0].equalsIgnoreCase("observers")||args[0].equalsIgnoreCase("obs")){
 				if(teamM.isPlayerAnObserver(p)==false){
 					teamM.addPlayerToObservers(p);
-					ms.send(ChatColor.AQUA, p, "You have joined the observers");
+					MessageSender.send(ChatColor.AQUA, p, "You have joined the observers");
 					return true;
 				}
 				else{
-					ms.send(ChatColor.RED, p, "You are already an observer!");
+					MessageSender.send(ChatColor.RED, p, "You are already an observer!");
 					return true;
 				}
 			}
@@ -70,24 +73,24 @@ public class JoinCommand implements CommandExecutor {
 				if(teamM.isValidTeam(args[0])){
 					if(teamM.isPlayerInvitedToTeam(p,args[0].toLowerCase())){
 						if(teamM.isTeamRoomToJoin(args[0].toLowerCase())){
-							ms.alertMessage(p, ChatColor.GREEN, "You have joined team " + teamM.getColorOfTeam(args[0].toLowerCase()) + args[0]);
+							MessageSender.alertMessage(p, ChatColor.GREEN, "You have joined team " + teamM.getColorOfTeam(args[0].toLowerCase()) + args[0]);
 							teamM.addPlayerToTeam(p, args[0].toLowerCase());
 							return true;
 						}
 						else{
-							ms.send(ChatColor.RED, p, "No room left on team " + args[0]);
+							MessageSender.send(ChatColor.RED, p, "No room left on team " + args[0]);
 							return true;
 						}
 
 					}
 					else{
-						ms.send(ChatColor.RED, p, "You are not invited to team " + args[0].toLowerCase());
+						MessageSender.send(ChatColor.RED, p, "You are not invited to team " + args[0].toLowerCase());
 						return true;
 					}
 				}
 
 				else{
-					ms.send(ChatColor.RED, p, "Team " + args[0].toLowerCase() + " is not a valid team");
+					MessageSender.send(ChatColor.RED, p, "Team " + args[0].toLowerCase() + " is not a valid team");
 					return true;
 				}
 			}

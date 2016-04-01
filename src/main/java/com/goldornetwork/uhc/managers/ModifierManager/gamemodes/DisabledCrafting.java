@@ -12,18 +12,13 @@ import com.goldornetwork.uhc.managers.TimerManager;
 public class DisabledCrafting implements Listener{
 
 	//instances
-	private TimerManager timerM = TimerManager.getInstance();
+	private TimerManager timerM;
 	
 	//gamemodes
 	private boolean enableGoneFishing;
 	
-	private DisabledCrafting(){}
-	
-	private static class InstanceHolder{
-		private static final DisabledCrafting INSTANCE = new DisabledCrafting();
-	}
-	public static DisabledCrafting getInstance(){
-		return InstanceHolder.INSTANCE;
+	public DisabledCrafting(TimerManager timerM) {
+		this.timerM=timerM;
 	}
 	
 	public void enableGoneFishing(boolean val){

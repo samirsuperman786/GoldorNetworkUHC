@@ -16,20 +16,23 @@ import com.goldornetwork.uhc.utils.AntiXray;
 public class BreakEvent implements Listener{
 
 	//instances
-	private static BreakEvent instance = new BreakEvent();
-	private TeamManager teamM = TeamManager.getInstance();
-	private TimerManager timerM= TimerManager.getInstance();
-	private FlowerPower flowerPowerM = FlowerPower.getInstance();
-	private AntiXray antiX = AntiXray.getInstace();
-	private BlockRush blockRushM = BlockRush.getInstance();
+	private TeamManager teamM;
+	private TimerManager timerM;
+	private FlowerPower flowerPowerM;
+	private AntiXray antiX;
+	private BlockRush blockRushM;
 	//storage
 
 	
 	private boolean enableFlowerPower;
 	private boolean enableBlockRush;
-
-	public static BreakEvent getInstance(){
-		return instance;
+	
+	public BreakEvent(TeamManager teamM, TimerManager timerM, FlowerPower flowerPowerM, AntiXray antiX, BlockRush blockRushM) {
+		this.teamM=teamM;
+		this.timerM=timerM;
+		this.flowerPowerM=flowerPowerM;
+		this.antiX= antiX;
+		this.blockRushM=blockRushM;
 	}
 
 	public void setup(){

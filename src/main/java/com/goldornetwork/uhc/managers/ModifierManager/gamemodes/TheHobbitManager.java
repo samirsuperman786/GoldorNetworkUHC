@@ -25,24 +25,20 @@ import com.goldornetwork.uhc.utils.MessageSender;
 public class TheHobbitManager implements Listener{
 
 	//instances
-	private TimerManager timerM = TimerManager.getInstance();
-	private TeamManager teamM = TeamManager.getInstance();
-	private MessageSender ms = new MessageSender();
-	private JoinEvent joinE = JoinEvent.getInstance();
+	private TimerManager timerM;
+	private TeamManager teamM;
+	private JoinEvent joinE;
 	
 	//storage
 	private boolean enableTheHobbit;
 	private List<UUID> lateHobbits = new ArrayList<UUID>();
 	
-	private TheHobbitManager(){}
+	public TheHobbitManager(TimerManager timerM, TeamManager teamM, JoinEvent joinE) {
+		this.timerM=timerM;
+		this.teamM=teamM;
+		this.joinE=joinE;
+	}
 	
-	private static class InstanceHolder{
-		private static final TheHobbitManager INSTANCE = new TheHobbitManager();
-	}
-	public static TheHobbitManager getInstance(){
-		
-		return InstanceHolder.INSTANCE;
-	}
 	public void setup(){
 		lateHobbits.clear();
 		enableTheHobbit=false;
@@ -90,7 +86,7 @@ public class TheHobbitManager implements Listener{
 						if(p.getItemInHand().getItemMeta().getDisplayName().equals("The Magic Ring of Invisibility")){
 									p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 30*20, 1));
 									p.getInventory().remove(p.getItemInHand());
-									ms.send(ChatColor.GOLD, p, "You have activated your invisibility ring!");
+									MessageSender.send(ChatColor.GOLD, p, "You have activated your invisibility ring!");
 						}
 					}
 				}

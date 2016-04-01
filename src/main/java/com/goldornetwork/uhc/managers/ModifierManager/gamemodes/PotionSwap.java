@@ -10,30 +10,32 @@ import org.bukkit.Effect;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Team;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.listeners.JoinEvent;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
 
+import io.netty.util.Timer;
+
 public class PotionSwap{
-//TODO give new effect to offline players through onjoinevent
+
 	
 	//instances
-	private TeamManager teamM = TeamManager.getInstance();
-	private TimerManager timerM = TimerManager.getInstance();
-	private JoinEvent joinE = JoinEvent.getInstance();
+	private TeamManager teamM;
+	private TimerManager timerM;
+	private JoinEvent joinE;
 	//storage
 	private List<UUID> latePotionPlayers = new ArrayList<UUID>();
 	
-	private PotionSwap(){}
+	public PotionSwap(TeamManager teamM, TimerManager timerM, JoinEvent joinE) {
+		this.teamM=teamM;
+		this.timerM=timerM;
+		this.joinE=joinE;
+	}
+
 	
-	private static class InstanceHolder{
-		private static final PotionSwap INSTANCE = new PotionSwap();
-	}
-	public static PotionSwap getInstance(){
-		return InstanceHolder.INSTANCE;
-	}
 	public void setup(){
 		latePotionPlayers.clear();
 		timerM.enablePotionSwap(false);

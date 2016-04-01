@@ -9,21 +9,21 @@ import org.bukkit.util.Vector;
 
 public class SpectatorRegionManager implements Runnable {
 
-	private static SpectatorRegionManager instance = new SpectatorRegionManager();
 	
 	//instances
-	private TeamManager teamM = TeamManager.getInstance();
-	private TimerManager timerM = TimerManager.getInstance();
-	private ScatterManager scatterM = ScatterManager.getInstance();
+	private TeamManager teamM;
+	private TimerManager timerM;
+	private ScatterManager scatterM;
 	
 	//storage
-	int bufferBlocks = 15;
-	Location center = scatterM.getUHCWorld().getWorldBorder().getCenter();
+	final int bufferBlocks = 15;
+	final Location center = scatterM.getUHCWorld().getWorldBorder().getCenter();
 	
-	public static SpectatorRegionManager getInstance(){
-		return instance;
+	public SpectatorRegionManager(TeamManager teamM, TimerManager timerM, ScatterManager scatterM) {
+		this.teamM=teamM;
+		this.timerM=timerM;
+		this.scatterM=scatterM;
 	}
-	
 	@Override
 	public void run() {
 		int radius = (int) ((scatterM.getUHCWorld().getWorldBorder().getSize())/2);
@@ -39,9 +39,7 @@ public class SpectatorRegionManager implements Runnable {
 					}
 				}
 			}
-		}
-		
-		
+		}	
 	}
 
 }

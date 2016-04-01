@@ -10,19 +10,14 @@ import com.goldornetwork.uhc.utils.MessageSender;
 public class Switcheroo {
 	
 	//instances
-	private MessageSender ms = new MessageSender();
-	private TeamManager teamM = TeamManager.getInstance();
-	private BowListener bowListener = BowListener.getInstance();
+	private TeamManager teamM;
+	private BowListener bowListener;
 
-	private Switcheroo(){}
+	public Switcheroo(TeamManager teamM, BowListener bowListener) {
+		this.teamM=teamM;
+		this.bowListener=bowListener;
+	}
 	
-	private static class InstanceHolder{
-		private static final Switcheroo INSTANCE = new Switcheroo();
-	}
-	public static Switcheroo getInstance(){
-		
-		return InstanceHolder.INSTANCE;
-	}
 	public void setup(){
 		bowListener.enableSwitcheroo(false);
 	}
@@ -34,8 +29,8 @@ public class Switcheroo {
 		Location shooterLocation = shooter.getLocation();
 		target.teleport(shooterLocation);
 		shooter.teleport(targetLocation);
-		ms.send(ChatColor.RED, target, "You have switched places with " + teamM.getColorOfPlayer(shooter )+ shooter.getName());
-		ms.send(ChatColor.RED, shooter, "You have switched places with " + teamM.getColorOfPlayer(target) + target.getName());
+		MessageSender.send(ChatColor.RED, target, "You have switched places with " + teamM.getColorOfPlayer(shooter )+ shooter.getName());
+		MessageSender.send(ChatColor.RED, shooter, "You have switched places with " + teamM.getColorOfPlayer(target) + target.getName());
 	}
 	
 	

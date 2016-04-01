@@ -23,9 +23,8 @@ public class ScatterManager implements Runnable {
 	//TODO check if spawn location is valid 
 
 	//instances
-	private static ScatterManager instance = new ScatterManager();
-	private TeamManager teamM = TeamManager.getInstance();
-	private MoveEvent moveE = MoveEvent.getInstace();
+	private TeamManager teamM;
+	private MoveEvent moveE;
 	
 	//storage
 	private boolean startScattering;
@@ -41,8 +40,9 @@ public class ScatterManager implements Runnable {
 	private List<String> nameOfTeams = new ArrayList<String>();
 	private List<UUID> FFAToScatter = new ArrayList<UUID>();
 
-	public static ScatterManager getInstance(){
-		return instance;
+	public ScatterManager(TeamManager teamM, MoveEvent moveE) {
+		this.teamM=teamM;
+		this.moveE=moveE;
 	}
 
 	public void setup(){
