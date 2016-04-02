@@ -32,7 +32,6 @@ public abstract class Gamemode{
 		if (this instanceof Listener) {
 			Bukkit.getPluginManager().registerEvents((Listener) this, plugin);
 		}
-
 		enabled = true;
 		onEnable();
 		return true;

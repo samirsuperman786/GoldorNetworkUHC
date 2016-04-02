@@ -8,46 +8,57 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scoreboard.Team;
 
 import com.goldornetwork.uhc.UHC;
-import com.goldornetwork.uhc.listeners.JoinEvent;
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.TimerManager;
+import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
+import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
+import com.goldornetwork.uhc.managers.GameModeManager.State;
 
-import io.netty.util.Timer;
-
-public class PotionSwap{
+public class PotionSwap extends Gamemode implements Listener{
 
 	
 	//instances
 	private UHC plugin;
 	private TeamManager teamM;
-	private TimerManager timerM;
-	private JoinEvent joinE;
 	//storage
 	private List<UUID> latePotionPlayers = new ArrayList<UUID>();
 	
-	public PotionSwap(UHC plugin, TeamManager teamM, TimerManager timerM, JoinEvent joinE) {
+	public PotionSwap(UHC plugin, TeamManager teamM) {
+		super("PotionSwap", "Every 5 minutes, players will receive a new potion effect!");
 		this.plugin=plugin;
 		this.teamM=teamM;
-		this.timerM=timerM;
-		this.joinE=joinE;
 	}
 
-	
-	public void setup(){
+	@Override
+	public void onEnable() {
 		latePotionPlayers.clear();
-		timerM.enablePotionSwap(false);
-		joinE.enablePotionSwap(false);
 	}
-	public void enablePotionSwap(boolean val){
-		timerM.enablePotionSwap(val);
-		joinE.enablePotionSwap(val);
+	
+	@Override
+	public void onDisable() {}
+	@EventHandler
+	public void on(PlayerJoinEvent e){
+		Player p = e.getPlayer();
+		if(State.getState().equals(State.INGAME)){
+			if(latePotionPlayers.contains(p.getUniqueId())){
+				giveAPlayerARandomPotion(p);
+				removePlayerFromLateGive(p);
+			}
+		}
 	}
-	public void run(){
+	
+	@EventHandler
+	public void on(GameStartEvent e){
+		run();
+	}
+	
+	private void run(){
 		plugin.getServer().getScheduler().runTaskTimer(plugin, new Runnable(){
 			@Override
 			public void run() {
@@ -56,7 +67,7 @@ public class PotionSwap{
 						giveAPlayerARandomPotion(Bukkit.getServer().getPlayer(u));
 					}
 					else{
-						addAPlayerToLateGive(u);
+						latePotionPlayers.add(u);
 					}
 				}
 			}
@@ -64,23 +75,13 @@ public class PotionSwap{
 		}, 0L, 6000L); //5 minutes
 	}
 	
-	public List<UUID> getLatePotionPlayers(){
-		return latePotionPlayers;
-	}
-	public void giveAPlayerARandomPotion(Player p){
-		p.addPotionEffect(new PotionEffect(getRandomPotion(), 6000, 1));
+	private void giveAPlayerARandomPotion(Player p){
+		p.addPotionEffect(new PotionEffect(getRandomPotion(), 5980, 1));
 		p.getWorld().playEffect(p.getLocation(), Effect.POTION_BREAK, 10);
-	}
-	public void giveAPlayerARandomPotion(Player p, int durationInSeconds){
-		p.addPotionEffect(new PotionEffect(getRandomPotion(), durationInSeconds*20, 1));
-	}
-	public void addAPlayerToLateGive(UUID u){
-		this.latePotionPlayers.add(u);
 	}
 	public void removePlayerFromLateGive(Player p){
 		latePotionPlayers.remove(p.getUniqueId());
 	}
-	
 	
 	private PotionEffectType getRandomPotion(){
 		Random random = new Random();

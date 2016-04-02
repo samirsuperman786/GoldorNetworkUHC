@@ -12,59 +12,66 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.goldornetwork.uhc.listeners.JoinEvent;
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.TimerManager;
+import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
+import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
+import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.utils.MessageSender;
 
-public class TheHobbitManager implements Listener{
+public class TheHobbitManager extends Gamemode implements Listener{
 
 	//instances
-	private TimerManager timerM;
 	private TeamManager teamM;
-	private JoinEvent joinE;
+
 	
 	//storage
-	private boolean enableTheHobbit;
 	private List<UUID> lateHobbits = new ArrayList<UUID>();
 	
-	public TheHobbitManager(TimerManager timerM, TeamManager teamM, JoinEvent joinE) {
-		this.timerM=timerM;
+	public TheHobbitManager(TeamManager teamM) {
+		super("TheHobbit", "Players receive one golden nugget and when clicked, the player receives invisibility for 30 seconds!");
 		this.teamM=teamM;
-		this.joinE=joinE;
 	}
-	
-	public void setup(){
+	@Override
+	public void onEnable() {
 		lateHobbits.clear();
-		enableTheHobbit=false;
-		joinE.enableTheHobbit(false);
-		timerM.enableTheHobbit(false);
-	}
-	public void enableTheHobbit(boolean val){
-		this.enableTheHobbit=val;
-		joinE.enableTheHobbit(val);
-		timerM.enableTheHobbit(val);
 	}
 	
-	public void giveAPlayerHobbitItems(Player p){
+	@Override
+	public void onDisable() {}
+	
+	@EventHandler
+	public void on(GameStartEvent e){
+		distributeItems();
+	}
+	@EventHandler
+	public void on(PlayerJoinEvent e){
+		Player p = e.getPlayer();
+		if(State.getState().equals(State.INGAME)){
+			if(lateHobbits.contains(p.getUniqueId())){
+				giveAPlayerHobbitItems(p);
+				removePlayerFromLateHobbits(p);
+			}
+		}
+	}
+	
+	private void giveAPlayerHobbitItems(Player p){
 		ItemStack given = new ItemStack(Material.GOLD_NUGGET,1);
 		ItemMeta im = given.getItemMeta();
 		im.setDisplayName(ChatColor.AQUA + "The Magic Ring of Invisibility");
 		given.setItemMeta(im);
 		p.getInventory().addItem(given);
 	}
-	public List<UUID> getLateHobbits(){
-		return lateHobbits;
-	}
-	public void removePlayerFromLateHobbits(Player p){
+	
+	private void removePlayerFromLateHobbits(Player p){
 		lateHobbits.remove(p.getUniqueId());
 	}
-	public void distributeItems(){
+	private void distributeItems(){
 		for(UUID u : teamM.getPlayersInGame()){
 			if(Bukkit.getServer().getPlayer(u).isOnline()){
 				Player p = Bukkit.getServer().getPlayer(u);
@@ -77,10 +84,9 @@ public class TheHobbitManager implements Listener{
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onUse(PlayerInteractEvent e){
+	public void on(PlayerInteractEvent e){
 		Player p = e.getPlayer();
-		if(enableTheHobbit){
-			if(timerM.hasCountDownEnded()){
+			if(State.getState().equals(State.INGAME)){
 				if(teamM.isPlayerInGame(p)){
 					if(p.getItemInHand().equals(Material.GOLD_NUGGET)){
 						if(p.getItemInHand().getItemMeta().getDisplayName().equals("The Magic Ring of Invisibility")){
@@ -90,10 +96,7 @@ public class TheHobbitManager implements Listener{
 						}
 					}
 				}
-				
 			}
-
-		}
 	}
 
 

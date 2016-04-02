@@ -6,6 +6,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
 
 public class MoveEvent implements Listener {
@@ -13,7 +14,8 @@ public class MoveEvent implements Listener {
 	private TeamManager teamM;
 	private boolean freezeAll;
 	
-	public MoveEvent(TeamManager teamM) {
+	public MoveEvent(UHC plugin, TeamManager teamM) {
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.teamM=teamM;
 	}
 	public void setup(){

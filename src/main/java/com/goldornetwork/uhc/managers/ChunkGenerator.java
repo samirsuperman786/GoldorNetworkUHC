@@ -13,7 +13,6 @@ public class ChunkGenerator implements Runnable{
 	}
 
 	//storage
-	private Location center;
 	private int radius;
 	private World world;
 
@@ -40,7 +39,6 @@ public class ChunkGenerator implements Runnable{
 
 	public void loadGenerator(World world, Location center, int radius){
 		this.world = world;
-		this.center = center;
 		this.radius = 16*(Math.round(radius/16));
 		this.i=center.getBlockX();
 		this.j=center.getBlockZ();
@@ -72,9 +70,6 @@ public class ChunkGenerator implements Runnable{
 			startGenerating=true;
 		}
 	}
-
-
-
 
 	@Override
 	public void run() {

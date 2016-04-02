@@ -13,10 +13,11 @@ import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import com.goldornetwork.uhc.listeners.MoveEvent;
+import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
+import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.utils.MessageSender;
 
 public class ScatterManager implements Runnable {
 
@@ -25,7 +26,7 @@ public class ScatterManager implements Runnable {
 	//instances
 	private TeamManager teamM;
 	private MoveEvent moveE;
-	
+
 	//storage
 	private boolean startScattering;
 	private boolean scatterTeam;
@@ -62,7 +63,6 @@ public class ScatterManager implements Runnable {
 		WorldBorder wb = getUHCWorld().getWorldBorder();
 		wb.setCenter(getUHCWorld().getSpawnLocation());
 		wb.setSize(radius*2);
-		//wb.setSize(50, 120); use this to shrink border
 		wb.setDamageBuffer(0);
 		wb.setDamageAmount(.5);
 		wb.setWarningTime(15);
@@ -73,8 +73,6 @@ public class ScatterManager implements Runnable {
 			}
 		}
 		//Test code here
-
-
 
 
 	}
@@ -130,7 +128,13 @@ public class ScatterManager implements Runnable {
 		//TODO make a rotation list of viable UHC maps
 		return Bukkit.getServer().getWorld("lol");
 	}
-
+	public Location getCenter(){
+		return getUHCWorld().getSpawnLocation();
+	}
+	public void shrinkBorder(){
+		getUHCWorld().getWorldBorder().setSize(400, 15*60);
+		MessageSender.broadcast("The worldborder will now slowly shrink to a radius of 400.");
+	}
 
 	@Override
 	public void run() {
@@ -197,23 +201,20 @@ public class ScatterManager implements Runnable {
 					scatterComplete=true;
 					scatterFFA=false;
 				}
-
-
 			}
-
 		}
 		else{
 			//do nothing
 		}
 
-
-
 	}
 
 	private void setupStartingOptions() {
+		Bukkit.getPluginManager().callEvent(new GameStartEvent());
+		State.setState(State.INGAME);
 		moveE.unfreezePlayers();
 		getUHCWorld().setGameRuleValue("doMobSpawning", "true");
-		
 	}
+
 
 }

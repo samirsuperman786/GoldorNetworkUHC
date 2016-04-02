@@ -16,7 +16,9 @@ public class BoardManager {
 	public BoardManager(TeamManager teamM) {
 		this.teamM=teamM;
 	}
-
+	public void setup(){
+		
+	}
 	public void initializeScoreBoard(){
 		ScoreboardManager manager = Bukkit.getServer().getScoreboardManager();
 		Scoreboard board = manager.getNewScoreboard();

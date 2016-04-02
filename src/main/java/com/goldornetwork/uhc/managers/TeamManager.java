@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.management.timer.TimerNotification;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -64,7 +62,7 @@ public class TeamManager {
 	
 	
 	
-	public void initializeTeams(int numberOfTeams){
+	private void initializeTeams(int numberOfTeams){
 
 
 		for(int i =0; i<numberOfTeams; i++){
@@ -137,9 +135,9 @@ public class TeamManager {
 		isFFAEnabled = true;
 	}
 	
-	public void setupTeams(int numberOfTeams, int teamSize){
+	public void setupTeams(int teamSize){
 		isTeamsEnabled = true;
-		initializeTeams(numberOfTeams);
+		initializeTeams(14);
 		this.playersPerTeam = teamSize;
 	}
 	

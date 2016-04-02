@@ -27,10 +27,13 @@ public class CancelCommand extends UHCCommand {
 			MessageSender.send(ChatColor.RED, sender, "Match has already started!");
 			return true;
 		}
-		else{
+		else if(State.getState().equals(State.OPEN)){
 			timerM.cancelMatch();
 			MessageSender.send(ChatColor.GREEN, sender, "You have canceled the match!");
 			return true;
+		}
+		else{
+			return false;
 		}
 
 	}

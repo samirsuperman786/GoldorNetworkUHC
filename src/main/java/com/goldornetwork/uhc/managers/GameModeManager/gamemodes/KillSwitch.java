@@ -2,46 +2,46 @@ package com.goldornetwork.uhc.managers.GameModeManager.gamemodes;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.goldornetwork.uhc.listeners.JoinEvent;
-import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.TimerManager;
+import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
+import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.utils.MessageSender;
 
-public class KillSwitch {
+public class KillSwitch extends Gamemode implements Listener{
 
-	private TeamManager teamM;
-	private DeathEvent deathE;
-	private JoinEvent joinE;
-	private TimerManager timerM;
 	
-	public KillSwitch(TeamManager teamM, DeathEvent deathE, JoinEvent joinE, TimerManager timerM) {
-		this.teamM= teamM;
-		this.deathE=deathE;
-		this.joinE=joinE;
-		this.timerM=timerM;
+	public KillSwitch() {
+		super("KillSwitch", "When a player kills another player, that player will switch inventories!");
 	}
-	public void setup(){
-		deathE.enableKillSwitch(false);
-		joinE.enableTheHobbit(false);
-		timerM.enableTheHobbit(false);
+	@Override
+	public void onEnable() {}
+	
+	@Override
+	public void onDisable() {}
+	
+	@EventHandler(priority=EventPriority.MONITOR)
+	public void on(PlayerDeathEvent e){
+		if(State.getState().equals(State.INGAME)){
+			Player p = e.getEntity();
+			if(p.getKiller() instanceof Player){
+				Player killer = p.getKiller();
+				run(p, killer, e);
+			}
+		}
 	}
-	public void enableKillSwitch(boolean val){
-		deathE.enableKillSwitch(val);
-		joinE.enableTheHobbit(val);
-		timerM.enableTheHobbit(val);
-	}
-	public void run(Player target, Player killer, PlayerDeathEvent e){
+	private void run(Player target, Player killer, PlayerDeathEvent e){
 		ItemStack[] targetInventory = target.getInventory().getContents();
 		Inventory killerInventory = killer.getInventory();
 		killerInventory.clear();
 		killerInventory.setContents(targetInventory);
 		e.getDrops().clear();
-		MessageSender.alertMessage(killer, ChatColor.GOLD, "You have switched inventories with " + teamM.getColorOfPlayer(target) + target.getName());
-		deathE.playerDied(target, e);
+		MessageSender.alertMessage(killer, ChatColor.GOLD, "You have switched inventories with " +  target.getName());
 	}
 	
 }

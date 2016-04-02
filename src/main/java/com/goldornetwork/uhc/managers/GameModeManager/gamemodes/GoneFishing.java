@@ -8,54 +8,69 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.goldornetwork.uhc.listeners.BreakEvent;
-import com.goldornetwork.uhc.listeners.JoinEvent;
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.TimerManager;
+import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
+import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
+import com.goldornetwork.uhc.managers.GameModeManager.State;
 
-public class GoneFishing {
+public class GoneFishing extends Gamemode implements Listener {
 
 	private TeamManager teamM;
-	private DisabledCrafting disabledC;
-	private JoinEvent joinE;
-	private TimerManager timerM;
-	private FlowerPower flowerPowerM;
 	
 	private List <UUID> lateGoneFishing = new ArrayList<UUID>();
 	
-	public GoneFishing(TeamManager teamM, DisabledCrafting disabledC, JoinEvent joinE, TimerManager timerM, FlowerPower flowerPowerM) {
+	public GoneFishing(TeamManager teamM) {
+		super("GoneFishing", "Players spawn with infinite levels, 20 anvils, a fishing rod with: Luck of the Sea 250, Lure 250, and Unbreaking 150. Caution: Enchantment tables are disabled!");
 		this.teamM=teamM;
-		this.disabledC=disabledC;
-		this.joinE=joinE;
-		this.timerM=timerM;
-		this.flowerPowerM=flowerPowerM;
 	}
 	
-	public void setup(){
+	@Override
+	public void onEnable() {
 		lateGoneFishing.clear();
-		disabledC.enableGoneFishing(false);
-		joinE.enableGoneFishing(false);
-		timerM.enableGoneFishing(false);
-	}
-	public void enableGoneFishing(boolean val){
-		disabledC.enableGoneFishing(val);
-		joinE.enableGoneFishing(val);
-		timerM.enableGoneFishing(val);
-		flowerPowerM.addDisallowedItems(new ItemStack(125));//enchant table
 	}
 	
-	public List<UUID> getLateGoneFishing(){
-		return lateGoneFishing;
+	@EventHandler
+	public void on(GameStartEvent e){
+		distributeItems();
 	}
-	public void removeAPlayerFromLateGoneFishing(Player p){
-		lateGoneFishing.remove(p);
+	
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void on(PrepareItemCraftEvent e){
+		if(State.getState().equals(State.INGAME)){
+			Material item = e.getRecipe().getResult().getType();
+				if(item.equals(Material.ENCHANTMENT_TABLE)){
+					e.getInventory().setResult(new ItemStack(Material.AIR));
+				}
+			
+		}	
+	}
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void on(PlayerJoinEvent e){
+		Player p = e.getPlayer();
+		if(State.getState().equals(State.INGAME)){
+			if(teamM.isPlayerInGame(p)){
+				if(lateGoneFishing.contains(p.getUniqueId())){
+					giveAPlayerGoneFishingItems(p);
+					removeAPlayerFromLateGoneFishing(p);
+				}
+			}
+		}
+	}
+	
+	private void removeAPlayerFromLateGoneFishing(Player p){
+		lateGoneFishing.remove(p.getUniqueId());
 	}
 	
 
-	public void giveAPlayerGoneFishingItems(Player p){
+	private void giveAPlayerGoneFishingItems(Player p){
 		ItemStack given = new ItemStack(Material.FISHING_ROD, 1);
 		ItemMeta im = given.getItemMeta();
 		im.addEnchant(Enchantment.LUCK, 250, true);
@@ -66,7 +81,7 @@ public class GoneFishing {
 		p.getInventory().addItem(given);
 		p.setExp(Integer.MAX_VALUE);
 	}
-	public void distributeItems(){
+	private void distributeItems(){
 		for(UUID u : teamM.getPlayersInGame()){//INFINITE LEVELS, 20 ANVILS, FISHING ROD WITH LOFTS 250 & UNBREAKING 150, ENCHANT TABLES DISABLED
 			if(Bukkit.getServer().getPlayer(u).isOnline()){
 				Player p = Bukkit.getServer().getPlayer(u);

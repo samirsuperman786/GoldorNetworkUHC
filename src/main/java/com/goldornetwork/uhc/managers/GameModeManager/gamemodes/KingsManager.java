@@ -12,57 +12,66 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.goldornetwork.uhc.listeners.JoinEvent;
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.TimerManager;
+import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
+import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
+import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.utils.MessageSender;
 
-public class KingsManager {
+public class KingsManager extends Gamemode implements Listener{
 
 	//instances
 	private TeamManager teamM;
-	private JoinEvent joinE;
-	private TimerManager timerM;
 	
 	//storage
 	private Map<String, UUID> listOfKings = new HashMap<String, UUID>();
 	private List<UUID> lateKings = new ArrayList<UUID>();
 
-	public KingsManager(TeamManager teamM, JoinEvent joinE, TimerManager timerM) {
+	public KingsManager(TeamManager teamM) {
+		super("Kings", "A random player on a team will receive special powers!");
 		this.teamM=teamM;
-		this.joinE=joinE;
-		this.timerM=timerM;
 	}
-	
-	public void setup(){
+	@Override
+	public void onEnable() {
 		listOfKings.clear();
 		lateKings.clear();
-		joinE.enableKings(false);
-		timerM.enableKings(false);
 	}
-	public void enableKings(boolean val){
-		joinE.enableKings(val);
-		timerM.enableKings(val);
+	@Override
+	public void onDisable() {}
+	
+	@EventHandler
+	public void on(GameStartEvent e){
+		distibruteItemsToTeams();
 	}
 	
-	public List<UUID> getLateKings(){
-		return lateKings;
+	@EventHandler
+	public void on(PlayerJoinEvent e){
+		Player p = e.getPlayer();
+		if(State.getState().equals(State.INGAME)){
+			if(lateKings.contains(p.getUniqueId())){
+				giveAPlayerKingItems(p);
+				removePlayerFromLateKings(p);
+			}
+		}
 	}
-	public void giveAPlayerKingItems(Player King){
+	
+	private void giveAPlayerKingItems(Player King){
 		King.getInventory().addItem(new ItemStack(Material.DIAMOND_SWORD,1));
 		King.getInventory().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
 		King.getInventory().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
 		King.getInventory().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
 		King.getInventory().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
 	}
-	public void removePlayerFromLateKings(Player King){
+	private void removePlayerFromLateKings(Player King){
 		lateKings.remove(King.getUniqueId());
 	}
 
-	public void distibruteItemsToTeams() {
-		
+	private void distibruteItemsToTeams() {
 		for(String team : teamM.getListOfTeams()){
 			Random random = new Random();
 			//selecting a random king

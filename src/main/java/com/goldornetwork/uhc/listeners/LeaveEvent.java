@@ -6,7 +6,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import com.goldornetwork.uhc.managers.ScatterManager;
+import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
 
@@ -19,7 +19,8 @@ public class LeaveEvent implements Listener{
 	private TimerManager timerM;
 	//private ScatterManager scatterM = ScatterManager.getInstance();
 
-	public LeaveEvent(TeamManager teamM, TimerManager timerM) {
+	public LeaveEvent(UHC plugin, TeamManager teamM, TimerManager timerM) {
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.teamM=teamM;
 		this.timerM=timerM;
 	}

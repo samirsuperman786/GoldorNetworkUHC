@@ -2,14 +2,9 @@ package com.goldornetwork.uhc.managers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
-import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
-import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.GoneFishing;
-import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.KingsManager;
-import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.PotionSwap;
-import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.SkyHigh;
-import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.TheHobbitManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class TimerManager implements Runnable {
@@ -18,11 +13,6 @@ public class TimerManager implements Runnable {
 	 * 
 	 */
 	//instances
-	private KingsManager kingM;
-	private PotionSwap potionS;
-	private SkyHigh skyHighM;
-	private GoneFishing goneFishingM;
-	private TheHobbitManager hobbitM;
 	private ScatterManager scatterM;
 	private TeamManager teamM;
 	//storage
@@ -36,12 +26,6 @@ public class TimerManager implements Runnable {
 	
 	
 	
-	//gamemodes
-	private boolean enableTheHobbit;
-	private boolean enableSkyHigh;
-	private boolean enableGoneFishing;
-	private boolean enableKings;
-	private boolean enablePotionSwap;
 	
 	
 	public TimerManager(ScatterManager scatterM, TeamManager teamM) {
@@ -57,10 +41,6 @@ public class TimerManager implements Runnable {
 		matchStart=false;
 		startPVPTimer=false;
 		isPVPEnabled=false;
-		enableTheHobbit=false;
-		enableSkyHigh=false;
-		enableKings=false;
-		enablePotionSwap=false;
 	}
 	
 	public void startMatch(boolean start, int timeTillMatchStarts, int timeTillPVPStarts){
@@ -94,24 +74,6 @@ public class TimerManager implements Runnable {
 	public boolean isPVPEnabled(){
 		return isPVPEnabled;
 	}
-	public void enablePotionSwap(boolean val){
-		this.enablePotionSwap=val;
-	}
-	public void enableKings(boolean val){
-		this.enableKings=val;
-	}
-	
-	public void enableTheHobbit(boolean val){
-		this.enableTheHobbit = val;
-	}
-	public void enableSkyHigh(boolean val){
-		this.enableSkyHigh=val;
-	}
-	public void enableGoneFishing(boolean val){
-		this.enableGoneFishing=val;
-	}
-	
-	
 	
 	
 	@Override
@@ -136,28 +98,17 @@ public class TimerManager implements Runnable {
 			}
 			else if(timeTillMatchStart == 0){
 				MessageSender.broadcast("Match has started!");
-				
-				if(enableTheHobbit){
-					hobbitM.distributeItems();
-				}
-				if(enableSkyHigh){
-					skyHighM.distributeItems();
-				}
-				if(enableGoneFishing){
-					goneFishingM.distributeItems();
-				}
-				if(enableKings){
-					kingM.distibruteItemsToTeams();
-				}
-				if(enablePotionSwap){
-					potionS.run();
-				}
-				
+				State.setState(State.SCATTER);
 				if(teamM.isFFAEnabled()){
 					scatterM.scatterFFA();
 				}
 				else if(teamM.isTeamsEnabled()){
 					scatterM.scatterTeams();
+				}
+				for(Player all : Bukkit.getServer().getOnlinePlayers()){
+					if(teamM.isPlayerInGame(all)==false){
+						teamM.addPlayerToObservers(all);
+					}
 				}
 				hasMatchBegun = true;
 				startPVPTimer= true;
@@ -167,12 +118,13 @@ public class TimerManager implements Runnable {
 		}
 		
 		else if(timeTillMatchStart == -1){
+			teamM.setup();
 			MessageSender.broadcast("Match canceled");
 			matchStart=false;
 			timeTillMatchStart =-2; //-2 will act as a null value
 		}
 		
-		else if(startPVPTimer = true){
+		else if(startPVPTimer == true){
 			if(timeTillPVPStart>0){
 				if(timeTillPVPStart >= (5*60) && timeTillPVPStart % (10*60) == 0){
 					MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart/60 + ChatColor.RED + " minutes");
@@ -192,9 +144,8 @@ public class TimerManager implements Runnable {
 				timeTillPVPStart--;
 			}
 			else if(timeTillPVPStart==0){
-				State.setState(State.INGAME);
 				MessageSender.broadcast("PVP has been enabled!");
-				Bukkit.getPluginManager().callEvent(new GameStartEvent());
+				scatterM.shrinkBorder();
 				scatterM.getUHCWorld().setPVP(true);
 				isPVPEnabled = true;
 				timeTillPVPStart=-2;

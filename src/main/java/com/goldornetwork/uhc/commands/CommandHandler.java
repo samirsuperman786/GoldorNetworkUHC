@@ -30,11 +30,9 @@ import com.goldornetwork.uhc.utils.MessageSender;
 public class CommandHandler implements CommandExecutor, TabCompleter{
 
 	private final UHC plugin;
-	private final TeamManager teamM;
 	
-	public CommandHandler(UHC plugin, TeamManager teamM) {
+	public CommandHandler(UHC plugin) {
 		this.plugin=plugin;
-		this.teamM=teamM;
 	}
 
 	private List<UHCCommand> cmds = new ArrayList<UHCCommand>();
@@ -127,7 +125,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 		List<String> list = new ArrayList<String>();
 		
 		for (Player all : Bukkit.getOnlinePlayers()) {
-			if(sender instanceof Player && teamM.isPlayerAnObserver(all)==false){
+			if(sender instanceof Player){
 				continue;
 			}
 			list.add(all.getName());
@@ -137,9 +135,9 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 	}
 	
 	
-	public void registerCommands(TimerManager timerM, ChunkGenerator chunkG){
+	public void registerCommands(TeamManager teamM, TimerManager timerM, ChunkGenerator chunkG){
 		//game
-		cmds.add(new StartCommand(timerM));
+		cmds.add(new StartCommand(timerM, teamM));
 		cmds.add(new CancelCommand(timerM));
 		cmds.add(new ChunkGenerateCommand(chunkG));
 	
