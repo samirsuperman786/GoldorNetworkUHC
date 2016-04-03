@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.potion.PotionEffect;
@@ -42,7 +43,8 @@ public class PotionSwap extends Gamemode implements Listener{
 	
 	@Override
 	public void onDisable() {}
-	@EventHandler
+	
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(PlayerJoinEvent e){
 		Player p = e.getPlayer();
 		if(State.getState().equals(State.INGAME)){
@@ -53,7 +55,7 @@ public class PotionSwap extends Gamemode implements Listener{
 		}
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(GameStartEvent e){
 		run();
 	}

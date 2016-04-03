@@ -6,7 +6,9 @@ import org.bukkit.World;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class ChunkGenerator implements Runnable{
-
+	/*
+	 * TODO switch from runnable to bukkitrunnable
+	 */
 	//instances
 	public ChunkGenerator() {
 		

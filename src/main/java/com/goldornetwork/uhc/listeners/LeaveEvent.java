@@ -7,8 +7,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.goldornetwork.uhc.UHC;
+import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.TimerManager;
 
 public class LeaveEvent implements Listener{
 
@@ -16,19 +16,19 @@ public class LeaveEvent implements Listener{
 
 	//instances
 	private TeamManager teamM;
-	private TimerManager timerM;
+	private ScatterManager scatterM;
 	//private ScatterManager scatterM = ScatterManager.getInstance();
 
-	public LeaveEvent(UHC plugin, TeamManager teamM, TimerManager timerM) {
+	public LeaveEvent(UHC plugin, TeamManager teamM, ScatterManager scatterM) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.teamM=teamM;
-		this.timerM=timerM;
+		this.scatterM = scatterM;
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerLeave(PlayerQuitEvent e){
 		Player p = e.getPlayer();
-		if(timerM.hasMatchStarted()==true && timerM.hasCountDownEnded()==false){
+		/*if(State.getState().equals(State.OPEN)){
 			if(teamM.isPlayerInGame(p)){
 				if(teamM.isFFAEnabled()){
 					teamM.removePlayerFromFFA(p);
@@ -41,16 +41,8 @@ public class LeaveEvent implements Listener{
 				}
 
 			}
-		}
-		//TODO make below false
-		/*		else if(timerM.hasCountDownEnded()==false){
-			if(teamM.isPlayerInGame(p)==false){
-				LivingEntity chicken = (LivingEntity) scatterM.getUHCWorld().spawnEntity(p.getLocation(), EntityType.CHICKEN);
-				chicken.setCustomName(p.getName());
-				chicken.setHealth(p.getHealth());
-			}
-
 		}*/
+		
 
 	}
 

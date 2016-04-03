@@ -35,10 +35,15 @@ public class GameModeManager {
 	private List<Gamemode> gamemodes = new ArrayList<Gamemode>();
 	private UHC plugin;
 
-	//TODO work on constructor
 	public GameModeManager(UHC plugin) {
 		this.plugin=plugin;
 	}
+	/**
+	 * Used to initialize all game modes
+	 * @param timerM - the TimerManager
+	 * @param teamM - the TeamManager
+	 * @param scatterM - the ScatterManager
+	 */
 	public void setupGamemodes(TimerManager timerM, TeamManager teamM, ScatterManager scatterM){
 		gamemodes.add(new BlockRush(scatterM));
 		gamemodes.add(new FlowerPower(teamM));
@@ -51,6 +56,11 @@ public class GameModeManager {
 		gamemodes.add(new Switcheroo(teamM));
 		gamemodes.add(new TheHobbitManager(teamM));
 	}
+	/**
+	 * Used to get the class of a given game mode
+	 * @param name - the name of a game mode
+	 * @return <code> Gamemode </code> the class of the gamemode
+	 */
 	public Gamemode getGameMode(String name){
 		for(Gamemode gameMode : gamemodes){
 			if(gameMode.getName().equalsIgnoreCase(name)){
@@ -59,11 +69,15 @@ public class GameModeManager {
 		}
 		return null;
 	}
-	public void setup(UHC plugin){
-		this.plugin = plugin;
+	public void setup(){
 		options.clear();
 	}
 
+	/**
+	 * List of game modes
+	 * @author GOLD
+	 *
+	 */
 	public enum Gamemodes{
 		SKYHIGH, SWITCHEROO, REWARDINGLONGSHOTS, POTIONSWAP, KINGS, 
 		KILLSWITCH, THEHOBBIT, GONEFISHING, FLOWERPOWER, LANDISBAD, 
@@ -85,9 +99,18 @@ public class GameModeManager {
 	 * ticktock not done
 	 */
 
+	/**
+	 * Used to retrieve a list of all game modes
+	 * @return <code> List[Gamemode] </code> of all game modes
+	 */
 	public List<Gamemode> getGamemodes(){
 		return ImmutableList.copyOf(gamemodes);
 	}
+	
+	/** 
+	 * Used to retrieve all game modes that are enabled
+	 * @return <code> List[Gamemode] </code> of enabled game modes
+	 */
 	public List<Gamemode> getEnabledGamemodes(){
 		List<Gamemode> list = new ArrayList<Gamemode>();
 		for(Gamemode gameMode : gamemodes){
@@ -99,6 +122,10 @@ public class GameModeManager {
 	}
 
 
+	/**
+	 * Used to enable a specified game mode
+	 * @param gamemode - the game mode to enable
+	 */
 	public void enableGamemode(Gamemodes gamemode){
 
 		switch(gamemode){
@@ -133,6 +160,11 @@ public class GameModeManager {
 
 
 	}
+	
+	/**
+	 * Used to actually start the game mode
+	 * @param input
+	 */
 	private void startGamemode(String input){
 		getGameMode(input).enable(plugin);
 	}

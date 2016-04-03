@@ -34,11 +34,11 @@ public class MessageSender {
 	}
 	
 	public static void alertMessage(Player p, ChatColor cc, String msg){
-		p.sendMessage(getPrefix() + ChatColor.MAGIC + "G" + cc + msg + ChatColor.MAGIC + "G");
+		p.sendMessage(getPrefix() + ChatColor.MAGIC + "G" + cc + msg + ChatColor.GOLD + ChatColor.MAGIC + "G");
 	}
 	
 	public static void sendToOPS(String msg){
-		Bukkit.broadcast(ChatColor.RED + "[OPS] " + msg, Server.BROADCAST_CHANNEL_ADMINISTRATIVE);
+		Bukkit.broadcast(ChatColor.GOLD + "[OPS] " + msg, Server.BROADCAST_CHANNEL_ADMINISTRATIVE);
 	}
 	public static void broadcast(String msg){
 		Bukkit.getServer().broadcastMessage(getPrefix() + ChatColor.RED + msg);

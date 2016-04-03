@@ -13,6 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
@@ -44,7 +45,7 @@ public class KingsManager extends Gamemode implements Listener{
 	@Override
 	public void onDisable() {}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(GameStartEvent e){
 		distibruteItemsToTeams();
 	}

@@ -31,12 +31,12 @@ public class JoinCommand extends UHCCommand {
 			MessageSender.send(ChatColor.RED, p, "Match has not started yet!");
 			return true;
 		}
-		else if(teamM.isPlayerInGame(p)&& !(args[0].equalsIgnoreCase("observers")) && !(args[0].equalsIgnoreCase("obs"))){
+		else if(teamM.isPlayerInGame(p)){
 			MessageSender.send(ChatColor.RED, sender, "You are already on a team");
 			return true;
 		}
 
-		else if(State.getState().equals(State.INGAME) && !(args[0].equalsIgnoreCase("observers")) && !(args[0].equalsIgnoreCase("obs"))){
+		else if(State.getState().equals(State.INGAME)){
 			MessageSender.send(ChatColor.RED, p, "Match has already started!");
 			return true;
 		}
@@ -58,7 +58,8 @@ public class JoinCommand extends UHCCommand {
 			}
 		}
 		else if(args.length==1){
-			if(args[0].equalsIgnoreCase("observers")||args[0].equalsIgnoreCase("obs")){
+			//todo make a leave command
+		/*	if(args[0].equalsIgnoreCase("observers")||args[0].equalsIgnoreCase("obs")){
 				if(teamM.isPlayerAnObserver(p)==false){
 					teamM.addPlayerToObservers(p);
 					MessageSender.send(ChatColor.AQUA, p, "You have joined the observers");
@@ -68,7 +69,7 @@ public class JoinCommand extends UHCCommand {
 					MessageSender.send(ChatColor.RED, p, "You are already an observer!");
 					return true;
 				}
-			}
+			} */
 			if(teamM.isTeamsEnabled()){
 				if(teamM.isValidTeam(args[0])){
 					if(teamM.isPlayerInvitedToTeam(p,args[0].toLowerCase())){

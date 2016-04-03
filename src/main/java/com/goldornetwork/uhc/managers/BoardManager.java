@@ -19,6 +19,9 @@ public class BoardManager {
 	public void setup(){
 		
 	}
+	/**
+	 * Will setup the scoreboard to the initial values
+	 */
 	public void initializeScoreBoard(){
 		ScoreboardManager manager = Bukkit.getServer().getScoreboardManager();
 		Scoreboard board = manager.getNewScoreboard();

@@ -42,7 +42,7 @@ public class GoneFishing extends Gamemode implements Listener {
 		distributeItems();
 	}
 	
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler
 	public void on(PrepareItemCraftEvent e){
 		if(State.getState().equals(State.INGAME)){
 			Material item = e.getRecipe().getResult().getType();

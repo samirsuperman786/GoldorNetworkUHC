@@ -10,6 +10,7 @@ import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.utils.MessageSender;
+import com.goldornetwork.uhc.utils.Parser;
 
 public class StartCommand extends UHCCommand{
 
@@ -17,11 +18,11 @@ public class StartCommand extends UHCCommand{
 	private TimerManager timerM;
 	private TeamManager teamM;
 	//storage
-	private final int DEFAULTTIMETILLSTART=15*60;
-	private final int DEFAULTTIMETILLPVP=40*60;
+	private final int DEFAULTTIMETILLSTART=1*30; //change to 15 *60
+	private final int DEFAULTTIMETILLPVP=1*30; //change to 40*60
 	
 	public StartCommand(TimerManager timerM, TeamManager teamM) {
-		super("start", "[FFA|Teams]");
+		super("start", "[Teamsize]");
 		this.timerM=timerM;
 		this.teamM=teamM;
 	}
@@ -34,26 +35,22 @@ public class StartCommand extends UHCCommand{
 			MessageSender.send(ChatColor.RED, sender, "Match has already started!");
 			return true;
 		}
-		
-		else if(args[0].equalsIgnoreCase("FFA")){
-			teamM.setupFFA();
-			timerM.startMatch(true, DEFAULTTIMETILLSTART, DEFAULTTIMETILLPVP);
-			return true;
-		}
-		else if(args[0].equalsIgnoreCase("TEAMS")){
-			if(args.length!=2){
-				return false;
-			}
-			else{
-				if(Integer.valueOf(args[2])!=null){
-					int teamSize = Integer.valueOf(args[2]);
-					teamM.setupTeams(teamSize);
-					timerM.startMatch(true, DEFAULTTIMETILLSTART, DEFAULTTIMETILLPVP);
-					return true;
+		else if(args.length==1){
+			if(Parser.isInt(args[0])){
+				int teamSize = Integer.valueOf(args[0]);
+				if(teamSize==1){
+					teamM.setupFFA();
+					MessageSender.broadcast(ChatColor.GOLD + "FFA has been enabled!");
 				}
 				else{
-					return false;
+					teamM.setupTeams(teamSize);
+					MessageSender.broadcast(ChatColor.GOLD + "Teams have been enabled with a size of " + ChatColor.GRAY + teamSize + ChatColor.GOLD + " players per team!");
 				}
+				timerM.startMatch(DEFAULTTIMETILLSTART, DEFAULTTIMETILLPVP);
+				return true;
+			}
+			else{
+				return false;
 			}
 		}
 		else{

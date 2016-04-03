@@ -45,11 +45,11 @@ public class TheHobbitManager extends Gamemode implements Listener{
 	@Override
 	public void onDisable() {}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(GameStartEvent e){
 		distributeItems();
 	}
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(PlayerJoinEvent e){
 		Player p = e.getPlayer();
 		if(State.getState().equals(State.INGAME)){

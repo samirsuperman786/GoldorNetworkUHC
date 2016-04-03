@@ -135,6 +135,12 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 	}
 	
 	
+	/**
+	 * Will register all commands 
+	 * @param teamM TeamManager
+	 * @param timerM TimerManager
+	 * @param chunkG ChunkGenerator
+	 */
 	public void registerCommands(TeamManager teamM, TimerManager timerM, ChunkGenerator chunkG){
 		//game
 		cmds.add(new StartCommand(timerM, teamM));

@@ -13,14 +13,26 @@ public abstract class UHCCommand {
 		this.usage=usage;
 	}
 	
+	/**
+	 * Used to get the name of a command
+	 * @return <code> String </code>name of command
+	 */
 	public String getName(){
 		return name;
 	}
 	
+	/**
+	 * Used to get the usage of a command
+	 * @return <code> String </code> usage of command
+	 */
 	public String getUsage(){
 		return "/" + name + " " + usage;
 	}
 	
+	/**
+	 * Used to get the permission of a command
+	 * @return <code> String </code> permission of command
+	 */
 	public String getPermission(){
 		return "uhc." + name;
 	}

@@ -18,48 +18,55 @@ public class JoinEvent implements Listener{
 	//instances
 	private TeamManager teamM;
 	private ScatterManager scatterM;
-	
+
 	public JoinEvent(UHC plugin, TeamManager teamM, ScatterManager scatterM) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.teamM=teamM;
 		this.scatterM=scatterM;
-		
+
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onJoin(PlayerJoinEvent e){
 		Player p = e.getPlayer();
-			if(State.getState().equals(State.INGAME)|| State.getState().equals(State.SCATTER)){
-				if(teamM.isPlayerInGame(e.getPlayer())){
-					if(teamM.isFFAEnabled()){
-						if(scatterM.getLateScatters().contains(p.getUniqueId())){
-							scatterM.lateScatterAPlayerInFFA(p);
-							scatterM.removePlayerFromLateScatters(p);
-							MessageSender.send(ChatColor.GREEN, p, "You have been late scattered!");
-						}
-					}
-					else if(teamM.isTeamsEnabled()){
-						if(scatterM.getLateScatters().contains(p.getUniqueId())){
-							scatterM.lateScatterAPlayerInATeam(teamM.getTeamOfPlayer(p), p);
-							scatterM.removePlayerFromLateScatters(p);
-							MessageSender.send(ChatColor.GREEN, p, "You have been late scattered to your teams spawn!");
-						}
+		if(teamM.isPlayerInGame(p)){
+			if(teamM.isTeamsEnabled()){
+				teamM.displayName(p, teamM.getTeamOfPlayer(p));
+			}
+			else if(teamM.isFFAEnabled()){
+				teamM.displayName(p, "FFA");
+			}
+		}
+		else if(teamM.isPlayerAnObserver(p)){
+			p.setDisplayName(ChatColor.AQUA + "[Observer] " + p.getName()+ ChatColor.WHITE);
+		}
+		if(State.getState().equals(State.INGAME)|| State.getState().equals(State.SCATTER)){
+			if(teamM.isPlayerInGame(e.getPlayer())){
+				if(teamM.isFFAEnabled()){
+					if(scatterM.getLateScatters().contains(p.getUniqueId())){
+						scatterM.lateScatterAPlayerInFFA(p);
+						scatterM.removePlayerFromLateScatters(p);
+						MessageSender.send(ChatColor.GREEN, p, "You have been late scattered!");
 					}
 				}
-				else if(teamM.isPlayerInGame(e.getPlayer())==false){
-					if(p.getWorld().equals(scatterM.getUHCWorld())==false){
-						p.teleport(scatterM.getUHCWorld().getSpawnLocation());
+				else if(teamM.isTeamsEnabled()){
+					if(scatterM.getLateScatters().contains(p.getUniqueId())){
+						scatterM.lateScatterAPlayerInATeam(teamM.getTeamOfPlayer(p), p);
+						scatterM.removePlayerFromLateScatters(p);
+						MessageSender.send(ChatColor.GREEN, p, "You have been late scattered to your teams spawn!");
 					}
-					if(teamM.isPlayerAnObserver(p)==false){
-						teamM.addPlayerToObservers(p);
-					}
-					MessageSender.send(ChatColor.AQUA, p, "You are now spectating the game");
 				}
 			}
-				
-			
-			
-		
+			else if(teamM.isPlayerInGame(e.getPlayer())==false){
+				if(p.getWorld().equals(scatterM.getUHCWorld())==false){
+					p.teleport(scatterM.getUHCWorld().getSpawnLocation());
+				}
+				if(teamM.isPlayerAnObserver(p)==false){
+					teamM.addPlayerToObservers(p);
+				}
+				MessageSender.send(ChatColor.AQUA, p, "You are now spectating the game");
+			}
+		}
 
 	}
 

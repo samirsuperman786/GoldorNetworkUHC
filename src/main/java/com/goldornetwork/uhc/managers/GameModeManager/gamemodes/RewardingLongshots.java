@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
@@ -32,7 +33,7 @@ public class RewardingLongshots extends Gamemode implements Listener{
 	public void onDisable() {}
 	
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(EntityDamageByEntityEvent e){
 		if(State.getState().equals(State.INGAME)){
 			if(e.getEntity() instanceof Player){

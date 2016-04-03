@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
@@ -34,7 +35,7 @@ public class BlockRush extends Gamemode implements Listener{
 	public void onDisable() {
 		firstBlocksMined.clear();
 	}
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(BlockBreakEvent e){
 		if(State.getState().equals(State.INGAME)){
 			if(e instanceof Player){

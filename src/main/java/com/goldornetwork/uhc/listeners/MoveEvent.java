@@ -18,13 +18,24 @@ public class MoveEvent implements Listener {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.teamM=teamM;
 	}
+	
+	/**
+	 * Will clear all frozen players
+	 */
 	public void setup(){
 		this.freezeAll=false;
 	}
 
+	/**
+	 * Will freeze all players in game
+	 */
 	public void freezePlayers(){
 		this.freezeAll=true;
 	}
+	
+	/**
+	 * Will unfreeze all players in game
+	 */
 	public void unfreezePlayers(){
 		this.freezeAll=false;
 	}

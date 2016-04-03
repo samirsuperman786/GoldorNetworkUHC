@@ -11,6 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
@@ -20,6 +21,7 @@ import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
+import com.goldornetwork.uhc.managers.GameModeManager.PVPEnableEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.utils.MessageSender;
 
@@ -47,9 +49,13 @@ public class SkyHigh extends Gamemode implements Listener{
 	@Override
 	public void onDisable() {}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(GameStartEvent e){
 		distributeItems();
+		
+	}
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void on(PVPEnableEvent e){
 		plugin.getServer().getScheduler().runTaskTimer(plugin, new Runnable(){
 
 			@Override
@@ -59,8 +65,7 @@ public class SkyHigh extends Gamemode implements Listener{
 			
 		}, 0L, 20L);
 	}
-	
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(PlayerJoinEvent e){
 		Player p = e.getPlayer();
 		if(State.getState().equals(State.INGAME)){
