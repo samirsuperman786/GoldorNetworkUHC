@@ -1,7 +1,6 @@
 package com.goldornetwork.uhc;
 
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
@@ -19,10 +18,9 @@ import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.SpectatorRegionManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
+import com.goldornetwork.uhc.managers.VoteManager;
 import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
-import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager.Gamemodes;
 import com.goldornetwork.uhc.utils.AntiXray;
-import com.goldornetwork.uhc.utils.CombatLog;
 
 public class UHC extends JavaPlugin {
 
@@ -39,6 +37,7 @@ public class UHC extends JavaPlugin {
 	private ScatterManager scatterM;
 	private CommandHandler cmd;
 	private MoveEvent moveE;
+	private VoteManager voteM;
 	
 	public void instances(){
 		//instances
@@ -48,9 +47,11 @@ public class UHC extends JavaPlugin {
 		
 		scatterM= new ScatterManager(plugin, teamM, moveE);
 		
-		timerM = new TimerManager(plugin, scatterM, teamM);
-		
 		gameModeM= new GameModeManager(plugin);
+		
+		voteM = new VoteManager(plugin, gameModeM);
+		
+		timerM = new TimerManager(plugin, scatterM, teamM, voteM);
 		
 		gameModeM.setupGamemodes(timerM, teamM, scatterM);
 		
@@ -85,9 +86,8 @@ public class UHC extends JavaPlugin {
 		scatterM.setup();
 		timerM.setup();
 		moveE.setup();
-		gameModeM.setup();
+		voteM.setup();
 		//TESTCODE
-		gameModeM.enableGamemode(Gamemodes.SKYHIGH);
 	}
 
 

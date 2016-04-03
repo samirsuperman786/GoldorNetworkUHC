@@ -18,7 +18,7 @@ public class StartCommand extends UHCCommand{
 	private TimerManager timerM;
 	private TeamManager teamM;
 	//storage
-	private final int DEFAULTTIMETILLSTART=1*30; //change to 15 *60
+	private final int DEFAULTTIMETILLSTART=10*60; //change to 15 *60
 	private final int DEFAULTTIMETILLPVP=1*30; //change to 40*60
 	
 	public StartCommand(TimerManager timerM, TeamManager teamM) {
@@ -31,7 +31,7 @@ public class StartCommand extends UHCCommand{
 	public boolean execute(CommandSender sender, String[] args) {
 		//TODO work on easier start implementation
 		
-		if(State.getState().equals(State.OPEN)){
+		if(!State.getState().equals(State.NOT_RUNNING)){
 			MessageSender.send(ChatColor.RED, sender, "Match has already started!");
 			return true;
 		}

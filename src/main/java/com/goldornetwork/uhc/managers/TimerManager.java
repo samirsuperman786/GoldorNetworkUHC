@@ -1,13 +1,12 @@
 package com.goldornetwork.uhc.managers;
 
-import java.util.UUID;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
+import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.PVPEnableEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.utils.MessageSender;
@@ -18,12 +17,15 @@ public class TimerManager {
 	 * 
 	 */
 	//instances
+	private UHC plugin;
 	private ScatterManager scatterM;
 	private TeamManager teamM;
-	private UHC plugin;
+	private VoteManager voteM;
+	
 	//storage
 	private int timeTillMatchStart;
 	private int timeTillPVPStart;
+	private int timeTillVote;
 	private boolean hasMatchBegun;
 	private boolean matchStart;
 	private boolean isPVPEnabled;
@@ -32,10 +34,11 @@ public class TimerManager {
 
 
 
-	public TimerManager(UHC plugin, ScatterManager scatterM, TeamManager teamM) {
+	public TimerManager(UHC plugin, ScatterManager scatterM, TeamManager teamM, VoteManager voteM) {
 		this.plugin=plugin;
 		this.scatterM=scatterM;
 		this.teamM=teamM;
+		this.voteM=voteM;
 	}
 	
 	/**
@@ -47,6 +50,7 @@ public class TimerManager {
 		hasMatchBegun=false;
 		timeTillMatchStart=-2;
 		timeTillPVPStart=-2;
+		timeTillVote=-2;
 		matchStart=false;
 		isPVPEnabled=false;
 	}
@@ -65,8 +69,42 @@ public class TimerManager {
 		isPVPEnabled= false;
 		matchStart = true;
 		countdownTimer();
+		voteTimer();
 	}
 	
+	private void voteTimer(){
+		timeTillVote=0;
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				timeTillVote++;
+				if(timeTillVote==1){
+					voteM.generateOptions();
+					MessageSender.broadcast("-[Options]");
+					
+					for(int i = 0; i<voteM.getNumberOfOptions(); i++){
+						MessageSender.broadcast("Option " + (i + 1));
+						for(Gamemode game : voteM.getOptions().get(i)){
+							MessageSender.broadcast(ChatColor.AQUA + game.getName());
+							
+						}
+						//MessageSender.broadcast(voteM.getOptions().get(1).get(1).getName() +  " lol");
+						MessageSender.broadcast("---------------");
+						
+					}
+					
+					MessageSender.broadcast(ChatColor.LIGHT_PURPLE + "Please use /vote [option], also /info [gamemode]");
+				}
+				else if(timeTillVote==5*60){
+					voteM.enableOption(voteM.getWinner());
+					MessageSender.broadcast("Option " + voteM.getWinner() + " has won.");
+					cancel();
+				}
+				
+			}
+		}.runTaskTimer(plugin, 100L, 20L);
+	}
 	/**
 	 * When called, this will begin the count down to the start of the match
 	 */
@@ -165,6 +203,7 @@ public class TimerManager {
 	public void cancelMatch(){
 		MessageSender.broadcast("Match canceled");
 		timeTillMatchStart=-1;
+		State.setState(State.NOT_RUNNING);
 		teamM.setup();
 	}
 

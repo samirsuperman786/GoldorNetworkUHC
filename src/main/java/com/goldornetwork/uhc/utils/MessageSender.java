@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 public class MessageSender {
 	
 	private static String getPrefix(){
-		return (ChatColor.GOLD + "[GoldorNetwork] ");
+		return (ChatColor.GOLD + "[GN] ");
 	}
 
 	public static void send(ChatColor cc, Player p, String msg){
