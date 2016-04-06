@@ -7,32 +7,38 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
+import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
+import com.goldornetwork.uhc.managers.GameModeManager.PVPEnableEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.utils.MessageSender;
 
-public class LandIsBad extends Gamemode{
+public class LandIsBad extends Gamemode implements Listener{
 
 	//instances
 	private TeamManager teamM;
-	private TimerManager timerM;
 	//storage
 	private UHC plugin;
 	private Map<UUID, BukkitTask> playersToDamage= new HashMap<UUID, BukkitTask>();
 
-	public LandIsBad(UHC plugin, TeamManager teamM, TimerManager timerM) {
+	public LandIsBad(UHC plugin, TeamManager teamM) {
 		super("LandIsBad", "After PVP is enabled, players who are not underwater will take a heart of damage every ten seconds!");
 		this.plugin=plugin;
 		this.teamM=teamM;
-		this.timerM=timerM;
 	}
 	@Override
 	public void onEnable() {
+		
+	}
+	
+	
+	public void on(PVPEnableEvent e){
 		plugin.getServer().getScheduler().runTaskTimer(plugin, new Runnable(){
 			@Override
 			public void run() {
@@ -40,10 +46,9 @@ public class LandIsBad extends Gamemode{
 			}
 
 		}, 0L, 20L);
+		
 	}
 	private void runTask() {
-		if(State.getState().equals(State.INGAME)){
-			if(timerM.isPVPEnabled()){
 				for(UUID u : teamM.getPlayersInGame()){
 					if(Bukkit.getServer().getPlayer(u).isOnline()){
 						Player p = Bukkit.getServer().getPlayer(u);
@@ -69,9 +74,7 @@ public class LandIsBad extends Gamemode{
 							}
 						}
 					}
-				}
-			}
-		}
+				}	
 
 	}
 }

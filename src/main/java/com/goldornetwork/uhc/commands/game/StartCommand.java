@@ -18,7 +18,7 @@ public class StartCommand extends UHCCommand{
 	private TimerManager timerM;
 	private TeamManager teamM;
 	//storage
-	private final int DEFAULTTIMETILLSTART=10*60; //change to 15 *60
+	private final int DEFAULTTIMETILLSTART=6*60; //change to 15 *60
 	private final int DEFAULTTIMETILLPVP=1*30; //change to 40*60
 	
 	public StartCommand(TimerManager timerM, TeamManager teamM) {

@@ -21,9 +21,11 @@ import com.goldornetwork.uhc.commands.team.CreateCommand;
 import com.goldornetwork.uhc.commands.team.InvitePlayerCommand;
 import com.goldornetwork.uhc.commands.team.JoinCommand;
 import com.goldornetwork.uhc.commands.team.UnInvitePlayerCommand;
+import com.goldornetwork.uhc.commands.team.VoteCommand;
 import com.goldornetwork.uhc.managers.ChunkGenerator;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
+import com.goldornetwork.uhc.managers.VoteManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 
@@ -141,7 +143,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 	 * @param timerM TimerManager
 	 * @param chunkG ChunkGenerator
 	 */
-	public void registerCommands(TeamManager teamM, TimerManager timerM, ChunkGenerator chunkG){
+	public void registerCommands(TeamManager teamM, TimerManager timerM, ChunkGenerator chunkG, VoteManager voteM){
 		//game
 		cmds.add(new StartCommand(timerM, teamM));
 		cmds.add(new CancelCommand(timerM));
@@ -153,6 +155,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 		cmds.add(new InvitePlayerCommand(teamM));
 		cmds.add(new JoinCommand(teamM));
 		cmds.add(new UnInvitePlayerCommand(teamM));
+		cmds.add(new VoteCommand(voteM));
 		
 		for(UHCCommand cmd : cmds){
 			PluginCommand pCmd = plugin.getCommand(cmd.getName());

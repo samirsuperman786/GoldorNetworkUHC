@@ -57,14 +57,14 @@ public class UHC extends JavaPlugin {
 		
 		boardM = new BoardManager(teamM);
 		
-		chunkG= new ChunkGenerator();
+		chunkG= new ChunkGenerator(plugin);
 		
 		
 		
 		//cmds
 		cmd = new CommandHandler(plugin);
 		
-		cmd.registerCommands(teamM, timerM, chunkG);
+		cmd.registerCommands(teamM, timerM, chunkG, voteM);
 		
 		//listeners
 		new SpectatorRegionManager(plugin, teamM, scatterM);
@@ -76,9 +76,6 @@ public class UHC extends JavaPlugin {
 		new WeatherChange(plugin);
 		new AntiXray(plugin);
 		//new CombatLog(plugin, scatterM, teamM);
-		//timers
-		BukkitScheduler sched = Bukkit.getServer().getScheduler();
-		sched.runTaskTimer(plugin, chunkG, 0L, 20L);
 		
 		//setup
 		teamM.setup();
@@ -88,6 +85,7 @@ public class UHC extends JavaPlugin {
 		moveE.setup();
 		voteM.setup();
 		//TESTCODE
+		
 	}
 
 

@@ -21,6 +21,7 @@ public class Medic implements Listener {
 	private int timeTillHeal;
 	public Medic(UHC plugin, TeamManager teamM) {
 		this.plugin=plugin;
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.teamM=teamM;
 		timeTillHeal=15;
 	}
@@ -36,13 +37,15 @@ public class Medic implements Listener {
 					for(UUID u : teamM.getPlayersInGame()){
 						if(Bukkit.getOfflinePlayer(u).isOnline()){
 							Bukkit.getPlayer(u).setHealth(Bukkit.getPlayer(u).getMaxHealth());
+							Bukkit.getPlayer(u).setFoodLevel(20);
+							Bukkit.getPlayer(u).setSaturation(20L);
 						}
 					}
 					cancel();
 				}
 				else if(timeTillHeal>0){
 					if(timeTillHeal<=5){
-						MessageSender.broadcast(ChatColor.GOLD + "Final heal in" + ChatColor.GRAY + timeTillHeal);
+						MessageSender.broadcast(ChatColor.GOLD + "Final heal in " + ChatColor.GRAY + timeTillHeal);
 					}
 				}
 				timeTillHeal--;

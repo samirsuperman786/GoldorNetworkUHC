@@ -59,7 +59,7 @@ public class GameModeManager {
 		gamemodes.add(new FlowerPower(teamM));
 		gamemodes.add(new KillSwitch());
 		gamemodes.add(new KingsManager(teamM));
-		gamemodes.add(new LandIsBad(plugin, teamM, timerM));
+		gamemodes.add(new LandIsBad(plugin, teamM));
 		gamemodes.add(new PotionSwap(plugin, teamM));
 		gamemodes.add(new RewardingLongshots(teamM));
 		gamemodes.add(new SkyHigh(plugin, teamM));

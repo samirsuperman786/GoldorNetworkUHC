@@ -13,6 +13,7 @@ import com.goldornetwork.uhc.commands.UHCCommand;
 import com.goldornetwork.uhc.managers.ChunkGenerator;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.utils.MessageSender;
+import com.goldornetwork.uhc.utils.Parser;
 
 public class ChunkGenerateCommand extends UHCCommand{
 
@@ -33,17 +34,26 @@ public class ChunkGenerateCommand extends UHCCommand{
 			return true;
 		}
 		else if(chunkG.isGenerating()==true){
-			MessageSender.send(ChatColor.RED, sender, "Please cancel current generation first!");
+			MessageSender.send(ChatColor.RED, sender, "Please cancel current generation first using /render cancel");
 			return true;
 		}
 		else if(args.length>0){
-			if(args.length==2){
+			if(args.length==1){
+				if(args[0].equalsIgnoreCase("cancel")){
+					chunkG.cancelGeneration();
+					return true;
+				}
+				else{
+					return false;
+				}
+			}
+			else if(args.length==2){
 				if(Bukkit.getServer().getWorld(args[0])!=null){
 					World world = Bukkit.getServer().getWorld(args[0]);
 					if(world.getWorldBorder()!=null){
-						if(Integer.valueOf(args[1])!=null){
+						if(Parser.isInt(args[1])){
 							int radius = Integer.valueOf(args[1]);
-							chunkG.loadGenerator(world, world.getWorldBorder().getCenter(), radius);
+							chunkG.generate(world, world.getWorldBorder().getCenter(), radius);
 							MessageSender.broadcast("Generating chunks with a radius of " + radius + " in world \"" + world.getName()  + "\" ETC : " + (chunkG.getTimeTillCompleteInMinutes()) + " minutes");
 							MessageSender.broadcast("Warning- the server should be empty during the generation period.");
 							return true;
@@ -54,9 +64,9 @@ public class ChunkGenerateCommand extends UHCCommand{
 
 					}
 					else{
-						if(Integer.valueOf(args[1])!=null){
+						if(Parser.isInt(args[1])){
 							int radius = Integer.valueOf(args[1]);
-							chunkG.loadGenerator(world, new Location(world, 0, 0, 0) , radius);
+							chunkG.generate(world, new Location(world, 0, 0, 0) , radius);
 							MessageSender.broadcast("Generating chunks with a radius of " + radius + " in world \"" + world.getName() + "\" ETC : " + (chunkG.getTimeTillCompleteInMinutes()) + " minutes");
 							MessageSender.broadcast("Warning- the server should be empty during the generation period.");
 							return true;

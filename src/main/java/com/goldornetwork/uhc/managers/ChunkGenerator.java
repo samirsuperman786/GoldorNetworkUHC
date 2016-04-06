@@ -1,17 +1,21 @@
 package com.goldornetwork.uhc.managers;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.utils.MessageSender;
 
-public class ChunkGenerator implements Runnable{
-	/*
-	 * TODO switch from runnable to bukkitrunnable
-	 */
+public class ChunkGenerator {
+
+
 	//instances
-	public ChunkGenerator() {
-		
+	private UHC plugin;
+
+	public ChunkGenerator(UHC plugin) {
+		this.plugin=plugin;
 	}
 
 	//storage
@@ -32,14 +36,15 @@ public class ChunkGenerator implements Runnable{
 
 
 	//storage
-	private boolean isGeneratingDone;
-	private boolean startGenerating;
-	private int chunksPerRun =15;
+	private boolean pause;
+	private boolean generating;
+	private boolean cancel;
+	private final int CHUNKS_PER_RUN =5;
 	private int chunksLeft;
-	private int duration=0;
+	private int duration;
 
 
-	public void loadGenerator(World world, Location center, int radius){
+	public void generate(World world, Location center, int radius){
 		this.world = world;
 		this.radius = 16*(Math.round(radius/16));
 		this.i=center.getBlockX();
@@ -48,51 +53,54 @@ public class ChunkGenerator implements Runnable{
 		this.segment_length=1;
 		this.segment_passed=0;
 		this.k =0;
-		this.startGenerating=true;
+		this.duration=0;
+		this.generating=true;
+		this.pause=false;
+		this.cancel=false;
+		generateMachine();
+	}
+	public boolean isGenerating(){
+		return generating;
 	}
 
 	public double getTimeTillCompleteInMinutes(){
-		return (((radius/16) * (radius/16) *4)/chunksPerRun)/60;
+		return (((radius/16) * (radius/16) *4)/CHUNKS_PER_RUN)/60;
 	}
 
-	public boolean isGenerating(){
-		return startGenerating;
+	public void cancelGeneration(){
+		MessageSender.broadcast("Generation cancelled.");
+		cancel=true;
 	}
-
 	public void pauseGeneration(){
-		if(startGenerating){
-			startGenerating=false;
-		}
-		else{
-			//nothing
-		}
+		pause=true;
+		MessageSender.broadcast("Generation paused.");
 	}
 	public void resumeGeneration(){
-		if(startGenerating==false){
-			startGenerating=true;
-		}
+		pause = false;
+		MessageSender.broadcast("Generation resumed.");
 	}
 
-	@Override
-	public void run() {
-		duration++;
-		if(isGeneratingDone){
-			MessageSender.broadcast("Done Preloading Chunks!");
-			isGeneratingDone=false;
-		}
-		else if(startGenerating){
-			if(duration% 10 ==0){//take a break every 10 seconds and save world
-				if(startGenerating){
-					world.save();
-				}
-				return;
-			}
-			if(duration %300 ==0){//updates every 5 minutes
-				MessageSender.broadcast((getTimeTillCompleteInMinutes() - (chunksLeft/chunksPerRun))/60 + " minutes until \"" + world.getName() +"\" will finish rendering." );
-			}
+	private void generateMachine(){
 
-			else{
-				for(int c = 0; c< chunksPerRun; c++){
+		new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				duration++;
+				if(duration%10 ==0){
+					world.save();
+					return;
+				}
+				
+
+				if(pause){
+					return;
+				}
+				if(cancel){
+					cancel();
+					cancel=false;
+				}
+				for(int c = 0; c< CHUNKS_PER_RUN; c++){
 					if(k <((radius/16) * (radius/16) *4)){
 						chunksLeft--;
 						++k;
@@ -100,6 +108,7 @@ public class ChunkGenerator implements Runnable{
 						j += dj;
 						++segment_passed;
 
+						//insert while statement to check if chunk is already loaded
 						if (segment_passed == segment_length) {
 							// done with current segment
 							segment_passed = 0;
@@ -118,23 +127,13 @@ public class ChunkGenerator implements Runnable{
 						//Bukkit.getPlayer("g0ldmanpox").teleport(new Location(world, i, world.getMaxHeight(), j));
 					}
 					else if(k==((radius/16) * (radius/16) *4)){
-						startGenerating=false;
-						isGeneratingDone=true;
+						MessageSender.broadcast(ChatColor.GOLD + "Generating complete.");
+						generating=false;
+						cancel();
 					}
-
 				}
 			}
-
-
-
-		}
-
-
-
-
-
-
-
+		}.runTaskTimer(plugin, 0L, 20L);
 	}
 
 

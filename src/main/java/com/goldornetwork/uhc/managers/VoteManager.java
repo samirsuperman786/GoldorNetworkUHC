@@ -37,6 +37,12 @@ public class VoteManager {
 	public int getNumberOfOptions(){
 		return NUMBEROFOPTIONS;
 	}
+	public boolean isValidOption(int option){
+		if(option <NUMBEROFOPTIONS){
+			return true;
+		}
+		return false;
+	}
 	public void generateOptions(){
 		for(int k = 0; k<NUMBEROFOPTIONS; k++){
 			List<Gamemode> toAdd = new ArrayList<Gamemode>();
