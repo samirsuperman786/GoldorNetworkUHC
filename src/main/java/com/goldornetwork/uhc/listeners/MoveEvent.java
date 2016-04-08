@@ -1,35 +1,49 @@
 package com.goldornetwork.uhc.listeners;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
 
 public class MoveEvent implements Listener {
 
-	private static MoveEvent instance = new MoveEvent();
-	private TeamManager teamM = TeamManager.getInstance();
+	private TeamManager teamM;
 	private boolean freezeAll;
 	
-	public static MoveEvent getInstace(){
-		return instance;
+	public MoveEvent(UHC plugin, TeamManager teamM) {
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
+		this.teamM=teamM;
 	}
+	
+	/**
+	 * Will clear all frozen players
+	 */
 	public void setup(){
 		this.freezeAll=false;
 	}
 
+	/**
+	 * Will freeze all players in game
+	 */
 	public void freezePlayers(){
 		this.freezeAll=true;
 	}
+	
+	/**
+	 * Will unfreeze all players in game
+	 */
 	public void unfreezePlayers(){
 		this.freezeAll=false;
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onPlayerMove(PlayerMoveEvent e){
+	public void on(PlayerMoveEvent e){
 		if(freezeAll){
 			if(teamM.getPlayersInGame().contains(e.getPlayer().getUniqueId())){
 				Location from=e.getFrom();
@@ -43,6 +57,19 @@ public class MoveEvent implements Listener {
 				}
 			}
 		}
-	
 	}
+	
+	@EventHandler
+	public void on(EntityDamageEvent e){
+		if(freezeAll){
+			if(e.getEntity() instanceof Player){
+				Player p = (Player) e.getEntity();
+				if(teamM.getPlayersInGame().contains(p.getUniqueId())){
+					e.setCancelled(true);
+				}
+			}
+		}
+		
+	}
+	
 }

@@ -1,109 +1,143 @@
 package com.goldornetwork.uhc;
 
-import org.bukkit.Bukkit;
+import java.io.File;
+import java.io.IOException;
+
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.goldornetwork.uhc.commands.CancelCommand;
-import com.goldornetwork.uhc.commands.ChunkGenerateCommand;
-import com.goldornetwork.uhc.commands.CreateCommand;
-import com.goldornetwork.uhc.commands.InvitePlayerCommand;
-import com.goldornetwork.uhc.commands.JoinCommand;
-import com.goldornetwork.uhc.commands.StartCommand;
-import com.goldornetwork.uhc.commands.UnInvitePlayerCommand;
-import com.goldornetwork.uhc.listeners.BreakEvent;
-import com.goldornetwork.uhc.listeners.ChatEvent;
+import com.goldornetwork.uhc.commands.CommandHandler;
+import com.goldornetwork.uhc.listeners.BackGround;
+import com.goldornetwork.uhc.listeners.DeathEvent;
 import com.goldornetwork.uhc.listeners.JoinEvent;
 import com.goldornetwork.uhc.listeners.LeaveEvent;
 import com.goldornetwork.uhc.listeners.MoveEvent;
+import com.goldornetwork.uhc.listeners.WeatherChange;
+import com.goldornetwork.uhc.managers.BoardManager;
 import com.goldornetwork.uhc.managers.ChunkGenerator;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.SpectatorRegionManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
-import com.goldornetwork.uhc.managers.ModifierManager.LocationListener;
-import com.goldornetwork.uhc.managers.ModifierManager.ModifierManager;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.BowListener;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.DeathEvent;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.DisabledCrafting;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.KingsManager;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.LandIsBadManager;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.PotionSwap;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.SkyHigh;
-import com.goldornetwork.uhc.managers.ModifierManager.actions.TheHobbitManager;
+import com.goldornetwork.uhc.managers.VoteManager;
+import com.goldornetwork.uhc.managers.WorldManager;
+import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
+import com.goldornetwork.uhc.utils.AntiXray;
+import com.goldornetwork.uhc.utils.Medic;
 
 public class UHC extends JavaPlugin {
 
+	/*
+	 * TODO config file
+	 */
+	//instances
 	private static UHC plugin;
-
-	@Override
-	public void onDisable(){
-
+	private GameModeManager gameModeM;
+	private TeamManager teamM;
+	private TimerManager timerM;
+	private BoardManager boardM;
+	private ChunkGenerator chunkG;
+	private ScatterManager scatterM;
+	private CommandHandler cmd;
+	private MoveEvent moveE;
+	private VoteManager voteM;
+	private Medic medic;
+	private WorldManager worldM;
+	
+	public void instances(){
+		
+		//instances
+		teamM= new TeamManager(plugin);
+		
+		moveE= new MoveEvent(plugin, teamM);
+		
+		scatterM= new ScatterManager(plugin, teamM, moveE);
+		
+		gameModeM= new GameModeManager(plugin);
+		
+		voteM = new VoteManager(plugin, gameModeM);
+		
+		timerM = new TimerManager(plugin, scatterM, teamM, voteM);
+		
+		boardM = new BoardManager(teamM);
+		
+		chunkG= new ChunkGenerator(plugin);
+		
+		worldM = new WorldManager(plugin, scatterM);
+		
+		medic= new Medic(plugin, teamM);
+		
+		//cmds
+		cmd = new CommandHandler(plugin);
+		
+		cmd.registerCommands(teamM, timerM, chunkG, voteM);
+		
+		//listeners
+		new SpectatorRegionManager(plugin, teamM, scatterM);
+		
+		new BackGround(plugin);
+		new DeathEvent(plugin, teamM, scatterM);
+		new JoinEvent(plugin, teamM, scatterM);
+		new LeaveEvent(plugin,teamM, scatterM);
+		new WeatherChange(plugin);
+		new AntiXray(plugin);
+		//new CombatLog(plugin, scatterM, teamM);
+		
+		//setup
+		gameModeM.setupGamemodes(teamM, scatterM);
+		teamM.setup();
+		boardM.setup();
+		scatterM.setup();
+		timerM.setup();
+		moveE.setup();
+		voteM.setup();
+		worldM.setup();
+		
 	}
+
+
+	private void createConfig() {
+		 try {
+		        if (!getDataFolder().exists()) {
+		            getDataFolder().mkdirs();
+		        }
+		        File file = new File(getDataFolder(), "config.yml");
+		        if (!file.exists()) {
+		            getLogger().info("Config.yml not found, creating!");
+		            saveDefaultConfig();
+		        } else {
+		            getLogger().info("Config.yml found, loading!");
+		        }
+		    } catch (Exception e) {
+		        e.printStackTrace();
+
+		    }
+		 
+		 File file = new File(getDataFolder(), "config.yml");
+		 if (!file.exists()) {
+		     getLogger().info("config.yml not found, creating!");
+		     saveDefaultConfig();
+		 } else {
+		     getLogger().info("config.yml found, loading!");
+		 }
+		 getConfig().options().copyDefaults(true);
+		 
+	}
+
 
 	@Override
 	public void onEnable(){
 		plugin = this;
-		registerListeners();
-		registerCommands();
-		setup();
-		registerTimers();
+		createConfig();
+		instances();
 	}
 	
-	public static UHC getInstance(){
-		return plugin;
+
+
+	@Override
+	public void onDisable(){
+		plugin=null;
 	}
-
-	private void registerTimers() {
-		Bukkit.getServer().getScheduler().runTaskTimer(this, ScatterManager.getInstance(), 0L, 20L);
-		Bukkit.getServer().getScheduler().runTaskTimer(this, TimerManager.getInstance(), 0L, 20L);
-		Bukkit.getServer().getScheduler().runTaskTimer(this, SpectatorRegionManager.getInstance(), 0L, 40L);
-		Bukkit.getServer().getScheduler().runTaskTimer(this, LocationListener.getInstance(), 0L, 20L);
-		Bukkit.getServer().getScheduler().runTaskTimer(this, ChunkGenerator.getInstance(), 0L, 20L);
-		
-	}
-
-	private void setup() {
-		TeamManager.getInstance().setup();
-		ScatterManager.getInstance().setup();
-		ModifierManager.getInstance().setup(plugin);
-		DeathEvent.getInstance().setup();
-		BowListener.getInstance().setup();
-		TimerManager.getInstance().setup();
-		JoinEvent.getInstance().setup();
-		BreakEvent.getInstance().setup();
-		LocationListener.getInstance().setup();
-		MoveEvent.getInstace().setup();
-	}
-
-	private void registerCommands() {
-		getCommand("start").setExecutor(new StartCommand());
-		getCommand("cancel").setExecutor(new CancelCommand());
-		getCommand("create").setExecutor(new CreateCommand());
-		getCommand("join").setExecutor(new JoinCommand());
-		getCommand("invite").setExecutor(new InvitePlayerCommand());
-		getCommand("uninvite").setExecutor(new UnInvitePlayerCommand());
-		getCommand("render").setExecutor(new ChunkGenerateCommand());
-	}
-
-	private void registerListeners() {
-		new ChatEvent(this);
-		Bukkit.getServer().getPluginManager().registerEvents(JoinEvent.getInstance(), this);
-		Bukkit.getServer().getPluginManager().registerEvents(BreakEvent.getInstance(), this);
-		Bukkit.getServer().getPluginManager().registerEvents(BowListener.getInstance(), this);
-		Bukkit.getServer().getPluginManager().registerEvents(DeathEvent.getInstance(), this);
-		Bukkit.getServer().getPluginManager().registerEvents(TheHobbitManager.getInstance(), this);
-		Bukkit.getServer().getPluginManager().registerEvents(DisabledCrafting.getInstance(), this);
-		Bukkit.getServer().getPluginManager().registerEvents(LeaveEvent.getInstace(), this);
-		Bukkit.getServer().getPluginManager().registerEvents(MoveEvent.getInstace(), this);
-	
-	}
-
-
-
-
-
-
-
 
 
 }

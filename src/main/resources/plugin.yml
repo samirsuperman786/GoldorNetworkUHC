@@ -27,4 +27,7 @@ commands:
       aliases: [ui] 
    render:
       description: Use this to render the world!
-      usage: /<command> [world] [radius]       
+      usage: /<command> [world] [radius]
+   vote:
+      description: Use this to vote for a poll!
+      usage: /<command> [option]        
