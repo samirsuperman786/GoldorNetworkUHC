@@ -35,7 +35,7 @@ public class VoteCommand extends UHCCommand{
 				MessageSender.send(ChatColor.RED, p, "No poll currently open!");
 				return true;
 			}
-			if(args.length==1){
+			else if(args.length==1){
 				if(Parser.isInt(args[0])){
 					int input = Integer.valueOf(args[0]);
 					if(voteM.isValidOption(input)){

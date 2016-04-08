@@ -38,13 +38,11 @@ public class BlockRush extends Gamemode implements Listener{
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(BlockBreakEvent e){
 		if(State.getState().equals(State.INGAME)){
-			if(e instanceof Player){
 				Player p = e.getPlayer();
 				if(firstBlocksMined.contains(e.getBlock().getType())==false){
 					run(p, e);
 					
 				}
-			}
 		}
 	}
 	

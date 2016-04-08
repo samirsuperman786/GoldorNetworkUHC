@@ -20,6 +20,7 @@ import com.goldornetwork.uhc.managers.SpectatorRegionManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.VoteManager;
+import com.goldornetwork.uhc.managers.WorldManager;
 import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
 import com.goldornetwork.uhc.utils.AntiXray;
 import com.goldornetwork.uhc.utils.Medic;
@@ -41,6 +42,7 @@ public class UHC extends JavaPlugin {
 	private MoveEvent moveE;
 	private VoteManager voteM;
 	private Medic medic;
+	private WorldManager worldM;
 	
 	public void instances(){
 		
@@ -57,11 +59,11 @@ public class UHC extends JavaPlugin {
 		
 		timerM = new TimerManager(plugin, scatterM, teamM, voteM);
 		
-		gameModeM.setupGamemodes(teamM, scatterM);
-		
 		boardM = new BoardManager(teamM);
 		
 		chunkG= new ChunkGenerator(plugin);
+		
+		worldM = new WorldManager(plugin, scatterM);
 		
 		medic= new Medic(plugin, teamM);
 		
@@ -72,6 +74,7 @@ public class UHC extends JavaPlugin {
 		
 		//listeners
 		new SpectatorRegionManager(plugin, teamM, scatterM);
+		
 		new BackGround(plugin);
 		new DeathEvent(plugin, teamM, scatterM);
 		new JoinEvent(plugin, teamM, scatterM);
@@ -81,13 +84,14 @@ public class UHC extends JavaPlugin {
 		//new CombatLog(plugin, scatterM, teamM);
 		
 		//setup
+		gameModeM.setupGamemodes(teamM, scatterM);
 		teamM.setup();
 		boardM.setup();
 		scatterM.setup();
 		timerM.setup();
 		moveE.setup();
 		voteM.setup();
-		
+		worldM.setup();
 		
 	}
 

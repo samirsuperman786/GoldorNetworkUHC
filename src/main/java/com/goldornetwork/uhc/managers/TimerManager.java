@@ -47,9 +47,11 @@ public class TimerManager {
 	private void config(){
 		plugin.getConfig().addDefault("TIME-TILL-MATCH-START", 15);
 		plugin.getConfig().addDefault("TIME-TILL-PVP-START", 40);
+		plugin.getConfig().addDefault("TIME-TILL-VOTE-END", 5);
 		plugin.saveConfig();
 		this.timeTillMatchStart = (plugin.getConfig().getInt("TIME-TILL-MATCH-START")*60);
 		this.timeTillPVPStart = (plugin.getConfig().getInt("TIME-TILL-PVP-START")*60);
+		this.timeTillVote = (plugin.getConfig().getInt("TIME-TILL-VOTE-END")*60);
 	}
 
 	/**
@@ -67,29 +69,34 @@ public class TimerManager {
 	}
 	
 	private void voteTimer(){
-		timeTillVote=0;
+		
 		new BukkitRunnable() {
 			
 			@Override
 			public void run() {
-				timeTillVote++;
-				if(timeTillVote==1){
-					voteM.generateOptions();
-					MessageSender.broadcast("-[Options]");
-					
-					for(int i = 0; i<voteM.getNumberOfOptions(); i++){
-						MessageSender.broadcast("Option " + (i + 1));
-						for(Gamemode game : voteM.getOptions().get(i)){
-							MessageSender.broadcast(ChatColor.AQUA + game.getName());
-							
-						}
-						MessageSender.broadcast("---------------");
+				voteM.generateOptions();
+				MessageSender.broadcast("-[Options]");
+				for(int i = 0; i<voteM.getNumberOfOptions(); i++){
+					MessageSender.broadcast("Option " + (i + 1));
+					for(Gamemode game : voteM.getOptions().get(i)){
+						MessageSender.broadcast(ChatColor.AQUA + game.getName());
 						
 					}
+					MessageSender.broadcast("---------------");
 					
-					MessageSender.broadcast(ChatColor.LIGHT_PURPLE + "Please use /vote [option], also /info [gamemode]");
 				}
-				else if(timeTillVote==5*60){
+				MessageSender.broadcast(ChatColor.LIGHT_PURPLE + "Please use /vote [option], also /info [gamemode]");
+				
+			}
+		}.runTaskLater(plugin, 100L);
+		
+		
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				timeTillVote--;
+				if(timeTillVote==0){
 					voteM.enableOption(voteM.getWinner());
 					MessageSender.broadcast("Option " + (voteM.getWinner()+1) + " has won.");
 					cancel();

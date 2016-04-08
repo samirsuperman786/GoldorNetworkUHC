@@ -64,14 +64,13 @@ public class FlowerPower extends Gamemode implements Listener{
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(BlockBreakEvent e){
 		if(State.getState().equals(State.INGAME)){
-			if(e instanceof Player){
 				Player p = e.getPlayer();
 				if(teamM.isPlayerInGame(p)){
 					if(e.getBlock().getType().equals(Material.YELLOW_FLOWER) || e.getBlock().getType().equals(Material.RED_ROSE)){
 						run(p, e);
 					}
 				}
-			}
+			
 		}
 	}
 	public void run(Player p, BlockBreakEvent e){

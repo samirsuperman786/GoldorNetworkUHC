@@ -32,6 +32,7 @@ public class TeamManager {
 	//storage
 	private int playersPerTeam;
 	private int MaxFFASize;
+	private int MaxTeams;
 	private boolean isFFAEnabled;
 	private boolean isTeamsEnabled;
 
@@ -71,8 +72,10 @@ public class TeamManager {
 	
 	private void config(){
 		plugin.getConfig().addDefault("MAX-FFA-SIZE", 100);
+		plugin.getConfig().addDefault("MAX-TEAMS", 24);
 		plugin.saveConfig();
 		this.MaxFFASize=plugin.getConfig().getInt("MAX-FFA-SIZE");
+		this.MaxTeams=plugin.getConfig().getInt("MAX-TEAMS");
 	}
 
 
@@ -86,7 +89,6 @@ public class TeamManager {
 		for(int i =0; i<numberOfTeams; i++){
 			String loopTeam=null;
 			String colorOfTeam = null;
-
 
 			switch(i){
 			case 1: loopTeam = "Alpha";
@@ -132,36 +134,36 @@ public class TeamManager {
 			colorOfTeam = ChatColor.LIGHT_PURPLE.toString();
 			break;
 			case 15: loopTeam = "Omicron";
-			colorOfTeam = ChatColor.LIGHT_PURPLE.toString() + ChatColor.ITALIC;
+			colorOfTeam = ChatColor.BLACK.toString() + ChatColor.ITALIC;
 			break;
 			case 16: loopTeam = "Pi";
-			colorOfTeam = ChatColor.LIGHT_PURPLE.toString() + ChatColor.ITALIC;
+			colorOfTeam = ChatColor.BLUE.toString() + ChatColor.ITALIC;
 			break;
 			case 17: loopTeam = "Rho";
-			colorOfTeam = ChatColor.LIGHT_PURPLE.toString() + ChatColor.ITALIC;
+			colorOfTeam = ChatColor.YELLOW.toString() + ChatColor.ITALIC;
 			break;
 			case 18: loopTeam = "Sigma";
-			colorOfTeam = ChatColor.LIGHT_PURPLE.toString() + ChatColor.ITALIC;
+			colorOfTeam = ChatColor.DARK_AQUA.toString() + ChatColor.ITALIC;
 			break;
 			case 19: loopTeam = "Tau";
-			colorOfTeam = ChatColor.LIGHT_PURPLE.toString() + ChatColor.ITALIC;
+			colorOfTeam = ChatColor.DARK_BLUE.toString() + ChatColor.ITALIC;
 			break;
 			case 20: loopTeam = "Upsilon";
-			colorOfTeam = ChatColor.LIGHT_PURPLE.toString() + ChatColor.ITALIC;
+			colorOfTeam = ChatColor.DARK_GRAY.toString() + ChatColor.ITALIC;
 			break;
 			case 21: loopTeam = "Phi";
-			colorOfTeam = ChatColor.LIGHT_PURPLE.toString() + ChatColor.ITALIC;
+			colorOfTeam = ChatColor.DARK_GREEN.toString() + ChatColor.ITALIC;
 			break;
 			case 22: loopTeam = "Chi";
-			colorOfTeam = ChatColor.LIGHT_PURPLE.toString() + ChatColor.ITALIC;
+			colorOfTeam = ChatColor.DARK_PURPLE.toString() + ChatColor.ITALIC;
 			break;
 			case 23: loopTeam = "Psi";
-			colorOfTeam = ChatColor.LIGHT_PURPLE.toString() + ChatColor.ITALIC;
+			colorOfTeam = ChatColor.DARK_RED.toString() + ChatColor.ITALIC;
 			break;
 			case 24: loopTeam = "Omega";
-			colorOfTeam = ChatColor.LIGHT_PURPLE.toString() + ChatColor.ITALIC;
+			colorOfTeam = ChatColor.GOLD.toString() + ChatColor.ITALIC;
 			break;
-			default: plugin.getLogger().info("Error at team initialization");
+			default:
 
 			}
 			if(loopTeam == null){
@@ -193,7 +195,7 @@ public class TeamManager {
 	 */
 	public void setupTeams(int teamSize){
 		isTeamsEnabled = true;
-		initializeTeams(24);
+		initializeTeams(MaxTeams);
 		this.playersPerTeam = teamSize;
 	}
 

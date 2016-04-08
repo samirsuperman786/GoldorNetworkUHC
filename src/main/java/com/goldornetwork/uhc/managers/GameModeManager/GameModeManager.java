@@ -55,6 +55,10 @@ public class GameModeManager {
 	 * @param scatterM - the ScatterManager
 	 */
 	public void setupGamemodes(TeamManager teamM, ScatterManager scatterM){
+		
+		for(Gamemode game : getEnabledGamemodes()){
+			game.disable();
+		}
 		gamemodes.add(new BlockRush(scatterM));
 		gamemodes.add(new FlowerPower(teamM));
 		gamemodes.add(new KillSwitch());

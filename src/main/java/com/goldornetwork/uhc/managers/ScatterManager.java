@@ -234,7 +234,6 @@ public class ScatterManager{
 	 */
 	private boolean validate(Location loc){
 		Location landBlock = loc.clone().add(0, -1, 0);
-		Material landBlockType = landBlock.getBlock().getType();
 		boolean valid = true;
 		if(loc.getBlockY()<60){
 			valid =false;
@@ -255,7 +254,7 @@ public class ScatterManager{
 		 * checking if a player will spawn in a cube of air
 		 */
 		for(BlockFace face : BlockFace.values()){
-			if(landBlock.clone().add(0, 2, 0).getBlock().getRelative(face).getType()!=Material.AIR){
+			if(landBlock.clone().add(0, 3, 0).getBlock().getRelative(face).getType()!=Material.AIR){
 				valid=false;
 			}
 		}

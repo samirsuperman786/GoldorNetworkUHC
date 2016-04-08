@@ -1,18 +1,22 @@
 package com.goldornetwork.uhc.managers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.UUID;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
+import com.goldornetwork.uhc.utils.MessageSender;
 
 public class VoteManager {
 
@@ -80,6 +84,7 @@ public class VoteManager {
 		voteActive=false;
 		for(Gamemode game : options.get(choice)){
 			game.enable(plugin);
+			MessageSender.broadcast(ChatColor.AQUA + game.getName() + " has been enabled");
 		}
 	}
 	
@@ -93,18 +98,15 @@ public class VoteManager {
 	}
 	public void addVote(Player p, int choice){
 		haveVoted.add(p.getUniqueId());
-		mostPopularVote.put(choice-1, (mostPopularVote.get(choice-1) + 1));
+		mostPopularVote.replace(choice-1, (mostPopularVote.get(choice-1) + 1));
 	}
 	
 	public int getWinner(){
-		int max = 0;
-		int currentWinner = 0;
-		for(int i = 0, temp =0; i< NUMBEROFOPTIONS; i++){
-			currentWinner=i;
-			temp= mostPopularVote.get(i);
-			if(temp > max){
-				max = temp;
-				currentWinner=i;
+		int maxVal = (Collections.max(mostPopularVote.values()));
+		int currentWinner=0;
+		for(Map.Entry<Integer, Integer> entry : mostPopularVote.entrySet()){
+			if(entry.getValue()==maxVal){
+				currentWinner=entry.getKey();
 			}
 		}
 		return currentWinner;

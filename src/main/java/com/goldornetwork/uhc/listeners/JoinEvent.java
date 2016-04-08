@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.potion.PotionEffect;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.ScatterManager;
@@ -44,10 +45,14 @@ public class JoinEvent implements Listener{
 		}
 		
 		if(State.getState().equals(State.OPEN) || State.getState().equals(State.NOT_RUNNING)){
+			for(PotionEffect effect : p.getActivePotionEffects()){
+				p.removePotionEffect(effect.getType());
+			}
 			if(!p.isOp()){
 				p.setGameMode(GameMode.ADVENTURE);
 			}
-			//if(p.getWorld())
+			p.getInventory().clear();
+			p.teleport(scatterM.getLobby().getSpawnLocation());
 			Medic.heal(p);
 		}
 		if(State.getState().equals(State.INGAME)|| State.getState().equals(State.SCATTER)){
