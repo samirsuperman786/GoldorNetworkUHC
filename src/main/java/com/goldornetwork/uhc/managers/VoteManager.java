@@ -2,6 +2,7 @@ package com.goldornetwork.uhc.managers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -20,9 +21,11 @@ public class VoteManager {
 	private Random random = new Random();
 	private final int NUMBEROFOPTIONS = 3;
 	private final int AMOUNTTOENABLE = 3;
-	private Map<Integer, List<Gamemode>> options = new HashMap<Integer, List<Gamemode>>();
+	private List<List<Gamemode>> options= new LinkedList<List<Gamemode>>();
+	//private Map<Integer, List<Gamemode>> options = new HashMap<Integer, List<Gamemode>>();
 	private Map<Integer, Integer> mostPopularVote = new HashMap<Integer, Integer>();
 	private List<UUID> haveVoted = new ArrayList<UUID>();
+	private boolean voteActive;
 	
 	public VoteManager(UHC plugin, GameModeManager gamemodeM) {
 		this.plugin=plugin;
@@ -30,20 +33,22 @@ public class VoteManager {
 	}
 	
 	public void setup(){
-		options.clear();
 		mostPopularVote.clear();
 		haveVoted.clear();
+		options.clear();
+		voteActive=false;
 	}
 	public int getNumberOfOptions(){
 		return NUMBEROFOPTIONS;
 	}
 	public boolean isValidOption(int option){
-		if(option <NUMBEROFOPTIONS){
+		if(option> 0 && option <=NUMBEROFOPTIONS){
 			return true;
 		}
 		return false;
 	}
 	public void generateOptions(){
+		voteActive=true;
 		for(int k = 0; k<NUMBEROFOPTIONS; k++){
 			List<Gamemode> toAdd = new ArrayList<Gamemode>();
 			toAdd.clear();
@@ -62,16 +67,17 @@ public class VoteManager {
 					}
 				}
 			}
-			options.put(k, toAdd);
+			options.add(toAdd);
 			mostPopularVote.put(k, 0);
 		}
 	}
 	
-	public Map<Integer, List<Gamemode>> getOptions(){
+	public List<List<Gamemode>> getOptions(){
 		return options;
 	}
 	
 	public void enableOption(int choice){
+		voteActive=false;
 		for(Gamemode game : options.get(choice)){
 			game.enable(plugin);
 		}
@@ -87,7 +93,7 @@ public class VoteManager {
 	}
 	public void addVote(Player p, int choice){
 		haveVoted.add(p.getUniqueId());
-		mostPopularVote.put(choice, (mostPopularVote.get(choice) + 1));
+		mostPopularVote.put(choice-1, (mostPopularVote.get(choice-1) + 1));
 	}
 	
 	public int getWinner(){
@@ -103,4 +109,9 @@ public class VoteManager {
 		}
 		return currentWinner;
 	}
+	
+	public boolean isActive(){
+		return voteActive;
+	}
+	
 }

@@ -17,6 +17,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
+import org.bukkit.WorldCreator;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -164,12 +165,6 @@ public class ScatterManager{
 
 			@Override
 			public void run() {
-				if(FFAToScatter.isEmpty()){
-					Bukkit.getServer().getLogger().info("Error at scattering");
-					cancel();
-					return;
-				}
-				else{
 					for(int i = 0; i<teleportsPerSecond; i++){
 						if(k>=FFAToScatter.size()){
 							scatterComplete=true;
@@ -191,7 +186,7 @@ public class ScatterManager{
 						}
 						k++;
 					}
-				}
+				
 			}
 		}.runTaskTimer(plugin, 0L, 20L);
 	}
@@ -345,12 +340,23 @@ public class ScatterManager{
 	 * Called when scattering has completed, it sets up world conditions
 	 */
 	private void setupStartingOptions() {
-		Bukkit.getPluginManager().callEvent(new GameStartEvent());
-		State.setState(State.INGAME);
-		moveE.unfreezePlayers();
-		MessageSender.broadcast(ChatColor.GOLD + "Scattering complete!");
-		getUHCWorld().setGameRuleValue("doMobSpawning", "true");
+		//adding a slight delay 
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				Bukkit.getPluginManager().callEvent(new GameStartEvent());
+				State.setState(State.INGAME);
+				moveE.unfreezePlayers();
+				MessageSender.broadcast(ChatColor.GOLD + "Scattering complete!");
+				getUHCWorld().setGameRuleValue("doMobSpawning", "true");
+			}
+		}.runTaskLater(plugin, 100L);
+	
 	}
 
+	public World getLobby(){
+		return plugin.getServer().createWorld(new WorldCreator("Lobby"));
+	}
 
 }

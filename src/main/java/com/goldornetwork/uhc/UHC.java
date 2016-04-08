@@ -1,11 +1,13 @@
 package com.goldornetwork.uhc;
 
-import org.bukkit.Bukkit;
+import java.io.File;
+import java.io.IOException;
+
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitScheduler;
 
 import com.goldornetwork.uhc.commands.CommandHandler;
-import com.goldornetwork.uhc.listeners.ChatEvent;
+import com.goldornetwork.uhc.listeners.BackGround;
 import com.goldornetwork.uhc.listeners.DeathEvent;
 import com.goldornetwork.uhc.listeners.JoinEvent;
 import com.goldornetwork.uhc.listeners.LeaveEvent;
@@ -13,7 +15,6 @@ import com.goldornetwork.uhc.listeners.MoveEvent;
 import com.goldornetwork.uhc.listeners.WeatherChange;
 import com.goldornetwork.uhc.managers.BoardManager;
 import com.goldornetwork.uhc.managers.ChunkGenerator;
-import com.goldornetwork.uhc.managers.Medic;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.SpectatorRegionManager;
 import com.goldornetwork.uhc.managers.TeamManager;
@@ -21,6 +22,7 @@ import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.VoteManager;
 import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
 import com.goldornetwork.uhc.utils.AntiXray;
+import com.goldornetwork.uhc.utils.Medic;
 
 public class UHC extends JavaPlugin {
 
@@ -38,10 +40,12 @@ public class UHC extends JavaPlugin {
 	private CommandHandler cmd;
 	private MoveEvent moveE;
 	private VoteManager voteM;
+	private Medic medic;
 	
 	public void instances(){
+		
 		//instances
-		teamM= new TeamManager();
+		teamM= new TeamManager(plugin);
 		
 		moveE= new MoveEvent(plugin, teamM);
 		
@@ -53,13 +57,13 @@ public class UHC extends JavaPlugin {
 		
 		timerM = new TimerManager(plugin, scatterM, teamM, voteM);
 		
-		gameModeM.setupGamemodes(timerM, teamM, scatterM);
+		gameModeM.setupGamemodes(teamM, scatterM);
 		
 		boardM = new BoardManager(teamM);
 		
 		chunkG= new ChunkGenerator(plugin);
 		
-		
+		medic= new Medic(plugin, teamM);
 		
 		//cmds
 		cmd = new CommandHandler(plugin);
@@ -68,8 +72,7 @@ public class UHC extends JavaPlugin {
 		
 		//listeners
 		new SpectatorRegionManager(plugin, teamM, scatterM);
-		new Medic(plugin, teamM);
-		new ChatEvent(plugin);
+		new BackGround(plugin);
 		new DeathEvent(plugin, teamM, scatterM);
 		new JoinEvent(plugin, teamM, scatterM);
 		new LeaveEvent(plugin,teamM, scatterM);
@@ -84,14 +87,44 @@ public class UHC extends JavaPlugin {
 		timerM.setup();
 		moveE.setup();
 		voteM.setup();
-		//TESTCODE
 		
+		
+	}
+
+
+	private void createConfig() {
+		 try {
+		        if (!getDataFolder().exists()) {
+		            getDataFolder().mkdirs();
+		        }
+		        File file = new File(getDataFolder(), "config.yml");
+		        if (!file.exists()) {
+		            getLogger().info("Config.yml not found, creating!");
+		            saveDefaultConfig();
+		        } else {
+		            getLogger().info("Config.yml found, loading!");
+		        }
+		    } catch (Exception e) {
+		        e.printStackTrace();
+
+		    }
+		 
+		 File file = new File(getDataFolder(), "config.yml");
+		 if (!file.exists()) {
+		     getLogger().info("config.yml not found, creating!");
+		     saveDefaultConfig();
+		 } else {
+		     getLogger().info("config.yml found, loading!");
+		 }
+		 getConfig().options().copyDefaults(true);
+		 
 	}
 
 
 	@Override
 	public void onEnable(){
 		plugin = this;
+		createConfig();
 		instances();
 	}
 	

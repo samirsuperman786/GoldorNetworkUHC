@@ -1,17 +1,18 @@
-package com.goldornetwork.uhc.managers;
+package com.goldornetwork.uhc.utils;
 
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
+import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
-import com.goldornetwork.uhc.utils.MessageSender;
 
 public class Medic implements Listener {
 
@@ -53,4 +54,11 @@ public class Medic implements Listener {
 			}
 		}.runTaskTimer(plugin, 0L, 20L);
 	}
+	
+	public static void heal(Player p){
+		p.setHealth(p.getMaxHealth());
+		p.setFoodLevel(20);
+		p.setSaturation(20L);
+	}
+	
 }

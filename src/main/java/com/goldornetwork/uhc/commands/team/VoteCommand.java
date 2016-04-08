@@ -31,11 +31,20 @@ public class VoteCommand extends UHCCommand{
 		}
 		else if(State.getState().equals(State.OPEN)){
 			Player p = (Player) sender;
+			if(voteM.isActive()==false){
+				MessageSender.send(ChatColor.RED, p, "No poll currently open!");
+				return true;
+			}
 			if(args.length==1){
 				if(Parser.isInt(args[0])){
 					int input = Integer.valueOf(args[0]);
 					if(voteM.isValidOption(input)){
+						if(voteM.hasVoted(p)){
+							MessageSender.send(ChatColor.RED, p, "You have already voted!");
+							return true;
+						}
 						voteM.addVote(p, input);
+						MessageSender.send(ChatColor.GREEN, p, "You have voted for option " + input);
 						return true;
 					}
 					else{

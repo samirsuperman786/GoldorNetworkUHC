@@ -1,6 +1,7 @@
 package com.goldornetwork.uhc.listeners;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -11,6 +12,7 @@ import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.utils.Medic;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class JoinEvent implements Listener{
@@ -23,12 +25,12 @@ public class JoinEvent implements Listener{
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.teamM=teamM;
 		this.scatterM=scatterM;
-
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onJoin(PlayerJoinEvent e){
 		Player p = e.getPlayer();
+	
 		if(teamM.isPlayerInGame(p)){
 			if(teamM.isTeamsEnabled()){
 				teamM.displayName(p, teamM.getTeamOfPlayer(p));
@@ -39,6 +41,14 @@ public class JoinEvent implements Listener{
 		}
 		else if(teamM.isPlayerAnObserver(p)){
 			p.setDisplayName(ChatColor.AQUA + "[Observer] " + p.getName()+ ChatColor.WHITE);
+		}
+		
+		if(State.getState().equals(State.OPEN) || State.getState().equals(State.NOT_RUNNING)){
+			if(!p.isOp()){
+				p.setGameMode(GameMode.ADVENTURE);
+			}
+			//if(p.getWorld())
+			Medic.heal(p);
 		}
 		if(State.getState().equals(State.INGAME)|| State.getState().equals(State.SCATTER)){
 			if(teamM.isPlayerInGame(e.getPlayer())){

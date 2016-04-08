@@ -9,9 +9,14 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
+import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.utils.Medic;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 
@@ -23,10 +28,10 @@ import com.goldornetwork.uhc.utils.MessageSender;
 public class TeamManager {
 
 	//instances
-
+	private UHC plugin;
 	//storage
-	private int playersPerTeam=5;
-	private int FFATeamSize=100;
+	private int playersPerTeam;
+	private int MaxFFASize;
 	private boolean isFFAEnabled;
 	private boolean isTeamsEnabled;
 
@@ -36,20 +41,21 @@ public class TeamManager {
 	private List<UUID> freezedPlayers = new ArrayList<UUID>();
 
 	private Map<UUID, String> teamOfPlayer = new HashMap<UUID, String>();
-	private Map<String, ChatColor> colorOfTeam = new HashMap<String, ChatColor>();
+	private Map<String, String> colorOfTeam = new HashMap<String, String>();
 	private Map<String, Integer> playersOnCurrentTeam = new HashMap<String, Integer>();
 	private Map<String, UUID> ownerOfTeam = new HashMap<String, UUID>();
 	private Map<UUID, UUID> invitedPlayers = new HashMap<UUID, UUID>();
+	
 
-
-	public TeamManager() {
-
+	public TeamManager(UHC plugin) {
+		this.plugin=plugin;
 	}
 
 	/**
 	 * Does the following: removes all players from ingame, removes all observers, and basically starts a new blank TeamManager
 	 */
 	public void setup(){
+		config();
 		isFFAEnabled=false;
 		isTeamsEnabled=false;
 		playersInGame.clear();
@@ -62,7 +68,12 @@ public class TeamManager {
 		ownerOfTeam.clear();
 		invitedPlayers.clear();
 	}
-
+	
+	private void config(){
+		plugin.getConfig().addDefault("MAX-FFA-SIZE", 100);
+		plugin.saveConfig();
+		this.MaxFFASize=plugin.getConfig().getInt("MAX-FFA-SIZE");
+	}
 
 
 	/**
@@ -74,53 +85,83 @@ public class TeamManager {
 
 		for(int i =0; i<numberOfTeams; i++){
 			String loopTeam=null;
-			ChatColor colorOfTeam = null;
+			String colorOfTeam = null;
 
 
 			switch(i){
 			case 1: loopTeam = "Alpha";
-			colorOfTeam = ChatColor.BLACK;
+			colorOfTeam = ChatColor.BLACK.toString();
 			break;
 			case 2: loopTeam = "Beta";
-			colorOfTeam = ChatColor.BLUE;
+			colorOfTeam = ChatColor.BLUE.toString();
 			break;
 			case 3: loopTeam = "Gamma";
-			colorOfTeam = ChatColor.YELLOW;
+			colorOfTeam = ChatColor.YELLOW.toString();
 			break;
 			case 4: loopTeam = "Delta";
-			colorOfTeam = ChatColor.DARK_AQUA;
+			colorOfTeam = ChatColor.DARK_AQUA.toString();
 			break;
 			case 5: loopTeam = "Epsilon";
-			colorOfTeam = ChatColor.DARK_BLUE;
+			colorOfTeam = ChatColor.DARK_BLUE.toString();
 			break;
 			case 6: loopTeam = "Zeta";
-			colorOfTeam = ChatColor.DARK_GRAY;
+			colorOfTeam = ChatColor.DARK_GRAY.toString();
 			break;
 			case 7: loopTeam = "Eta";
-			colorOfTeam = ChatColor.DARK_GREEN;
+			colorOfTeam = ChatColor.DARK_GREEN.toString();
 			break;
 			case 8: loopTeam = "Theta";
-			colorOfTeam = ChatColor.DARK_PURPLE;
+			colorOfTeam = ChatColor.DARK_PURPLE.toString();
 			break;
 			case 9: loopTeam = "Iota";
-			colorOfTeam = ChatColor.DARK_RED;
+			colorOfTeam = ChatColor.DARK_RED.toString();
 			break;
 			case 10: loopTeam = "Kappa";
-			colorOfTeam = ChatColor.GOLD;
+			colorOfTeam = ChatColor.GOLD.toString();
 			break;
 			case 11: loopTeam = "Lambda";
-			colorOfTeam = ChatColor.GRAY;
+			colorOfTeam = ChatColor.GRAY.toString();
 			break;
 			case 12: loopTeam = "Mu";
-			colorOfTeam = ChatColor.GREEN;
+			colorOfTeam = ChatColor.GREEN.toString();
 			break;
 			case 13: loopTeam = "Nu";
-			colorOfTeam = ChatColor.RED;
+			colorOfTeam = ChatColor.RED.toString();
 			break;
 			case 14: loopTeam = "Xi";
-			colorOfTeam = ChatColor.LIGHT_PURPLE;
+			colorOfTeam = ChatColor.LIGHT_PURPLE.toString();
 			break;
-			//TODO modifying existing colors with underline, strike through, and bold
+			case 15: loopTeam = "Omicron";
+			colorOfTeam = ChatColor.LIGHT_PURPLE.toString() + ChatColor.ITALIC;
+			break;
+			case 16: loopTeam = "Pi";
+			colorOfTeam = ChatColor.LIGHT_PURPLE.toString() + ChatColor.ITALIC;
+			break;
+			case 17: loopTeam = "Rho";
+			colorOfTeam = ChatColor.LIGHT_PURPLE.toString() + ChatColor.ITALIC;
+			break;
+			case 18: loopTeam = "Sigma";
+			colorOfTeam = ChatColor.LIGHT_PURPLE.toString() + ChatColor.ITALIC;
+			break;
+			case 19: loopTeam = "Tau";
+			colorOfTeam = ChatColor.LIGHT_PURPLE.toString() + ChatColor.ITALIC;
+			break;
+			case 20: loopTeam = "Upsilon";
+			colorOfTeam = ChatColor.LIGHT_PURPLE.toString() + ChatColor.ITALIC;
+			break;
+			case 21: loopTeam = "Phi";
+			colorOfTeam = ChatColor.LIGHT_PURPLE.toString() + ChatColor.ITALIC;
+			break;
+			case 22: loopTeam = "Chi";
+			colorOfTeam = ChatColor.LIGHT_PURPLE.toString() + ChatColor.ITALIC;
+			break;
+			case 23: loopTeam = "Psi";
+			colorOfTeam = ChatColor.LIGHT_PURPLE.toString() + ChatColor.ITALIC;
+			break;
+			case 24: loopTeam = "Omega";
+			colorOfTeam = ChatColor.LIGHT_PURPLE.toString() + ChatColor.ITALIC;
+			break;
+			default: plugin.getLogger().info("Error at team initialization");
 
 			}
 			if(loopTeam == null){
@@ -130,6 +171,7 @@ public class TeamManager {
 				playersOnCurrentTeam.put(loopTeam.toLowerCase(), 0);
 				listOfAvailableTeams.add(loopTeam.toLowerCase());
 				this.colorOfTeam.put(loopTeam.toLowerCase(), colorOfTeam);
+				
 			}
 
 		}
@@ -151,7 +193,7 @@ public class TeamManager {
 	 */
 	public void setupTeams(int teamSize){
 		isTeamsEnabled = true;
-		initializeTeams(14);
+		initializeTeams(24);
 		this.playersPerTeam = teamSize;
 	}
 
@@ -177,7 +219,7 @@ public class TeamManager {
 	 * @return <code> True </code> if there is room to join
 	 */
 	public boolean isFFARoomToJoin(){
-		if((FFATeamSize-playersInGame.size())>0){
+		if((MaxFFASize-playersInGame.size())>0){
 			return true;
 		}
 		else{
@@ -457,17 +499,21 @@ public class TeamManager {
 	public void addPlayerToObservers(Player p){
 		observers.add(p.getUniqueId());
 		p.setGameMode(GameMode.SPECTATOR);
+		for(PotionEffect effect : p.getActivePotionEffects()){
+			p.removePotionEffect(effect.getType());
+		}
+		p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2));
 		p.setDisplayName(ChatColor.AQUA + "[Observer] " + p.getName()+ ChatColor.WHITE);
 	}
-	public ChatColor getColorOfPlayer(Player p){
+	public String getColorOfPlayer(Player p){
 		if(isFFAEnabled){
-			return ChatColor.YELLOW;
+			return ChatColor.YELLOW.toString();
 		}
 		else if(isTeamsEnabled){
 			return colorOfTeam.get(getTeamOfPlayer(p).toLowerCase());
 		}
 		else{
-			return ChatColor.GRAY;
+			return ChatColor.GRAY.toString();
 		}
 
 	}
@@ -475,7 +521,7 @@ public class TeamManager {
 	 * @param team - the team to get the color of
 	 * @return <code> ChatColor </code> of the team
 	 */
-	public ChatColor getColorOfTeam(String team){
+	public String getColorOfTeam(String team){
 		return colorOfTeam.get(team.toLowerCase());
 	}
 

@@ -17,9 +17,6 @@ public class StartCommand extends UHCCommand{
 	//instances
 	private TimerManager timerM;
 	private TeamManager teamM;
-	//storage
-	private final int DEFAULTTIMETILLSTART=6*60; //change to 15 *60
-	private final int DEFAULTTIMETILLPVP=1*30; //change to 40*60
 	
 	public StartCommand(TimerManager timerM, TeamManager teamM) {
 		super("start", "[Teamsize]");
@@ -46,7 +43,7 @@ public class StartCommand extends UHCCommand{
 					teamM.setupTeams(teamSize);
 					MessageSender.broadcast(ChatColor.GOLD + "Teams have been enabled with a size of " + ChatColor.GRAY + teamSize + ChatColor.GOLD + " players per team!");
 				}
-				timerM.startMatch(DEFAULTTIMETILLSTART, DEFAULTTIMETILLPVP);
+				timerM.startMatch();
 				return true;
 			}
 			else{

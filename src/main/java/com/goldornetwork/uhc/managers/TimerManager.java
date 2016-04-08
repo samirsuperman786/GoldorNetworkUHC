@@ -12,10 +12,6 @@ import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class TimerManager {
-	/*
-	 * TODO make a class that is triggered on match start event
-	 * 
-	 */
 	//instances
 	private UHC plugin;
 	private ScatterManager scatterM;
@@ -26,12 +22,8 @@ public class TimerManager {
 	private int timeTillMatchStart;
 	private int timeTillPVPStart;
 	private int timeTillVote;
-	private boolean hasMatchBegun;
 	private boolean matchStart;
 	private boolean isPVPEnabled;
-
-
-
 
 
 	public TimerManager(UHC plugin, ScatterManager scatterM, TeamManager teamM, VoteManager voteM) {
@@ -46,13 +38,18 @@ public class TimerManager {
 	 * 
 	 */
 	public void setup(){
+		config();
 		State.setState(State.NOT_RUNNING);
-		hasMatchBegun=false;
-		timeTillMatchStart=-2;
-		timeTillPVPStart=-2;
-		timeTillVote=-2;
 		matchStart=false;
 		isPVPEnabled=false;
+	}
+	
+	private void config(){
+		plugin.getConfig().addDefault("TIME-TILL-MATCH-START", 15);
+		plugin.getConfig().addDefault("TIME-TILL-PVP-START", 40);
+		plugin.saveConfig();
+		this.timeTillMatchStart = (plugin.getConfig().getInt("TIME-TILL-MATCH-START")*60);
+		this.timeTillPVPStart = (plugin.getConfig().getInt("TIME-TILL-PVP-START")*60);
 	}
 
 	/**
@@ -61,11 +58,8 @@ public class TimerManager {
 	 * @param timeTillMatchStarts - the time to wait until the match starts
 	 * @param timeTillPVPStarts - the time to wait until PVP is enabled after the match has started
 	 */
-	public void startMatch(int timeTillMatchStarts, int timeTillPVPStarts){
+	public void startMatch(){
 		State.setState(State.OPEN);
-		this.timeTillMatchStart = timeTillMatchStarts;
-		this.timeTillPVPStart= timeTillPVPStarts;
-		hasMatchBegun=false;
 		isPVPEnabled= false;
 		matchStart = true;
 		countdownTimer();
@@ -89,7 +83,6 @@ public class TimerManager {
 							MessageSender.broadcast(ChatColor.AQUA + game.getName());
 							
 						}
-						//MessageSender.broadcast(voteM.getOptions().get(1).get(1).getName() +  " lol");
 						MessageSender.broadcast("---------------");
 						
 					}
@@ -98,7 +91,7 @@ public class TimerManager {
 				}
 				else if(timeTillVote==5*60){
 					voteM.enableOption(voteM.getWinner());
-					MessageSender.broadcast("Option " + voteM.getWinner() + " has won.");
+					MessageSender.broadcast("Option " + (voteM.getWinner()+1) + " has won.");
 					cancel();
 				}
 				
@@ -146,7 +139,6 @@ public class TimerManager {
 						}
 					}
 					pvpTimer();
-					hasMatchBegun = true;
 					cancel();
 				}
 				else if(timeTillMatchStart==-1){
@@ -213,18 +205,6 @@ public class TimerManager {
 	 */
 	public boolean hasMatchStarted(){
 		return matchStart;
-	}
-
-	/** Used to check if the count down has ended
-	 * @return <code> True </code> if the count down has ended
-	 */
-	public boolean hasCountDownEnded(){
-		if(hasMatchBegun){
-			return true;
-		}
-		else{
-			return false;
-		}
 	}
 
 	/**

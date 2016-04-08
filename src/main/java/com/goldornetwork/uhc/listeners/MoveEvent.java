@@ -1,9 +1,11 @@
 package com.goldornetwork.uhc.listeners;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import com.goldornetwork.uhc.UHC;
@@ -41,7 +43,7 @@ public class MoveEvent implements Listener {
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onPlayerMove(PlayerMoveEvent e){
+	public void on(PlayerMoveEvent e){
 		if(freezeAll){
 			if(teamM.getPlayersInGame().contains(e.getPlayer().getUniqueId())){
 				Location from=e.getFrom();
@@ -55,6 +57,19 @@ public class MoveEvent implements Listener {
 				}
 			}
 		}
-	
 	}
+	
+	@EventHandler
+	public void on(EntityDamageEvent e){
+		if(freezeAll){
+			if(e.getEntity() instanceof Player){
+				Player p = (Player) e.getEntity();
+				if(teamM.getPlayersInGame().contains(p.getUniqueId())){
+					e.setCancelled(true);
+				}
+			}
+		}
+		
+	}
+	
 }
