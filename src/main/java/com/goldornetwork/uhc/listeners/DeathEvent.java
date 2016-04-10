@@ -2,26 +2,31 @@ package com.goldornetwork.uhc.listeners;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.managers.world.WorldManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class DeathEvent implements Listener {
 
 	//instances
+	private UHC plugin;
 	private TeamManager teamM;
 	private ScatterManager scatterM;
+	private WorldManager worldM;
 	
-	public DeathEvent(UHC plugin, TeamManager teamM, ScatterManager scatterM) {
+	public DeathEvent(UHC plugin, TeamManager teamM, ScatterManager scatterM, WorldManager worldM) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
+		this.plugin=plugin;
 		this.teamM=teamM;
 		this.scatterM=scatterM;
+		this.worldM=worldM;
 	}
 
 	/**
@@ -34,24 +39,44 @@ public class DeathEvent implements Listener {
 				teamM.removePlayerFromOwner(p);
 			}
 			teamM.removePlayerFromTeam(p);
+			if(teamM.getActiveTeams().size()==1){
+				worldM.endGame(teamM.getPlayersOnATeam(teamM.getActiveTeams().get(0)));
+			}
 		}
 		else if(teamM.isFFAEnabled()){
 			teamM.removePlayerFromFFA(p);
-			if(teamM.getPlayersInGame().size()<=1){
-				MessageSender.broadcast("Game over!");
+			if(teamM.getPlayersInGame().size()==1){
+				worldM.endGame(teamM.getPlayersInGame());
+			}
+			else if(teamM.getPlayersInGame().size()<1){
+				worldM.endGame();
 			}
 		}
-		p.setHealth(p.getMaxHealth());
-		teamM.addPlayerToObservers(p);
-		p.teleport(scatterM.getCenter());
+		
 	}
 
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent e){
 		Player p = e.getEntity();
-		if(teamM.isPlayerInGame(p)==true && State.getState().equals(State.INGAME)){
-			p.getWorld().strikeLightningEffect(p.getLocation());
-			playerDied(p);
+		p.setHealth(p.getMaxHealth());
+		teamM.addPlayerToObservers(p);
+		if(teamM.isPlayerInGame(p)){
+			if(State.getState().equals(State.INGAME) || State.getState().equals(State.SCATTER)){
+				p.getWorld().strikeLightningEffect(p.getLocation());
+				
+				//So no race conditions happen
+				new BukkitRunnable() {
+					
+					@Override
+					public void run() {
+						playerDied(p);
+					}
+				}.runTaskLater(plugin, 5L);
+				
+			}
+			else{
+				e.setDeathMessage(null);
+			}
 		}
 		else{
 			e.setDeathMessage(null);

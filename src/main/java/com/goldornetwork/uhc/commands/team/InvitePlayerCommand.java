@@ -65,7 +65,7 @@ public class InvitePlayerCommand extends UHCCommand{
 			return true;
 		}
 		else {
-			teamM.invitePlayer(p, Bukkit.getServer().getPlayer(args[0]));
+			teamM.invitePlayer(teamM.getTeamOfPlayer(p), Bukkit.getServer().getPlayer(args[0]));
 			MessageSender.alertMessage(Bukkit.getServer().getPlayer(args[0]), ChatColor.GREEN, "You have been invited to team " + teamM.getColorOfPlayer(p) + teamM.getTeamOfPlayer(p) + ChatColor.GREEN + " by " + teamM.getColorOfPlayer(p) + p.getName());
 			MessageSender.alertMessage(p, ChatColor.GREEN, "You have invited player " + Bukkit.getServer().getPlayer(args[0]).getName());
 			return true;

@@ -7,16 +7,14 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.TimerManager;
-import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.PVPEnableEvent;
-import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class LandIsBad extends Gamemode implements Listener{
@@ -37,7 +35,7 @@ public class LandIsBad extends Gamemode implements Listener{
 		
 	}
 	
-	
+	@EventHandler
 	public void on(PVPEnableEvent e){
 		plugin.getServer().getScheduler().runTaskTimer(plugin, new Runnable(){
 			@Override
@@ -50,7 +48,7 @@ public class LandIsBad extends Gamemode implements Listener{
 	}
 	private void runTask() {
 				for(UUID u : teamM.getPlayersInGame()){
-					if(Bukkit.getServer().getPlayer(u).isOnline()){
+					if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
 						Player p = Bukkit.getServer().getPlayer(u);
 						if(p.getRemainingAir()!=p.getMaximumAir()){
 							p.setRemainingAir(p.getMaximumAir()-1);

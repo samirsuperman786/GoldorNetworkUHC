@@ -1,6 +1,9 @@
 package com.goldornetwork.uhc.managers;
 
+import java.util.Arrays;
+
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -40,16 +43,15 @@ public class ChunkGenerator {
 	private boolean generating;
 	private boolean cancel;
 	private final int CHUNKS_PER_RUN =5;
-	private int chunksLeft;
-	private int duration;
-
+	private int duration;	
+	private Chunk[] loaded;
 
 	public void generate(World world, Location center, int radius){
 		this.world = world;
+		this.loaded=world.getLoadedChunks();
 		this.radius = 16*(Math.round(radius/16));
 		this.i=center.getBlockX();
 		this.j=center.getBlockZ();
-		this.chunksLeft=0;
 		this.segment_length=1;
 		this.segment_passed=0;
 		this.k =0;
@@ -102,13 +104,16 @@ public class ChunkGenerator {
 				}
 				for(int c = 0; c< CHUNKS_PER_RUN; c++){
 					if(k <((radius/16) * (radius/16) *4)){
-						chunksLeft--;
 						++k;
 						i += di;
 						j += dj;
 						++segment_passed;
-
-						//insert while statement to check if chunk is already loaded
+						while(Arrays.asList(loaded).contains(world.getChunkAt(i, j))){
+							++k;
+							i += di;
+							j += dj;
+							++segment_passed;
+						}
 						if (segment_passed == segment_length) {
 							// done with current segment
 							segment_passed = 0;
@@ -124,7 +129,6 @@ public class ChunkGenerator {
 							}
 						}
 						world.loadChunk(i, j);
-						//Bukkit.getPlayer("g0ldmanpox").teleport(new Location(world, i, world.getMaxHeight(), j));
 					}
 					else if(k==((radius/16) * (radius/16) *4)){
 						MessageSender.broadcast(ChatColor.GOLD + "Generating complete.");

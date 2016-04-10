@@ -9,14 +9,16 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.scoreboard.Team;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
-import com.goldornetwork.uhc.utils.Medic;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 
@@ -38,16 +40,19 @@ public class TeamManager {
 
 	private List<UUID> playersInGame = new ArrayList<UUID>();
 	private List<UUID> observers = new ArrayList<UUID>();
-	private List<String> listOfAvailableTeams = new ArrayList<String>();
+	private List<String> listOfActiveTeams = new ArrayList<String>();
+	
 	private List<UUID> freezedPlayers = new ArrayList<UUID>();
 
 	private Map<UUID, String> teamOfPlayer = new HashMap<UUID, String>();
 	private Map<String, String> colorOfTeam = new HashMap<String, String>();
 	private Map<String, Integer> playersOnCurrentTeam = new HashMap<String, Integer>();
 	private Map<String, UUID> ownerOfTeam = new HashMap<String, UUID>();
-	private Map<UUID, UUID> invitedPlayers = new HashMap<UUID, UUID>();
-	
+	private Map<String, List<UUID>> invitedPlayers = new HashMap<String, List<UUID>>();
 
+	private ScoreboardManager manager;
+	private Scoreboard board;
+	
 	public TeamManager(UHC plugin) {
 		this.plugin=plugin;
 	}
@@ -57,11 +62,13 @@ public class TeamManager {
 	 */
 	public void setup(){
 		config();
+		manager = plugin.getServer().getScoreboardManager();
+		board = manager.getNewScoreboard();
 		isFFAEnabled=false;
 		isTeamsEnabled=false;
 		playersInGame.clear();
 		observers.clear();
-		listOfAvailableTeams.clear();
+		listOfActiveTeams.clear();
 		freezedPlayers.clear();
 		teamOfPlayer.clear();
 		colorOfTeam.clear();
@@ -69,118 +76,59 @@ public class TeamManager {
 		ownerOfTeam.clear();
 		invitedPlayers.clear();
 	}
-	
+
 	private void config(){
+		List<String> toADD = new ArrayList<String>();
+		for(TEAMS team : TEAMS.values()){
+			toADD.add(team.toString());
+		}
 		plugin.getConfig().addDefault("MAX-FFA-SIZE", 100);
 		plugin.getConfig().addDefault("MAX-TEAMS", 24);
+		plugin.getTeamConfig().addDefault("TEAM-NAMES", toADD);
+		plugin.saveTeamConfig();
 		plugin.saveConfig();
 		this.MaxFFASize=plugin.getConfig().getInt("MAX-FFA-SIZE");
 		this.MaxTeams=plugin.getConfig().getInt("MAX-TEAMS");
 	}
 
 
+	public enum TEAMS{
+		ALPHA, BETA, GAMMA, DELTA, EPSILON, ZETA, ETA, THETA, IOTA, KAPPA, LAMBDA, MU, NU, XI, OMICRON, PI, RHO, SIGMA, TAU, UPSILON, PHI, CHI, PSI, OMEGA
+	}
+
+	public enum MODIFIERS{
+		WHITE, UNDERLINE, BOLD, ITALIC
+	}
+	public enum BASECOLORS{
+		BLACK, BLUE, BOLD, DARK_AQUA, DARK_BLUE, DARK_GRAY, DARK_GREEN, DARK_PURPLE, DARK_RED, GRAY, GREEN, LIGHT_PURPLE, YELLOW
+	}
+
 	/**
 	 * Sets up new teams based on how many teams are given
 	 * @param numberOfTeams - the number of teams to create
 	 */
-	private void initializeTeams(int numberOfTeams){
-
-
-		for(int i =0; i<numberOfTeams; i++){
-			String loopTeam=null;
-			String colorOfTeam = null;
-
-			switch(i){
-			case 1: loopTeam = "Alpha";
-			colorOfTeam = ChatColor.BLACK.toString();
-			break;
-			case 2: loopTeam = "Beta";
-			colorOfTeam = ChatColor.BLUE.toString();
-			break;
-			case 3: loopTeam = "Gamma";
-			colorOfTeam = ChatColor.YELLOW.toString();
-			break;
-			case 4: loopTeam = "Delta";
-			colorOfTeam = ChatColor.DARK_AQUA.toString();
-			break;
-			case 5: loopTeam = "Epsilon";
-			colorOfTeam = ChatColor.DARK_BLUE.toString();
-			break;
-			case 6: loopTeam = "Zeta";
-			colorOfTeam = ChatColor.DARK_GRAY.toString();
-			break;
-			case 7: loopTeam = "Eta";
-			colorOfTeam = ChatColor.DARK_GREEN.toString();
-			break;
-			case 8: loopTeam = "Theta";
-			colorOfTeam = ChatColor.DARK_PURPLE.toString();
-			break;
-			case 9: loopTeam = "Iota";
-			colorOfTeam = ChatColor.DARK_RED.toString();
-			break;
-			case 10: loopTeam = "Kappa";
-			colorOfTeam = ChatColor.GOLD.toString();
-			break;
-			case 11: loopTeam = "Lambda";
-			colorOfTeam = ChatColor.GRAY.toString();
-			break;
-			case 12: loopTeam = "Mu";
-			colorOfTeam = ChatColor.GREEN.toString();
-			break;
-			case 13: loopTeam = "Nu";
-			colorOfTeam = ChatColor.RED.toString();
-			break;
-			case 14: loopTeam = "Xi";
-			colorOfTeam = ChatColor.LIGHT_PURPLE.toString();
-			break;
-			case 15: loopTeam = "Omicron";
-			colorOfTeam = ChatColor.BLACK.toString() + ChatColor.ITALIC;
-			break;
-			case 16: loopTeam = "Pi";
-			colorOfTeam = ChatColor.BLUE.toString() + ChatColor.ITALIC;
-			break;
-			case 17: loopTeam = "Rho";
-			colorOfTeam = ChatColor.YELLOW.toString() + ChatColor.ITALIC;
-			break;
-			case 18: loopTeam = "Sigma";
-			colorOfTeam = ChatColor.DARK_AQUA.toString() + ChatColor.ITALIC;
-			break;
-			case 19: loopTeam = "Tau";
-			colorOfTeam = ChatColor.DARK_BLUE.toString() + ChatColor.ITALIC;
-			break;
-			case 20: loopTeam = "Upsilon";
-			colorOfTeam = ChatColor.DARK_GRAY.toString() + ChatColor.ITALIC;
-			break;
-			case 21: loopTeam = "Phi";
-			colorOfTeam = ChatColor.DARK_GREEN.toString() + ChatColor.ITALIC;
-			break;
-			case 22: loopTeam = "Chi";
-			colorOfTeam = ChatColor.DARK_PURPLE.toString() + ChatColor.ITALIC;
-			break;
-			case 23: loopTeam = "Psi";
-			colorOfTeam = ChatColor.DARK_RED.toString() + ChatColor.ITALIC;
-			break;
-			case 24: loopTeam = "Omega";
-			colorOfTeam = ChatColor.GOLD.toString() + ChatColor.ITALIC;
-			break;
-			default:
-
+	private void initializeT(){
+		List<String> colorsCombinations = new ArrayList<String>();
+		colorsCombinations.clear();
+		for(BASECOLORS colors : BASECOLORS.values()){
+			for(MODIFIERS modifier : MODIFIERS.values()){
+				colorsCombinations.add(ChatColor.valueOf(modifier.toString()).toString() + ChatColor.valueOf(colors.toString()).toString());
 			}
-			if(loopTeam == null){
-				// nothing
+		}
+		int i = 0;
+		for(String team : plugin.getTeamConfig().getStringList("TEAM-NAMES")){
+			playersOnCurrentTeam.put(team.toString().toLowerCase(), 0);
+			listOfActiveTeams.add(team.toString().toLowerCase());
+			this.colorOfTeam.put(team.toString().toLowerCase(), colorsCombinations.get(i));
+			i++;
+			if(i>=MaxTeams){
+				break;
 			}
-			else{
-				playersOnCurrentTeam.put(loopTeam.toLowerCase(), 0);
-				listOfAvailableTeams.add(loopTeam.toLowerCase());
-				this.colorOfTeam.put(loopTeam.toLowerCase(), colorOfTeam);
-				
-			}
-
 		}
 
-
-
 	}
+
+
 
 	/**
 	 * Sets up FFA
@@ -195,8 +143,9 @@ public class TeamManager {
 	 */
 	public void setupTeams(int teamSize){
 		isTeamsEnabled = true;
-		initializeTeams(MaxTeams);
 		this.playersPerTeam = teamSize;
+		initializeT();
+		
 	}
 
 	/**
@@ -235,7 +184,7 @@ public class TeamManager {
 	 * @return <code> True </code> if the given team exists
 	 */
 	public boolean isValidTeam(String team){
-		if(listOfAvailableTeams.contains(team.toLowerCase())){
+		if(listOfActiveTeams.contains(team.toLowerCase())){
 			return true;
 		}
 		else{
@@ -280,27 +229,9 @@ public class TeamManager {
 	 * @param p the player to remove from owner
 	 */
 	public void removePlayerFromOwner(Player p){
-		if(invitedPlayers.containsValue(p.getUniqueId())){
-			for(Map.Entry<UUID, UUID> entry: invitedPlayers.entrySet()){
-				if(entry.getValue()==p.getUniqueId()){
-					if(Bukkit.getServer().getPlayer(entry.getKey()).isOnline()){
-						MessageSender.alertMessage(Bukkit.getServer().getPlayer(entry.getKey()),ChatColor.RED, "Your invitation to team " + getTeamOfPlayer(p) + " has been revoked!");
-					}
-					invitedPlayers.remove(entry.getKey());
-				}
-			}
-		}
 		if(State.getState().equals(State.OPEN)){
-			for(UUID u : getPlayersOnATeam(getTeamOfPlayer(p))){
-				if(Bukkit.getServer().getPlayer(u).isOnline()){
-					MessageSender.alertMessage(Bukkit.getPlayer(u), ChatColor.RED, "Your team has been disbanded");
-					removePlayerFromTeam(Bukkit.getServer().getPlayer(u));
-				}
-			}
+			disbandTeam(getTeamOfPlayer(p));
 		}
-
-
-
 
 		ownerOfTeam.remove(p.getUniqueId());
 	}
@@ -309,10 +240,15 @@ public class TeamManager {
 	 * Removes a given player from a any team that player is on
 	 * @param p the player to remove from a team
 	 */
-	public void removePlayerFromTeam(Player p){
+	public void removePlayerFromTeam(OfflinePlayer p){
+		//removeScoreboardPlayer(teamOfPlayer.get(p.getUniqueId()), p);
 		decreaseTeamSize(getTeamOfPlayer(p), 1);
 		playersInGame.remove(p.getUniqueId());
 		teamOfPlayer.remove(p.getUniqueId());
+		if(p.isOnline()){
+			Player target = (Player) p;
+			target.setDisplayName(target.getName());
+		}
 	}
 
 
@@ -355,9 +291,10 @@ public class TeamManager {
 	 * @param p - the player to get the team of
 	 * @return <code> String </code> of the given players team
 	 */
-	public String getTeamOfPlayer(Player p){
+	public String getTeamOfPlayer(OfflinePlayer p){
 		return teamOfPlayer.get(p.getUniqueId()).toLowerCase();
 	}
+
 
 	/**
 	 * Retrieves the owner of a team
@@ -374,7 +311,7 @@ public class TeamManager {
 	 * @return <code> True </code> if the player is online
 	 */
 	public boolean isPlayerOnline(String target){
-		if(Bukkit.getServer().getPlayer(target).isOnline()){
+		if(Bukkit.getServer().getOfflinePlayer(target).isOnline()){
 			return true;
 		}
 		else{
@@ -393,6 +330,7 @@ public class TeamManager {
 			if(entry.getValue()==0){
 				addPlayerToTeam(p, entry.getKey());
 				ownerOfTeam.put(entry.getKey(), p.getUniqueId());
+				//registerScoreboardTeam(entry.getKey());
 				foundTeam= true;
 				break;
 			}
@@ -431,10 +369,11 @@ public class TeamManager {
 	 */
 	public void addPlayerToTeam(Player p, String team){
 		for(UUID u : getPlayersOnATeam(team.toLowerCase())){
-			if(Bukkit.getServer().getPlayer(u).isOnline()){
+			if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
 				MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.GREEN, p.getName() + " has joined your team.");
 			}
 		}
+		//addScoreboardPlayer(team, p);
 		playersInGame.add(p.getUniqueId());
 		teamOfPlayer.put(p.getUniqueId(), team);
 		increaseTeamSize(team, 1);
@@ -447,8 +386,18 @@ public class TeamManager {
 	 * @param inviter - the person who is inviting
 	 * @param target - the person to invite
 	 */
-	public void invitePlayer(Player inviter, Player target){
-		invitedPlayers.put(target.getUniqueId(), inviter.getUniqueId());
+	public void invitePlayer(String team, OfflinePlayer target){
+		if(invitedPlayers.containsKey(team)){
+			List<UUID> toAdd = new ArrayList<UUID>();
+			toAdd.addAll(invitedPlayers.get(team));
+			toAdd.add(target.getUniqueId());
+			invitedPlayers.put(team, toAdd);
+		}
+		else{
+			List<UUID> toAdd = new ArrayList<UUID>();
+			toAdd.add(target.getUniqueId());
+			invitedPlayers.put(team, toAdd);
+		}
 	}
 
 	/**
@@ -456,11 +405,18 @@ public class TeamManager {
 	 * @param inviter - the person who is un-inviting
 	 * @param target - the person to un-invite
 	 */
-	public void unInvitePlayer(Player inviter, Player target){
-		invitedPlayers.remove(target);
+	public void unInvitePlayer(String team, OfflinePlayer target){
+		List<UUID> toAdd = new ArrayList<UUID>();
+		toAdd.addAll(invitedPlayers.get(team));
+		for(UUID u : toAdd){
+			if(u.equals(target.getUniqueId())){
+				toAdd.remove(u);
+			}
+		}
+		invitedPlayers.put(team, toAdd);
 	}
 
-	
+
 	/**
 	 * Used to check if a player is invited to a team
 	 * @param p - the player to check for
@@ -468,9 +424,8 @@ public class TeamManager {
 	 * @return <code> True </code> if the player is invited to the given team
 	 */
 	public boolean isPlayerInvitedToTeam(Player p, String team){
-		if(invitedPlayers.containsKey(p.getUniqueId())&& teamOfPlayer.get(invitedPlayers.get(p.getUniqueId())).equalsIgnoreCase(team)){
+		if(invitedPlayers.get(team).contains(p.getUniqueId())){
 			return true;
-
 		}
 		else{
 			return false;
@@ -504,8 +459,10 @@ public class TeamManager {
 		for(PotionEffect effect : p.getActivePotionEffects()){
 			p.removePotionEffect(effect.getType());
 		}
-		p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2));
+		p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1, false, false));
+		p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
 		p.setDisplayName(ChatColor.AQUA + "[Observer] " + p.getName()+ ChatColor.WHITE);
+		MessageSender.send(ChatColor.AQUA, p, "You are now spectating.");
 	}
 	public String getColorOfPlayer(Player p){
 		if(isFFAEnabled){
@@ -547,9 +504,50 @@ public class TeamManager {
 	 * Used to retrieve the list of teams in game
 	 * @return <code> List[String] </code> of teams in game
 	 */
-	public List<String> getListOfTeams(){
-		return listOfAvailableTeams;
+
+	public List<String> getActiveTeams(){
+		List<String> activeTeams = new ArrayList<String>();
+
+		for(Map.Entry<String, Integer> entry : playersOnCurrentTeam.entrySet()){
+			if(entry.getValue()>0){
+				activeTeams.add(entry.getKey());
+			}
+		}
+		return activeTeams;
 	}
+	
+	public boolean isTeamInactive(String team){
+		boolean allOffline=true;
+		while(allOffline){
+			for(UUID u : getPlayersOnATeam(team)){
+				if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
+					allOffline=false;
+					break;
+				}
+			}
+			break;
+		}
+		return allOffline;
+	}
+	public void disbandTeam(String team){
+		
+		UUID owner = getOwnerOfTeam(team);
+		if(invitedPlayers.containsKey(team)){
+			for(UUID u: invitedPlayers.get(team)){
+				if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
+					MessageSender.alertMessage(Bukkit.getServer().getPlayer(u),ChatColor.RED, "Your invitation to team " + getColorOfTeam(team) + " has been revoked!");
+				}
+			}
+			invitedPlayers.remove(team);
+		}
+		
+		for(UUID u : getPlayersOnATeam(team)){
+			removePlayerFromTeam(Bukkit.getServer().getOfflinePlayer(u));
+		}
+		ownerOfTeam.remove(owner);
+		//unregisterScoreboardTeam(team);
+	}
+	
 	/**
 	 * used to increase the number of players currently on a team
 	 * @param team - the team to increase
@@ -568,8 +566,23 @@ public class TeamManager {
 		playersOnCurrentTeam.replace(team.toLowerCase(), playersOnCurrentTeam.get(team.toLowerCase()) - numberToDecrease);
 	}
 
+/*	private void registerScoreboardTeam(String teamName){
+		Team team = board.registerNewTeam(teamName);
+		team.setPrefix(getColorOfTeam(teamName));
+		team.setCanSeeFriendlyInvisibles(true);
+		team.setAllowFriendlyFire(false);
+	}
+	private void unregisterScoreboardTeam(String teamName){
+		board.getTeam(teamName).unregister();
+	}
+	private void addScoreboardPlayer(String teamName, OfflinePlayer p){
+		board.getTeam(teamName).addPlayer(p);
+	}
 
-
+	private void removeScoreboardPlayer(String teamName, OfflinePlayer p){
+		board.getTeam(teamName).removePlayer(p);
+	}
+	*/
 	/**
 	 * Used to edit the display name of a player
 	 * @param p - the player to change the display name of

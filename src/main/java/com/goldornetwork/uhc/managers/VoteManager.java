@@ -112,6 +112,10 @@ public class VoteManager {
 		return currentWinner;
 	}
 	
+	public int getWinnerVotes(){
+		return (Collections.max(mostPopularVote.values()));
+	}
+	
 	public boolean isActive(){
 		return voteActive;
 	}

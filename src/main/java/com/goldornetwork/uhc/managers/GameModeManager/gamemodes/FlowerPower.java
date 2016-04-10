@@ -1,10 +1,8 @@
 package com.goldornetwork.uhc.managers.GameModeManager.gamemodes;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
-import com.goldornetwork.uhc.utils.MessageSender;
+import com.google.common.collect.ImmutableSet;
 
 public class FlowerPower extends Gamemode implements Listener{
 
@@ -24,43 +22,29 @@ public class FlowerPower extends Gamemode implements Listener{
 	private Random random = new Random();
 	private TeamManager teamM;
 	
-	//storage
-	private List<ItemStack> disalloweditems = new ArrayList<ItemStack>();
 	
 	public FlowerPower(TeamManager teamM) {
 		super("FlowerPower", "When you break a flower, a random amount of a random item drops!");
 		this.teamM= teamM;
 	}
+	private static final Set<Material> INVALID_BLOCKS = ImmutableSet.of(
+			Material.AIR, Material.WATER, Material.STATIONARY_WATER, Material.LAVA, Material.STATIONARY_LAVA, Material.BED_BLOCK, Material.BEDROCK, Material.PISTON_EXTENSION,
+			Material.PISTON_BASE, Material.PISTON_MOVING_PIECE, Material.PISTON_STICKY_BASE, Material.REDSTONE_WIRE, Material.WHEAT, Material.SIGN, Material.SIGN_POST,
+			Material.WALL_SIGN, Material.ACACIA_DOOR, Material.BIRCH_DOOR, Material.DARK_OAK_DOOR, Material.IRON_DOOR, Material.JUNGLE_DOOR, Material.SPRUCE_DOOR,
+			Material.WOOD_DOOR, Material.WOODEN_DOOR, Material.REDSTONE_TORCH_ON, Material.REDSTONE_TORCH_OFF, Material.GLOWING_REDSTONE_ORE, Material.REDSTONE_COMPARATOR_OFF,
+			Material.REDSTONE_COMPARATOR_ON, Material.REDSTONE_LAMP_ON, Material.REDSTONE_LAMP_OFF, Material.SUGAR_CANE_BLOCK, Material.PUMPKIN_STEM, Material.MELON_STEM,
+			Material.NETHER_WARTS, Material.BREWING_STAND, Material.CAULDRON, Material.TRIPWIRE, Material.FLOWER_POT, Material.CROPS, Material.POTATO, Material.CARROT, 
+			Material.SKULL, Material.BARRIER, Material.COMMAND, Material.STANDING_BANNER, Material.WALL_BANNER, Material.DAYLIGHT_DETECTOR_INVERTED, Material.ENDER_PORTAL,
+			Material.ENDER_PORTAL_FRAME, Material.MOB_SPAWNER, Material.MONSTER_EGG, Material.MONSTER_EGGS
+			);
+	
 	@Override
 	public void onEnable() {
-		addDisallowedItems(7, 11);
-		addDisallowedItems(new ItemStack(18));//leaf
-		addDisallowedItems(new ItemStack(26));//bed
-		addDisallowedItems(new ItemStack(27));//decay leave
-		addDisallowedItems(new ItemStack(51));//fire
-		addDisallowedItems(new ItemStack(52));//spawner
-		addDisallowedItems(new ItemStack(55));//no idea
-		addDisallowedItems(new ItemStack(59));//no idea
-		addDisallowedItems(new ItemStack(62)); //lit furnace
-		addDisallowedItems(new ItemStack(63));//no idea
-		addDisallowedItems(new ItemStack(64));//half door
-		addDisallowedItems(new ItemStack(71));//half door
-		addDisallowedItems(new ItemStack(68));//no idea
-		addDisallowedItems(new ItemStack(90));//portal block
-		addDisallowedItems(92, 94);
-		addDisallowedItems(96, 255);
+		
 	}
 	@Override
 	public void onDisable() {}
 	
-	public void addDisallowedItems(ItemStack item){
-		this.disalloweditems.add(item);
-	}
-	public void addDisallowedItems(int minBound, int maxBound){ //apparently this is the only way to disallow large quantities of items
-		for(int low= minBound; low<=maxBound; low++){
-			this.disalloweditems.add(new ItemStack(low));
-		}
-	}
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(BlockBreakEvent e){
 		if(State.getState().equals(State.INGAME)){
@@ -76,12 +60,13 @@ public class FlowerPower extends Gamemode implements Listener{
 	public void run(Player p, BlockBreakEvent e){
 		boolean foundItem=false;
 		while(foundItem==false){
-			int item = random.nextInt(356) + 1;
-			if(disalloweditems.contains(new ItemStack(item))==false && new ItemStack(item).getItemMeta()!=null){
+			int item = random.nextInt(Material.values().length);
+			Material found = (Material.values()[item]);
+			if(INVALID_BLOCKS.contains(found)==false){
 				int amount = random.nextInt(64);
-				MessageSender.send(ChatColor.GREEN, p, "ID " + item);
-				p.getWorld().dropItem(e.getBlock().getLocation(), new ItemStack(item, amount));
+				p.getWorld().dropItem(e.getBlock().getLocation(), new ItemStack(found, amount));
 				foundItem=true;
+				break;
 			}
 		}
 	}

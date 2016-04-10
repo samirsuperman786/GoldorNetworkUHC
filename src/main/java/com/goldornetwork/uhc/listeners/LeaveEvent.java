@@ -9,6 +9,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
+import com.goldornetwork.uhc.managers.GameModeManager.State;
 
 public class LeaveEvent implements Listener{
 
@@ -28,20 +29,18 @@ public class LeaveEvent implements Listener{
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerLeave(PlayerQuitEvent e){
 		Player p = e.getPlayer();
-		/*if(State.getState().equals(State.OPEN)){
+		if(State.getState().equals(State.OPEN)){
 			if(teamM.isPlayerInGame(p)){
 				if(teamM.isFFAEnabled()){
 					teamM.removePlayerFromFFA(p);
 				}
 				else if(teamM.isTeamsEnabled()){
-					if(teamM.isPlayerOwner(p)){
-						teamM.removePlayerFromOwner(p);
+					if(teamM.isTeamInactive(teamM.getTeamOfPlayer(p))){
+						teamM.disbandTeam(teamM.getTeamOfPlayer(p));
 					}
-					teamM.removePlayerFromTeam(p);
 				}
-
 			}
-		}*/
+		}
 		
 
 	}

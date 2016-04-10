@@ -41,7 +41,7 @@ public class MessageSender {
 		Bukkit.broadcast(ChatColor.GOLD + "[OPS] " + msg, Server.BROADCAST_CHANNEL_ADMINISTRATIVE);
 	}
 	public static void broadcast(String msg){
-		Bukkit.getServer().broadcastMessage(getPrefix() + ChatColor.RED + msg);
+		Bukkit.getServer().broadcastMessage(getPrefix() + ChatColor.GOLD + msg);
 	}
 	
 }

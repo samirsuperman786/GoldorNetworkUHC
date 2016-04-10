@@ -40,6 +40,7 @@ public class KillSwitch extends Gamemode implements Listener{
 		Inventory killerInventory = killer.getInventory();
 		killerInventory.clear();
 		killerInventory.setContents(targetInventory);
+		killer.getInventory().setArmorContents(target.getInventory().getArmorContents());
 		e.getDrops().clear();
 		MessageSender.alertMessage(killer, ChatColor.GOLD, "You have switched inventories with " +  target.getName());
 	}

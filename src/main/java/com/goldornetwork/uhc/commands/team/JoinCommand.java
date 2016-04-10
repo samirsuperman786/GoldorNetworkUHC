@@ -2,6 +2,7 @@ package com.goldornetwork.uhc.commands.team;
 
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -27,8 +28,12 @@ public class JoinCommand extends UHCCommand {
 			MessageSender.noConsole(sender);
 			return true;
 		}
+		else if(State.getState().equals(State.INGAME)){
+			MessageSender.send(ChatColor.RED, p, "Match has already started!");
+			return true;
+		}
 		else if(State.getState().equals(State.OPEN)==false){
-			MessageSender.send(ChatColor.RED, p, "Match has not started yet!");
+			MessageSender.send(ChatColor.RED, p, "You may not join a team.");
 			return true;
 		}
 		else if(teamM.isPlayerInGame(p)){
@@ -36,10 +41,6 @@ public class JoinCommand extends UHCCommand {
 			return true;
 		}
 
-		else if(State.getState().equals(State.INGAME)){
-			MessageSender.send(ChatColor.RED, p, "Match has already started!");
-			return true;
-		}
 		else if(args.length == 0){
 			if(teamM.isFFAEnabled()){
 				if(teamM.isFFARoomToJoin()){
@@ -58,24 +59,13 @@ public class JoinCommand extends UHCCommand {
 			}
 		}
 		else if(args.length==1){
-			//todo make a leave command
-		/*	if(args[0].equalsIgnoreCase("observers")||args[0].equalsIgnoreCase("obs")){
-				if(teamM.isPlayerAnObserver(p)==false){
-					teamM.addPlayerToObservers(p);
-					MessageSender.send(ChatColor.AQUA, p, "You have joined the observers");
-					return true;
-				}
-				else{
-					MessageSender.send(ChatColor.RED, p, "You are already an observer!");
-					return true;
-				}
-			} */
 			if(teamM.isTeamsEnabled()){
 				if(teamM.isValidTeam(args[0])){
 					if(teamM.isPlayerInvitedToTeam(p,args[0].toLowerCase())){
 						if(teamM.isTeamRoomToJoin(args[0].toLowerCase())){
 							MessageSender.alertMessage(p, ChatColor.GREEN, "You have joined team " + teamM.getColorOfTeam(args[0].toLowerCase()) + args[0]);
 							teamM.addPlayerToTeam(p, args[0].toLowerCase());
+							teamM.unInvitePlayer(teamM.getTeamOfPlayer(p), p);
 							return true;
 						}
 						else{
@@ -108,7 +98,7 @@ public class JoinCommand extends UHCCommand {
 	@Override
 	public List<String> tabComplete(CommandSender sender, String[] args) {
 		if(args.length==1){
-			return teamM.getListOfTeams();
+			return teamM.getActiveTeams();
 		}
 		return null;
 	}

@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
+import com.goldornetwork.uhc.listeners.BackGround;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.PVPEnableEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
@@ -17,6 +18,7 @@ public class TimerManager {
 	private ScatterManager scatterM;
 	private TeamManager teamM;
 	private VoteManager voteM;
+	private BackGround backG;
 	
 	//storage
 	private int timeTillMatchStart;
@@ -26,11 +28,12 @@ public class TimerManager {
 	private boolean isPVPEnabled;
 
 
-	public TimerManager(UHC plugin, ScatterManager scatterM, TeamManager teamM, VoteManager voteM) {
+	public TimerManager(UHC plugin, ScatterManager scatterM, TeamManager teamM, VoteManager voteM, BackGround backG) {
 		this.plugin=plugin;
 		this.scatterM=scatterM;
 		this.teamM=teamM;
 		this.voteM=voteM;
+		this.backG=backG;
 	}
 	
 	/**
@@ -64,6 +67,7 @@ public class TimerManager {
 		State.setState(State.OPEN);
 		isPVPEnabled= false;
 		matchStart = true;
+		backG.mutePlayers();
 		countdownTimer();
 		voteTimer();
 	}
@@ -98,7 +102,7 @@ public class TimerManager {
 				timeTillVote--;
 				if(timeTillVote==0){
 					voteM.enableOption(voteM.getWinner());
-					MessageSender.broadcast("Option " + (voteM.getWinner()+1) + " has won.");
+					MessageSender.broadcast("Option " + (voteM.getWinner()+1) + " has won with " + ChatColor.GRAY + voteM.getWinnerVotes() + ChatColor.RED + " votes.");
 					cancel();
 				}
 				
@@ -133,14 +137,13 @@ public class TimerManager {
 					State.setState(State.SCATTER);
 					
 					if(teamM.isFFAEnabled()){
-						scatterM.scatterFFA();
+						scatterM.enableFFA();;
 					}
 					else if(teamM.isTeamsEnabled()){
-						scatterM.scatterTeams();
+						scatterM.enableTeams();
 					}
 					for(Player all : Bukkit.getServer().getOnlinePlayers()){
 						if(teamM.isPlayerInGame(all)==false){
-							MessageSender.send(ChatColor.AQUA, all, "You are now spectating the game");
 							teamM.addPlayerToObservers(all);
 							all.teleport(scatterM.getCenter());
 						}
@@ -164,11 +167,14 @@ public class TimerManager {
 			@Override
 			public void run() {
 				if(timeTillPVPStart>0){
-					if(timeTillPVPStart >= (5*60) && timeTillPVPStart % (10*60) == 0){
+					if(timeTillPVPStart >= (5*60) && timeTillPVPStart % (5*60) == 0){
 						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart/60 + ChatColor.RED + " minutes");
 					}
+					if(timeTillPVPStart== (299)){
+						scatterM.prePVPSetup();
+					}
 					else if(timeTillPVPStart<= (4*60) && timeTillPVPStart >= (1*60) && timeTillPVPStart % (1*60) ==0){
-						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart/60 + ChatColor.RED + " minutes");
+						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart/60 + ChatColor.RED + " minute(s)");
 					}
 					else if(timeTillPVPStart < 60 && timeTillPVPStart >=30 &&timeTillPVPStart%10==0){
 						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart + ChatColor.RED + " seconds");
@@ -177,7 +183,7 @@ public class TimerManager {
 						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart + ChatColor.RED + " seconds");
 					}
 					else if(timeTillPVPStart <= 5 && timeTillPVPStart >0){
-						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart + ChatColor.RED + " seconds");		
+						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart + ChatColor.RED + " second(s)");		
 					}
 					timeTillPVPStart--;
 				}

@@ -65,7 +65,7 @@ public class PotionSwap extends Gamemode implements Listener{
 			@Override
 			public void run() {
 				for(UUID u : teamM.getPlayersInGame()){
-					if(Bukkit.getServer().getPlayer(u).isOnline()){
+					if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
 						giveAPlayerARandomPotion(Bukkit.getServer().getPlayer(u));
 					}
 					else{
@@ -78,7 +78,10 @@ public class PotionSwap extends Gamemode implements Listener{
 	}
 	
 	private void giveAPlayerARandomPotion(Player p){
-		p.addPotionEffect(new PotionEffect(getRandomPotion(), 5980, 1));
+		for(PotionEffect effect : p.getActivePotionEffects()){
+			p.removePotionEffect(effect.getType());
+		}
+		p.addPotionEffect(new PotionEffect(getRandomPotion(), 6200, 0));
 		p.getWorld().playEffect(p.getLocation(), Effect.POTION_BREAK, 10);
 	}
 	public void removePlayerFromLateGive(Player p){

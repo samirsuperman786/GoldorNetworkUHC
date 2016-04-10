@@ -2,11 +2,13 @@ package com.goldornetwork.uhc.listeners;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 import com.goldornetwork.uhc.UHC;
@@ -48,10 +50,13 @@ public class JoinEvent implements Listener{
 			for(PotionEffect effect : p.getActivePotionEffects()){
 				p.removePotionEffect(effect.getType());
 			}
-			if(!p.isOp()){
-				p.setGameMode(GameMode.ADVENTURE);
-			}
+			p.setMaxHealth(20);
+			p.setGameMode(GameMode.ADVENTURE);
+			p.setDisplayName(p.getName());
 			p.getInventory().clear();
+			p.setLevel(0);
+			p.setExp(0L);
+			p.getInventory().setArmorContents(null);
 			p.teleport(scatterM.getLobby().getSpawnLocation());
 			Medic.heal(p);
 		}
@@ -59,14 +64,14 @@ public class JoinEvent implements Listener{
 			if(teamM.isPlayerInGame(e.getPlayer())){
 				if(teamM.isFFAEnabled()){
 					if(scatterM.getLateScatters().contains(p.getUniqueId())){
-						scatterM.lateScatterAPlayerInFFA(p);
+						scatterM.handleLateScatter(p);
 						scatterM.removePlayerFromLateScatters(p);
 						MessageSender.send(ChatColor.GREEN, p, "You have been late scattered!");
 					}
 				}
 				else if(teamM.isTeamsEnabled()){
 					if(scatterM.getLateScatters().contains(p.getUniqueId())){
-						scatterM.lateScatterAPlayerInATeam(teamM.getTeamOfPlayer(p), p);
+						scatterM.handleLateScatter(p);
 						scatterM.removePlayerFromLateScatters(p);
 						MessageSender.send(ChatColor.GREEN, p, "You have been late scattered to your teams spawn!");
 					}
@@ -79,7 +84,10 @@ public class JoinEvent implements Listener{
 				if(teamM.isPlayerAnObserver(p)==false){
 					teamM.addPlayerToObservers(p);
 				}
-				MessageSender.send(ChatColor.AQUA, p, "You are now spectating the game");
+				else{
+					MessageSender.send(ChatColor.AQUA, p, "You are now spectating the game");
+				}
+				
 			}
 		}
 

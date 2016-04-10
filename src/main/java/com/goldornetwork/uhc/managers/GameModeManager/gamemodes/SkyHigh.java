@@ -90,14 +90,17 @@ public class SkyHigh extends Gamemode implements Listener{
 	
 	private void runTask(){
 			for(UUID u : teamM.getPlayersInGame()){
-				if(Bukkit.getServer().getPlayer(u).isOnline()){
+				if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
 				if(Bukkit.getServer().getPlayer(u).getLocation().getBlockY()<=100){
 					if(playersToDamage.containsKey(u)==false){
 						BukkitTask task = plugin.getServer().getScheduler().runTaskTimer(plugin, new Runnable(){
 							@Override
 							public void run() {
-								Bukkit.getServer().getPlayer(u).damage(2);
-								MessageSender.send(ChatColor.RED, Bukkit.getServer().getPlayer(u), "You are below y = 101!");
+								if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
+									Bukkit.getServer().getPlayer(u).damage(2);
+									MessageSender.send(ChatColor.RED, Bukkit.getServer().getPlayer(u), "You are below y = 101!");
+								}
+								
 							}
 							
 						}, 0L, 600L);
@@ -118,7 +121,7 @@ public class SkyHigh extends Gamemode implements Listener{
 	
 	private void distributeItems(){
 		for(UUID u : teamM.getPlayersInGame()){
-			if(Bukkit.getServer().getPlayer(u).isOnline()){
+			if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
 				Player p = Bukkit.getServer().getPlayer(u);
 				giveAPlayerSkyHighItems(p);
 			}
