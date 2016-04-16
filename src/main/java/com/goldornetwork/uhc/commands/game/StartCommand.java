@@ -37,11 +37,11 @@ public class StartCommand extends UHCCommand{
 				int teamSize = Integer.valueOf(args[0]);
 				if(teamSize==1){
 					teamM.setupFFA();
-					MessageSender.broadcast(ChatColor.GOLD + "FFA has been enabled!");
+					MessageSender.broadcast("FFA has been enabled!");
 				}
 				else{
 					teamM.setupTeams(teamSize);
-					MessageSender.broadcast(ChatColor.GOLD + "Teams have been enabled with a size of " + ChatColor.GRAY + teamSize + ChatColor.GOLD + " players per team!");
+					MessageSender.broadcast("Teams have been enabled with a size of " + ChatColor.GRAY + teamSize + ChatColor.GOLD + " players per team!");
 				}
 				timerM.startMatch();
 				return true;

@@ -19,7 +19,7 @@ public class TimerManager {
 	private TeamManager teamM;
 	private VoteManager voteM;
 	private BackGround backG;
-	
+
 	//storage
 	private int timeTillMatchStart;
 	private int timeTillPVPStart;
@@ -34,19 +34,19 @@ public class TimerManager {
 		this.teamM=teamM;
 		this.voteM=voteM;
 		this.backG=backG;
+		config();
 	}
-	
+
 	/**
 	 * This does the following: sets the status of the server to not running and cancels all ongoing timers
 	 * 
 	 */
 	public void setup(){
-		config();
 		State.setState(State.NOT_RUNNING);
 		matchStart=false;
 		isPVPEnabled=false;
 	}
-	
+
 	private void config(){
 		plugin.getConfig().addDefault("TIME-TILL-MATCH-START", 15);
 		plugin.getConfig().addDefault("TIME-TILL-PVP-START", 40);
@@ -71,11 +71,11 @@ public class TimerManager {
 		countdownTimer();
 		voteTimer();
 	}
-	
+
 	private void voteTimer(){
-		
+
 		new BukkitRunnable() {
-			
+
 			@Override
 			public void run() {
 				voteM.generateOptions();
@@ -84,28 +84,28 @@ public class TimerManager {
 					MessageSender.broadcast("Option " + (i + 1));
 					for(Gamemode game : voteM.getOptions().get(i)){
 						MessageSender.broadcast(ChatColor.AQUA + game.getName());
-						
+
 					}
 					MessageSender.broadcast("---------------");
-					
+
 				}
 				MessageSender.broadcast(ChatColor.LIGHT_PURPLE + "Please use /vote [option], also /info [gamemode]");
-				
+
 			}
 		}.runTaskLater(plugin, 100L);
-		
-		
+
+
 		new BukkitRunnable() {
-			
+
 			@Override
 			public void run() {
 				timeTillVote--;
 				if(timeTillVote==0){
 					voteM.enableOption(voteM.getWinner());
-					MessageSender.broadcast("Option " + (voteM.getWinner()+1) + " has won with " + ChatColor.GRAY + voteM.getWinnerVotes() + ChatColor.RED + " votes.");
+					MessageSender.broadcast("Option " + (voteM.getWinner()+1) + " has won with " + ChatColor.GRAY + voteM.getWinnerVotes() + ChatColor.GOLD + " votes.");
 					cancel();
 				}
-				
+
 			}
 		}.runTaskTimer(plugin, 100L, 20L);
 	}
@@ -117,73 +117,77 @@ public class TimerManager {
 			@Override
 			public void run() {
 				if(timeTillMatchStart >0){
+
 					if(timeTillMatchStart>=60 && timeTillMatchStart%60 ==0){
-						MessageSender.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart/60 + ChatColor.RED + " minutes");
+						MessageSender.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart/60 + ChatColor.GOLD + " minutes");
 					}
 					else if(timeTillMatchStart <60 && timeTillMatchStart >=30 &&timeTillMatchStart%10==0){
-						MessageSender.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart + ChatColor.RED + " seconds");
+						MessageSender.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart + ChatColor.GOLD+ " seconds");
 					}
 					else if(timeTillMatchStart <=30 && timeTillMatchStart >=5 && timeTillMatchStart %5==0){
-						MessageSender.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart + ChatColor.RED + " seconds");
+						MessageSender.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart + ChatColor.GOLD+ " seconds");
 					}
 					else if(timeTillMatchStart <= 5 && timeTillMatchStart >0){
-						MessageSender.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart + ChatColor.RED + " seconds");		
+						MessageSender.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart +ChatColor.GOLD+ " seconds");		
 					}
 					timeTillMatchStart--;
 
 				}
 				else if(timeTillMatchStart == 0){
-					MessageSender.broadcast("Match has started!");
-					State.setState(State.SCATTER);
 					
-					if(teamM.isFFAEnabled()){
-						scatterM.enableFFA();;
-					}
-					else if(teamM.isTeamsEnabled()){
-						scatterM.enableTeams();
-					}
-					for(Player all : Bukkit.getServer().getOnlinePlayers()){
-						if(teamM.isPlayerInGame(all)==false){
-							teamM.addPlayerToObservers(all);
-							all.teleport(scatterM.getCenter());
+						MessageSender.broadcast("Match has started!");
+						State.setState(State.SCATTER);
+
+						if(teamM.isFFAEnabled()){
+							scatterM.enableFFA();;
 						}
-					}
-					pvpTimer();
-					cancel();
+						else if(teamM.isTeamsEnabled()){
+							scatterM.enableTeams();
+						}
+						for(Player all : Bukkit.getServer().getOnlinePlayers()){
+							if(teamM.isPlayerInGame(all)==false){
+								teamM.addPlayerToObservers(all);
+								all.teleport(scatterM.getCenter());
+							}
+						}
+						pvpTimer();
+						cancel();
+					
 				}
+
 				else if(timeTillMatchStart==-1){
 					cancel();
 				}
 			}
 		}.runTaskTimer(plugin, 0L, 20L);
 	}
-	
+
 	/**
 	 * When called, this will begin the count down till PVP is enabled
 	 */
 	private void pvpTimer(){
 		new BukkitRunnable() {
-			
+
 			@Override
 			public void run() {
 				if(timeTillPVPStart>0){
 					if(timeTillPVPStart >= (5*60) && timeTillPVPStart % (5*60) == 0){
-						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart/60 + ChatColor.RED + " minutes");
+						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart/60 + ChatColor.GOLD + " minutes");
 					}
 					if(timeTillPVPStart== (299)){
 						scatterM.prePVPSetup();
 					}
 					else if(timeTillPVPStart<= (4*60) && timeTillPVPStart >= (1*60) && timeTillPVPStart % (1*60) ==0){
-						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart/60 + ChatColor.RED + " minute(s)");
+						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart/60 + ChatColor.GOLD + " minute(s)");
 					}
 					else if(timeTillPVPStart < 60 && timeTillPVPStart >=30 &&timeTillPVPStart%10==0){
-						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart + ChatColor.RED + " seconds");
+						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart + ChatColor.GOLD + " seconds");
 					}
 					else if(timeTillPVPStart <=30 && timeTillPVPStart >=5 && timeTillPVPStart %5==0){
-						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart + ChatColor.RED + " seconds");
+						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart + ChatColor.GOLD + " seconds");
 					}
 					else if(timeTillPVPStart <= 5 && timeTillPVPStart >0){
-						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart + ChatColor.RED + " second(s)");		
+						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart + ChatColor.GOLD + " second(s)");		
 					}
 					timeTillPVPStart--;
 				}
@@ -195,12 +199,12 @@ public class TimerManager {
 					isPVPEnabled = true;
 					cancel();
 				}
-				
+
 			}
 		}.runTaskTimer(plugin, 0L, 20L);
 	}
-	
-	
+
+
 	/**
 	 * When called, this cancels the timer till match starts
 	 * @see countdownTimer()

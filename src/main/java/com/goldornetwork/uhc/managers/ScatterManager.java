@@ -7,10 +7,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -18,11 +16,9 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
-import org.bukkit.WorldCreator;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
@@ -30,6 +26,7 @@ import com.goldornetwork.uhc.listeners.BackGround;
 import com.goldornetwork.uhc.listeners.MoveEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.managers.world.WorldFactory;
 import com.goldornetwork.uhc.utils.MessageSender;
 import com.google.common.collect.ImmutableSet;
 
@@ -43,9 +40,11 @@ public class ScatterManager{
 	private TeamManager teamM;
 	private MoveEvent moveE;
 	private BackGround backG;
+	private WorldFactory worldF;
 	//storage
 	private boolean scatterComplete;
 	private int radius;
+	private World uhcWorld;
 	private boolean generated;
 	private final int LOADS_PER_SECOND = 5;
 	private int k;
@@ -60,11 +59,12 @@ public class ScatterManager{
 	private List<String> nameOfTeams = new ArrayList<String>();
 	private List<UUID> FFAToScatter= new ArrayList<UUID>();
 
-	public ScatterManager(UHC plugin, TeamManager teamM, MoveEvent moveE, BackGround backG) {
+	public ScatterManager(UHC plugin, TeamManager teamM, MoveEvent moveE, BackGround backG, WorldFactory worldF) {
 		this.plugin=plugin;
 		this.teamM=teamM;
 		this.moveE=moveE;
 		this.backG=backG;
+		this.worldF=worldF;
 		config();
 	}
 
@@ -78,6 +78,7 @@ public class ScatterManager{
 	 * will re-initialize the world border, will clear entities.
 	 */
 	public void setup(){
+		newUHCWorld();
 		moveE.unfreezePlayers();
 		radius = plugin.getConfig().getInt("radius");
 		getUHCWorld().setPVP(false);
@@ -114,7 +115,7 @@ public class ScatterManager{
 		return scatterComplete;
 	}
 	public void enableFFA(){
-		MessageSender.broadcast(ChatColor.GOLD + "Generating chunks...");
+		MessageSender.broadcast("Generating chunks...");
 		FFAToScatter.addAll(teamM.getPlayersInGame());
 		List<Location> toGenerate = new ArrayList<Location>();
 		for(UUID u : FFAToScatter){
@@ -125,7 +126,7 @@ public class ScatterManager{
 		generate(toGenerate);
 	}
 	public void enableTeams(){
-		MessageSender.broadcast(ChatColor.GOLD + "Generating chunks...");
+		MessageSender.broadcast("Generating chunks...");
 		List<Location> toGenerate = new ArrayList<Location>();
 		for(String team : teamM.getActiveTeams()){
 			Location location = findValidLocation(getUHCWorld(), radius);
@@ -162,7 +163,7 @@ public class ScatterManager{
 	 * Will scatter all teams and freeze them until scattering has completed
 	 */
 	private void scatterTeams(){
-		MessageSender.broadcast(ChatColor.GOLD + "Scattering players...");
+		MessageSender.broadcast("Scattering players...");
 		k=0;
 		moveE.freezePlayers();
 		new BukkitRunnable() {
@@ -207,6 +208,7 @@ public class ScatterManager{
 	 * Will scatter all players in game and freeze them until complete
 	 */
 	private void scatterFFA(){
+		MessageSender.broadcast("Scattering players...");
 		moveE.freezePlayers();
 		k=0;
 		new BukkitRunnable() {
@@ -358,13 +360,15 @@ public class ScatterManager{
 		return this.lateScatters;
 	}
 
+	public void newUHCWorld(){
+		uhcWorld = worldF.create();
+	}
 	/**
 	 * Used to get the world the match is being played in
 	 * @return <code> World </code> of match
 	 */
 	public World getUHCWorld(){
-		//TODO make a rotation list of viable UHC maps
-		return plugin.getServer().createWorld(new WorldCreator("lol"));
+		return this.uhcWorld;
 	}
 	/**
 	 * Used to retrieve the center of the match
@@ -409,7 +413,7 @@ public class ScatterManager{
 				Bukkit.getPluginManager().callEvent(new GameStartEvent());
 				State.setState(State.INGAME);
 				moveE.unfreezePlayers();
-				MessageSender.broadcast(ChatColor.GOLD + "Scattering complete!");
+				MessageSender.broadcast("Scattering complete!");
 				backG.unMutePlayers();
 				getUHCWorld().setGameRuleValue("doMobSpawning", "true");
 				getUHCWorld().setGameRuleValue("dodaylightcycle", "true");
@@ -424,7 +428,7 @@ public class ScatterManager{
 		getUHCWorld().setGameRuleValue("dodaylightcycle", "false");
 	}
 	public World getLobby(){
-		return plugin.getServer().createWorld(new WorldCreator("Lobby"));
+		return worldF.getLobby();
 	}
 
 }

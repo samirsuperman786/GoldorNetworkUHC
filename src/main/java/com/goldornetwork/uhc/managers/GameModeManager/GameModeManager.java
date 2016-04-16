@@ -7,7 +7,6 @@ import java.util.Random;
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.BlockRush;
 import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.FlowerPower;
 import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.KillSwitch;
@@ -22,20 +21,7 @@ import com.google.common.collect.ImmutableList;
 
 public class GameModeManager {
 
-	/* Skyhigh is done
-	 * switcheroo is done	
-	 * rewardinglongshots is done
-	 * potionswap is done
-	 * livewith regret needs work on custom death messages
-	 * kings is done
-	 * killswitch is done
-	 * thehobbit is done
-	 * gonefishing is pretty much done TODO edit server config
-	 * flowerpower almost done TODO add more restrictions on drops
-	 * landisbad is done
-	 * blockrush is done
-	 * ticktock not done
-	 */
+
 	
 	//instances
 	Random random = new Random();
@@ -69,6 +55,7 @@ public class GameModeManager {
 		gamemodes.add(new SkyHigh(plugin, teamM));
 		gamemodes.add(new Switcheroo(teamM));
 		gamemodes.add(new TheHobbitManager(teamM));
+		
 	}
 
 	@SuppressWarnings("unchecked")
@@ -111,6 +98,7 @@ public class GameModeManager {
 
 
 
+	
 
 
 	// SKYHIGH - after pvp has started, all players must be at or above y=101, for every 30 seconds they are not, they take 1 heart of damage

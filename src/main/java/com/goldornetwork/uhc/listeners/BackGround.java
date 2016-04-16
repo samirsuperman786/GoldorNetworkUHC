@@ -8,7 +8,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
@@ -27,12 +29,12 @@ public class BackGround implements Listener {
 	
 	public void mutePlayers(){
 		mutePlayers=true;
-		MessageSender.broadcast(ChatColor.GOLD + "Chat has been muted.");
+		MessageSender.broadcast("Chat has been muted.");
 	}
 	
 	public void unMutePlayers(){
 		mutePlayers= false;
-		MessageSender.broadcast(ChatColor.GOLD + "Chat has been unmuted!");
+		MessageSender.broadcast("Chat has been unmuted!");
 	}
 	
 	@EventHandler(priority = EventPriority.LOW)
@@ -60,6 +62,16 @@ public class BackGround implements Listener {
 			}
 		}
 	}
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent e){
+		e.setJoinMessage(ChatColor.GREEN + "\u2713" + ChatColor.DARK_GRAY +  e.getPlayer().getName());
+	}
+	
+	@EventHandler
+	public void onPlayerLeave(PlayerQuitEvent e){
+		e.setQuitMessage(ChatColor.RED + "\u2717" + ChatColor.DARK_GRAY+ e.getPlayer().getName());
+	}
+	
 	
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void on(AsyncPlayerChatEvent e){

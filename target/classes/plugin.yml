@@ -1,5 +1,6 @@
 name: GoldorNetworkUHC
 main: com.goldornetwork.uhc.UHC
+load: startup
 author: g0ldmanpox
 description: This is property of GoldorNetwork.
 version: 1.1

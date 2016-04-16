@@ -16,7 +16,7 @@ public class JoinCommand extends UHCCommand {
 
 	//instances
 	private TeamManager teamM;
-
+	
 	public JoinCommand(TeamManager teamM) {
 		super("join", "[team]");
 		this.teamM=teamM;
@@ -65,7 +65,7 @@ public class JoinCommand extends UHCCommand {
 						if(teamM.isTeamRoomToJoin(args[0].toLowerCase())){
 							MessageSender.alertMessage(p, ChatColor.GREEN, "You have joined team " + teamM.getColorOfTeam(args[0].toLowerCase()) + args[0]);
 							teamM.addPlayerToTeam(p, args[0].toLowerCase());
-							teamM.unInvitePlayer(teamM.getTeamOfPlayer(p), p);
+							teamM.unInvitePlayer(args[0], p);
 							return true;
 						}
 						else{

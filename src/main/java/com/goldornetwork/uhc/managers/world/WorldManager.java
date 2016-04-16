@@ -13,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.ScatterManager;
@@ -49,23 +50,21 @@ public class WorldManager implements Listener{
 	}
 	
 	public void endGame(List<UUID> winners){
-		MessageSender.broadcast(ChatColor.GOLD + "Game has ended!");
-		MessageSender.broadcast(ChatColor.GOLD + "Winners are: ");
+		MessageSender.broadcast("Game has ended!");
+		MessageSender.broadcast("Winners are: ");
 		for(UUID u : winners){
 			MessageSender.broadcast(Bukkit.getServer().getOfflinePlayer(u).getName());
-		}
-		for(Player all : Bukkit.getOnlinePlayers()){
-			all.setGameMode(GameMode.SPECTATOR);
+			if(Bukkit.getOfflinePlayer(u).isOnline()){
+				Player target = Bukkit.getServer().getPlayer(u);
+				target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 4));
+			}
 		}
 	}
 	
 	public void endGame(){
-		MessageSender.broadcast(ChatColor.GOLD + "Game has ended!");
-		MessageSender.broadcast(ChatColor.GOLD + "No one has won!");
+		MessageSender.broadcast("Game has ended!");
+		MessageSender.broadcast("No one has won!");
 		
-		for(Player all : Bukkit.getOnlinePlayers()){
-			all.setGameMode(GameMode.SPECTATOR);
-		}
 	}
 	@EventHandler
 	public void on(PlayerChangedWorldEvent e){

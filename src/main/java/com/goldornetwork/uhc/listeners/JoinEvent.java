@@ -46,6 +46,16 @@ public class JoinEvent implements Listener{
 			p.setDisplayName(ChatColor.AQUA + "[Observer] " + p.getName()+ ChatColor.WHITE);
 		}
 		
+		if(State.getState().equals(State.OPEN)){
+			if(teamM.isPlayerInGame(p)==false){
+				if(teamM.isTeamsEnabled()){
+					MessageSender.alertMessage(p, ChatColor.RED, "You are currently not on a team! Use /create");
+				}
+				else if(teamM.isFFAEnabled()){
+					MessageSender.alertMessage(p, ChatColor.RED, "You are not in the FFA yet! Use /join");
+				}
+			}
+		}
 		if(State.getState().equals(State.OPEN) || State.getState().equals(State.NOT_RUNNING)){
 			for(PotionEffect effect : p.getActivePotionEffects()){
 				p.removePotionEffect(effect.getType());

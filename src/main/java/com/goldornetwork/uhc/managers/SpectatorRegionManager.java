@@ -32,6 +32,10 @@ public class SpectatorRegionManager implements Listener {
 		this.plugin=plugin;
 		this.teamM=teamM;
 		this.scatterM=scatterM;
+		
+	}
+	
+	public void setup(){
 		center= scatterM.getCenter();
 	}
 	@EventHandler

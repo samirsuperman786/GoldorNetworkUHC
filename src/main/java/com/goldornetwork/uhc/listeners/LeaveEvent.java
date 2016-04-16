@@ -27,7 +27,7 @@ public class LeaveEvent implements Listener{
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onPlayerLeave(PlayerQuitEvent e){
+	public void on(PlayerQuitEvent e){
 		Player p = e.getPlayer();
 		if(State.getState().equals(State.OPEN)){
 			if(teamM.isPlayerInGame(p)){

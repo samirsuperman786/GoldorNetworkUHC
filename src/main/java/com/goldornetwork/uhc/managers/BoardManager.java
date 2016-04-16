@@ -1,18 +1,23 @@
 package com.goldornetwork.uhc.managers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 
 import com.goldornetwork.uhc.UHC;
@@ -20,65 +25,157 @@ import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 
 public class BoardManager implements Listener{
 
-	private UHC plugin;
 	private TeamManager teamM;
+	public BoardManager(UHC plugin) {
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
+	}
 
-	public BoardManager(UHC plugin, TeamManager teamM) {
-		//plugin.getServer().getPluginManager().registerEvents(this, plugin);
-		this.plugin=plugin;
+
+	/*
+	 * TODO only allow teamates to see green teammembers and everyone else should be red
+	 */
+	private UHC plugin;
+	private Scoreboard mainBoard;
+	private Team observerTeam;
+	
+	private List<Team> activeTeams = new ArrayList<Team>(); 
+	private Map<String, Team> teamScoreBoards = new HashMap<String, Team>();
+	private Map<UUID, String> teamOfPlayer = new HashMap<UUID, String>();
+	private Map<String, BukkitTask> scoreboardUpdaters = new HashMap<String, BukkitTask>();
+	
+
+	public void setup(TeamManager teamM){
 		this.teamM=teamM;
+		mainBoard=Bukkit.getScoreboardManager().getNewScoreboard();
+		for(Player all : Bukkit.getServer().getOnlinePlayers()){
+			all.setScoreboard(mainBoard);
+			all.setPlayerListName(ChatColor.stripColor(all.getName()));
+		}
+		initializeScoreBoard();	
+	}
+
+	private void initializeScoreBoard() {
+		observerTeam = mainBoard.registerNewTeam("observers");
+		observerTeam.setPrefix(ChatColor.AQUA + "[Observer]");
+	}
+
+	public void addPlayerToObserver(OfflinePlayer p){
+		observerTeam.addPlayer(p);
+		if(p.isOnline()){
+			Player target = (Player) p;
+			target.setPlayerListName(ChatColor.AQUA + target.getName());
+		}
 	}
 	
-	public void setup(){
-	//initializeScoreBoard();	
+	public void createTeam(String team){
+		Scoreboard teamBoard = Bukkit.getScoreboardManager().getNewScoreboard();
+		/*Objective o = teamBoard.registerNewObjective("showhealth", "health");
+		o.setDisplaySlot(DisplaySlot.BELOW_NAME);
+		o.setDisplayName("/ 20");
+		*/
+		Team newTeam = teamBoard.registerNewTeam(team);
+		newTeam.setCanSeeFriendlyInvisibles(true);
+		newTeam.setAllowFriendlyFire(false);
+		newTeam.setPrefix(ChatColor.GREEN + "");
+		
+		Team otherPlayers = teamBoard.registerNewTeam("others");
+		otherPlayers.setPrefix(ChatColor.RED + "");
+		
+		teamScoreBoards.put(team, newTeam);
+		activeTeams.add(newTeam);
+		
+		
+		//updater(team, teamBoard);
 	}
 	
-	@EventHandler
+	public void removeTeam(String team){
+		activeTeams.remove(teamScoreBoards.get(team));
+		teamScoreBoards.get(team).unregister();
+		teamScoreBoards.remove(team);
+		//cancelUpdater(team);
+	}
+	
+	public void addPlayerToTeam(String team, Player p){
+		teamScoreBoards.get(team).addPlayer(p);
+		teamOfPlayer.put(p.getUniqueId(), team.toLowerCase());
+		p.setScoreboard(teamScoreBoards.get(team).getScoreboard());
+		
+	}
+	public void removePlayerFromTeam(String team, OfflinePlayer p){
+		teamScoreBoards.get(team).removePlayer(p);
+		teamOfPlayer.remove(p.getUniqueId());
+		if(p.isOnline()){
+			Player target = (Player) p;
+			target.setScoreboard(mainBoard);
+		}
+		
+		
+	}
+	public Scoreboard getScoreboardOfPlayer(Player p){
+		return teamScoreBoards.get(teamOfPlayer.get(p.getUniqueId())).getScoreboard();
+	}
+	
+	private void updater(String team, Scoreboard sc){
+		BukkitTask run = new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				for(OfflinePlayer teamates : teamScoreBoards.get(team).getPlayers()){
+					if(teamates.isOnline()){
+						Player p = teamates.getPlayer();
+						p.setScoreboard(sc);
+					}
+				}
+				
+			}
+		}.runTaskTimer(plugin, 0L, 20L);
+		scoreboardUpdaters.put(team, run);
+	}
+	
+	private void cancelUpdater(String team){
+		scoreboardUpdaters.get(team).cancel();
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(GameStartEvent e){
-		displayHealth();
-	}
-	
-	@EventHandler
-	public void on(PlayerDeathEvent e){
-		if(teamM.isTeamsEnabled()){
-			ScoreboardManager manager = Bukkit.getServer().getScoreboardManager();
-			Scoreboard board = manager.getMainScoreboard();
-			if(board.getTeam(teamM.getTeamOfPlayer(e.getEntity())).hasPlayer(e.getEntity())){
-				board.getTeam(teamM.getTeamOfPlayer(e.getEntity())).removePlayer(e.getEntity());
+		for(Team team : activeTeams){
+			for(UUID u : teamM.getPlayersInGame()){
+				if(!(team.getPlayers().contains(Bukkit.getOfflinePlayer(u)))){
+					team.getScoreboard().getTeam("others").addPlayer(Bukkit.getOfflinePlayer(u));
+				}
 			}
 		}
 	}
-	/**
-	 * Will setup the scoreboard to the initial values
-	 */
-	public void initializeScoreBoard(){
-		ScoreboardManager manager = Bukkit.getServer().getScoreboardManager();
-		Scoreboard board = manager.getNewScoreboard();
-		Objective header = board.registerNewObjective("header", "dummy");
-		header.setDisplaySlot(DisplaySlot.SIDEBAR);
-		header.setDisplayName(ChatColor.GOLD + "GoldorNetwork");
-		Objective objective = board.registerNewObjective("mapsize", "dummy");
-		objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-		objective.setDisplayName(ChatColor.AQUA + "MapSize");
-		Score score = objective.getScore("");
-		score.setScore(plugin.getConfig().getInt("radius"));
-		for(Player p : Bukkit.getServer().getOnlinePlayers()){
-			p.setScoreboard(board);
+	
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void on(PlayerJoinEvent e){
+		Player p = e.getPlayer();
+		if(teamOfPlayer.containsKey(p.getUniqueId())){
+			p.setScoreboard(getScoreboardOfPlayer(p));
 		}
 	}
 	
-	
-	public void displayHealth(){
-		ScoreboardManager manager = Bukkit.getScoreboardManager();
-		Scoreboard board = manager.getNewScoreboard();
-		 
-		Objective objective = board.registerNewObjective("showhealth", "health");
-		objective.setDisplaySlot(DisplaySlot.PLAYER_LIST);
-		//objective.setDisplayName(ChatColor.RED + "\u2764");
-		 
-		for(Player online : Bukkit.getOnlinePlayers()){
-		  online.setScoreboard(board);
-		  online.setHealth(online.getHealth()); 
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void on(PlayerDeathEvent e){
+		Player p = e.getEntity();
+		if(teamOfPlayer.containsKey(p.getUniqueId())){
+			for(Team team : activeTeams){
+				for(UUID u : teamM.getPlayersInGame()){
+					if(!(team.getPlayers().contains(Bukkit.getOfflinePlayer(u)))){
+						team.getScoreboard().getTeam("others").removePlayer(Bukkit.getOfflinePlayer(u));
+					}
+				}
+			}
+			getScoreboardOfPlayer(p).getTeam(teamOfPlayer.get(p.getUniqueId())).removePlayer(p);
+			p.setScoreboard(mainBoard);
+		}
+		else{
+			p.setScoreboard(mainBoard);
 		}
 	}
+
+
+
+
 }

@@ -90,7 +90,7 @@ public class TheHobbitManager extends Gamemode implements Listener{
 				if(teamM.isPlayerInGame(p)){
 					if(e.getMaterial().equals(Material.GOLD_NUGGET)){
 						if(e.getItem().getItemMeta().getDisplayName().equals(ChatColor.AQUA + "The Magic Ring of Invisibility")){
-									p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 30*20, 0));
+									p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 30*20, 0, false, false));
 									p.getInventory().remove(p.getItemInHand());
 									MessageSender.send(ChatColor.GOLD, p, "You have activated your invisibility ring!");
 						}

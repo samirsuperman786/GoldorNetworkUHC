@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.google.common.collect.ImmutableSet;
 
 public class BlockRush extends Gamemode implements Listener{
 
@@ -22,7 +23,6 @@ public class BlockRush extends Gamemode implements Listener{
 	private ScatterManager scatterM;
 	//storage
 	private List<Material> firstBlocksMined = new ArrayList<Material>();
-	
 	public BlockRush(ScatterManager scatterM) {
 		super("BlockRush", "First one to mine a unique block gets a diamond!");
 		this.scatterM=scatterM;

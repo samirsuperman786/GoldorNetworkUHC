@@ -131,7 +131,7 @@ public class ChunkGenerator {
 						world.loadChunk(i, j);
 					}
 					else if(k==((radius/16) * (radius/16) *4)){
-						MessageSender.broadcast(ChatColor.GOLD + "Generating complete.");
+						MessageSender.broadcast("Generating complete.");
 						generating=false;
 						cancel();
 					}
