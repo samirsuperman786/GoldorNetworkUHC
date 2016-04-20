@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -19,6 +20,9 @@ import org.bukkit.WorldBorder;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
@@ -31,7 +35,7 @@ import com.goldornetwork.uhc.utils.MessageSender;
 import com.google.common.collect.ImmutableSet;
 
 
-public class ScatterManager{
+public class ScatterManager implements Listener{
 
 	//TODO check if spawn location is valid 
 
@@ -41,17 +45,19 @@ public class ScatterManager{
 	private MoveEvent moveE;
 	private BackGround backG;
 	private WorldFactory worldF;
+	private static Runtime rt = Runtime.getRuntime();
 	//storage
 	private boolean scatterComplete;
 	private int radius;
 	private World uhcWorld;
-	private boolean generated;
-	private final int LOADS_PER_SECOND = 5;
+	private final int LOADS_PER_SECOND = 1;
 	private int k;
-	private int a;
+	private final int fillMemoryTolerance = 500;
 	private BlockFace[] faces = new BlockFace[] { BlockFace.SELF, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH_EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH_WEST, BlockFace.NORTH_WEST};
 
 	//storage
+	private List<Location> validatedLocs = new ArrayList<Location>();
+	private List<Chunk> chunksToKeepLoaded = new ArrayList<Chunk>();
 	private Map<String, List<UUID>> teamToScatter = new HashMap<String, List<UUID>>();
 	private Map<String, Location> locationsOfTeamSpawn = new HashMap<String, Location>();
 	private Map<UUID, Location> locationsOfFFA = new HashMap<UUID, Location>();
@@ -65,7 +71,7 @@ public class ScatterManager{
 		this.moveE=moveE;
 		this.backG=backG;
 		this.worldF=worldF;
-		config();
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
 	private void config(){
@@ -78,6 +84,7 @@ public class ScatterManager{
 	 * will re-initialize the world border, will clear entities.
 	 */
 	public void setup(){
+		config();
 		newUHCWorld();
 		moveE.unfreezePlayers();
 		radius = plugin.getConfig().getInt("radius");
@@ -107,6 +114,14 @@ public class ScatterManager{
 
 	}
 
+	@EventHandler
+	public void on(ChunkUnloadEvent e){
+		if(State.getState().equals(State.SCATTER)){
+			if(chunksToKeepLoaded.contains(e.getChunk())){
+				e.setCancelled(true);
+			}
+		}
+	}
 	/**
 	 * Used to check state of scattering
 	 * @return <code> True </code> if scattering has completed
@@ -115,37 +130,67 @@ public class ScatterManager{
 		return scatterComplete;
 	}
 	public void enableFFA(){
-		MessageSender.broadcast("Generating chunks...");
 		FFAToScatter.addAll(teamM.getPlayersInGame());
-		List<Location> toGenerate = new ArrayList<Location>();
-		for(UUID u : FFAToScatter){
-			Location loc = findValidLocation(getUHCWorld(), radius);
-			toGenerate.add(loc);
-			locationsOfFFA.put(u, loc);	
-		}
-		generate(toGenerate);
+		findLocations(FFAToScatter.size());
 	}
 	public void enableTeams(){
-		MessageSender.broadcast("Generating chunks...");
-		List<Location> toGenerate = new ArrayList<Location>();
 		for(String team : teamM.getActiveTeams()){
-			Location location = findValidLocation(getUHCWorld(), radius);
-			toGenerate.add(location);
-			locationsOfTeamSpawn.put(team, location);
 			nameOfTeams.add(team);
 			teamToScatter.put(team, teamM.getPlayersOnATeam(team));
 		}
-		generate(toGenerate);
-
+		findLocations(nameOfTeams.size());
 	}
 
+	private void findLocations(int numberOfLocationsToFind){
+		MessageSender.broadcast("Finding locations...");
+		k=0;
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				if(availableMemoryTooLow()){
+					return;
+				}
+				else if(k ==numberOfLocationsToFind){
+					if(teamM.isFFAEnabled()){
+						int j = 0;
+						for(UUID u : teamM.getPlayersInGame()){
+							locationsOfFFA.put(u, validatedLocs.get(j));
+							j++;
+						}
+					}
+					else if(teamM.isTeamsEnabled()){
+						int j = 0;
+						for(String team : teamM.getActiveTeams()){
+							locationsOfTeamSpawn.put(team, validatedLocs.get(j));
+							j++;
+						}
+					}
+					generate(validatedLocs);
+					cancel();
+				}
+				else{
+					for(int i = 0; i<LOADS_PER_SECOND; i++){
+						validatedLocs.add(findValidLocation(getUHCWorld(), radius));
+						k++;
+					}
+				}
+				
+				
+			}
+		}.runTaskTimer(plugin, 0L, 20L);
+	}
 	private void generate(List<Location> loc){
-		a=0;
+		MessageSender.broadcast("Generating...");
+		k=0;
 		new BukkitRunnable() {
 
 			@Override
 			public void run() {
-				if(a==(loc.size()-1)){
+				if(availableMemoryTooLow()){
+					return;
+				}
+				if(k==loc.size()){
 					if(teamM.isFFAEnabled()){
 						scatterFFA();
 					}
@@ -154,16 +199,25 @@ public class ScatterManager{
 					}
 					cancel();
 				}
-				getUHCWorld().loadChunk(getUHCWorld().getChunkAt(loc.get(a)));
-				a++;
+				getUHCWorld().loadChunk(loc.get(k).getBlockX(), loc.get(k).getBlockZ(), true);
+				chunksToKeepLoaded.add(getUHCWorld().getChunkAt(loc.get(k)));
+				k++;
 			}
 		}.runTaskTimer(plugin, 0L, 20L);
+	}
+	public static int AvailableMemory()
+	{
+		return (int)((rt.maxMemory() - rt.totalMemory() + rt.freeMemory()) / 1048576);  // 1024*1024 = 1048576 (bytes in 1 MB)
+	}
+	private boolean availableMemoryTooLow(){
+		
+		return AvailableMemory() < fillMemoryTolerance;
 	}
 	/**
 	 * Will scatter all teams and freeze them until scattering has completed
 	 */
 	private void scatterTeams(){
-		MessageSender.broadcast("Scattering players...");
+		MessageSender.broadcast("Scattering teams...");
 		k=0;
 		moveE.freezePlayers();
 		new BukkitRunnable() {
@@ -175,7 +229,7 @@ public class ScatterManager{
 					return;
 				}
 				else{
-					if(k>=teamM.getActiveTeams().size()){
+					if(k==teamM.getActiveTeams().size()){
 						setupStartingOptions();
 						scatterComplete=true;
 						cancel();
@@ -212,7 +266,6 @@ public class ScatterManager{
 		moveE.freezePlayers();
 		k=0;
 		new BukkitRunnable() {
-
 			@Override
 			public void run() {
 				for(int i = 0; i<LOADS_PER_SECOND; i++){
@@ -261,14 +314,17 @@ public class ScatterManager{
 			int z = random.nextInt(radius * 2) - radius;
 			x= x+ getCenter().getBlockX();
 			z= z+ getCenter().getBlockZ();
-			//int x = random.nextInt((radius*2) - (-radius*2) +1) + (-radius*2);
-			//int z = random.nextInt((radius*2) - (-radius*2) +1) + (-radius*2);
 			location.setX(x);
 			location.setZ(z);
-			location.setY(getUHCWorld().getHighestBlockYAt(location.getBlockX(), location.getBlockZ()));
+			world.loadChunk(x, z, true);
+			location.setY(world.getHighestBlockYAt(location.getBlockX(), location.getBlockZ()));
+			
 			if(validate(location.clone())){
 				valid=true;
 				break;
+			}
+			else{
+				world.unloadChunkRequest(x, z);
 			}
 		}
 		return location;
@@ -285,25 +341,29 @@ public class ScatterManager{
 		if(loc.getBlockY()<60){
 			valid =false;
 		}
+		/*else{
+			for(Material notValid : INVALID_SPAWN_BLOCKS){
+				for(BlockFace face : faces){
+					//getting the block at land
+					if(loc.getBlock().getRelative(face).getType().equals(notValid) || loc.getBlock().getRelative(face).getType().equals(Material.AIR)){
+						valid=false;
+						break;
+					}
 
-		for(Material notValid : INVALID_SPAWN_BLOCKS){
-			for(BlockFace face : faces){
-				//getting the block at land
-				if(loc.getBlock().getRelative(face).getType().equals(notValid) || loc.getBlock().getRelative(face).getType().equals(Material.AIR)){
-					valid=false;
-				}
+					//getting the block above land
+					else if(!(loc.clone().add(0, 1, 0).getBlock().getRelative(face).getType().equals(Material.AIR))){
+						valid=false;
+						break;
+					}
 
-				//getting the block above land
-				if(!(loc.clone().add(0, 1, 0).getBlock().getRelative(face).getType().equals(Material.AIR))){
-					valid=false;
-				}
-
-				//getting the block 2 above land
-				if(!(loc.clone().add(0, 2, 0).getBlock().getRelative(face).getType().equals(Material.AIR))){
-					valid = false;
+					//getting the block 2 above land
+					else if(!(loc.clone().add(0, 2, 0).getBlock().getRelative(face).getType().equals(Material.AIR))){
+						valid = false;
+						break;
+					}
 				}
 			}
-		}
+		}*/
 
 		return valid;
 	}
@@ -375,7 +435,7 @@ public class ScatterManager{
 	 * @return <code> Location </code> of the center of the match
 	 */
 	public Location getCenter(){
-		return getUHCWorld().getSpawnLocation();
+		return uhcWorld.getSpawnLocation();
 	}
 
 	/**

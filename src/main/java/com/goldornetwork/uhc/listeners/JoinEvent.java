@@ -72,20 +72,18 @@ public class JoinEvent implements Listener{
 		}
 		if(State.getState().equals(State.INGAME)|| State.getState().equals(State.SCATTER)){
 			if(teamM.isPlayerInGame(e.getPlayer())){
-				if(teamM.isFFAEnabled()){
 					if(scatterM.getLateScatters().contains(p.getUniqueId())){
 						scatterM.handleLateScatter(p);
 						scatterM.removePlayerFromLateScatters(p);
 						MessageSender.send(ChatColor.GREEN, p, "You have been late scattered!");
 					}
-				}
-				else if(teamM.isTeamsEnabled()){
+				
 					if(scatterM.getLateScatters().contains(p.getUniqueId())){
 						scatterM.handleLateScatter(p);
 						scatterM.removePlayerFromLateScatters(p);
 						MessageSender.send(ChatColor.GREEN, p, "You have been late scattered to your teams spawn!");
 					}
-				}
+				
 			}
 			else if(teamM.isPlayerInGame(e.getPlayer())==false){
 				if(p.getWorld().equals(scatterM.getUHCWorld())==false){

@@ -22,19 +22,12 @@ import org.bukkit.scoreboard.Team;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
+import com.goldornetwork.uhc.utils.MessageSender;
 
 public class BoardManager implements Listener{
 
-	private TeamManager teamM;
-	public BoardManager(UHC plugin) {
-		plugin.getServer().getPluginManager().registerEvents(this, plugin);
-	}
-
-
-	/*
-	 * TODO only allow teamates to see green teammembers and everyone else should be red
-	 */
 	private UHC plugin;
+	private TeamManager teamM;
 	private Scoreboard mainBoard;
 	private Team observerTeam;
 	
@@ -43,10 +36,15 @@ public class BoardManager implements Listener{
 	private Map<UUID, String> teamOfPlayer = new HashMap<UUID, String>();
 	private Map<String, BukkitTask> scoreboardUpdaters = new HashMap<String, BukkitTask>();
 	
+	public BoardManager(UHC plugin) {
+		this.plugin=plugin;
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
+	}
+
 
 	public void setup(TeamManager teamM){
 		this.teamM=teamM;
-		mainBoard=Bukkit.getScoreboardManager().getNewScoreboard();
+		mainBoard=plugin.getServer().getScoreboardManager().getNewScoreboard();
 		for(Player all : Bukkit.getServer().getOnlinePlayers()){
 			all.setScoreboard(mainBoard);
 			all.setPlayerListName(ChatColor.stripColor(all.getName()));

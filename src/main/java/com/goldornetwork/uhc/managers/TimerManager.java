@@ -34,7 +34,6 @@ public class TimerManager {
 		this.teamM=teamM;
 		this.voteM=voteM;
 		this.backG=backG;
-		config();
 	}
 
 	/**
@@ -42,6 +41,7 @@ public class TimerManager {
 	 * 
 	 */
 	public void setup(){
+		config();
 		State.setState(State.NOT_RUNNING);
 		matchStart=false;
 		isPVPEnabled=false;
@@ -139,7 +139,7 @@ public class TimerManager {
 						State.setState(State.SCATTER);
 
 						if(teamM.isFFAEnabled()){
-							scatterM.enableFFA();;
+							scatterM.enableFFA();
 						}
 						else if(teamM.isTeamsEnabled()){
 							scatterM.enableTeams();

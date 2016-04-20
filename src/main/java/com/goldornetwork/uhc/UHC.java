@@ -63,23 +63,23 @@ public class UHC extends JavaPlugin {
 		//instances
 		worldF= new WorldFactory(plugin);
 		
+		backG = new BackGround(plugin);
+		
 		gameModeM= new GameModeManager(plugin);
 		
 		boardM = new BoardManager(plugin);
 		
+		chunkG= new ChunkGenerator(plugin);
+		
 		teamM= new TeamManager(plugin, boardM);
 		
 		moveE= new MoveEvent(plugin, teamM);
-
-		backG = new BackGround(plugin);
 		
 		scatterM= new ScatterManager(plugin, teamM, moveE, backG, worldF);
 		
 		voteM = new VoteManager(plugin, gameModeM, teamM);
 		
 		timerM = new TimerManager(plugin, scatterM, teamM, voteM, backG);
-		
-		chunkG= new ChunkGenerator(plugin);
 		
 		spectM = new SpectatorRegionManager(plugin, teamM, scatterM);
 		
@@ -105,16 +105,16 @@ public class UHC extends JavaPlugin {
 	}
 
 	private void setup(){
+		worldF.setup();
 		teamM.setup();
 		boardM.setup(teamM);
 		timerM.setup();
 		moveE.setup();
 		voteM.setup();
 		worldM.setup();
-		spectM.setup();
 		gameModeM.setupGamemodes(teamM, scatterM);
-		worldF.setup();
 		scatterM.setup();
+		spectM.setup();
 	}
 
 	private void createConfig() {
@@ -162,7 +162,15 @@ public class UHC extends JavaPlugin {
 		plugin = this;
 		createConfig();
 		instances();
-		setup();
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				setup();
+				
+			}
+		}.runTaskLater(plugin, 20L);
+		
 	}
 	
 

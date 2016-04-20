@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
@@ -17,6 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldInitEvent;
 
 import com.goldornetwork.uhc.UHC;
+import com.goldornetwork.uhc.utils.MessageSender;
 
 public class WorldFactory implements Listener{
 
@@ -38,7 +40,12 @@ public class WorldFactory implements Listener{
 			dir.getParentFile().mkdirs();
 			Bukkit.getLogger().info("Creating matches folder");
 		}
-		
+		for(World world : Bukkit.getWorlds()){
+			for(Chunk chunk : world.getLoadedChunks()){
+				chunk.unload();
+			}
+			Bukkit.unloadWorld(world, false);
+		}
 		for(File cleanup : dir.listFiles()){
 			try {
 				FileUtils.deleteDirectory(cleanup);
@@ -83,9 +90,9 @@ public class WorldFactory implements Listener{
 		WorldCreator creator = new WorldCreator(fileName);
 		creator.environment(World.Environment.NORMAL);
 		creator.type(WorldType.NORMAL);
-		creator.seed(random.nextInt());
+		creator.seed(random.nextLong());
 		creator.generateStructures(true);
-		World world = plugin.getServer().createWorld(creator);
+		World world = Bukkit.createWorld(creator);
 		world.setSpawnLocation(0, world.getHighestBlockYAt(0, 0), 0);
 		return world;
 	}
@@ -93,7 +100,9 @@ public class WorldFactory implements Listener{
 	
 	@EventHandler
 	public void on(WorldInitEvent e){
-		e.getWorld().setKeepSpawnInMemory(false);
+		if(e.getWorld().getName().equals("world")){
+			//e.getWorld().setKeepSpawnInMemory(false);	
+		}
 	}
 	
 }

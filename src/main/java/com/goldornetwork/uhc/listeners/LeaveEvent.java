@@ -31,10 +31,7 @@ public class LeaveEvent implements Listener{
 		Player p = e.getPlayer();
 		if(State.getState().equals(State.OPEN)){
 			if(teamM.isPlayerInGame(p)){
-				if(teamM.isFFAEnabled()){
-					teamM.removePlayerFromFFA(p);
-				}
-				else if(teamM.isTeamsEnabled()){
+				 if(teamM.isTeamsEnabled()){
 					if(teamM.isTeamInactive(teamM.getTeamOfPlayer(p))){
 						teamM.disbandTeam(teamM.getTeamOfPlayer(p));
 					}

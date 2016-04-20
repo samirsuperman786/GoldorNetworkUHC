@@ -54,13 +54,13 @@ public class TeamManager {
 	public TeamManager(UHC plugin, BoardManager boardM) {
 		this.plugin=plugin;
 		this.boardM=boardM;
-		config();
 	}
 
 	/**
 	 * Does the following: removes all players from ingame, removes all observers, and basically starts a new blank TeamManager
 	 */
 	public void setup(){
+		config();
 		isFFAEnabled=false;
 		isTeamsEnabled=false;
 		playersInGame.clear();
@@ -327,7 +327,6 @@ public class TeamManager {
 				boardM.createTeam(entry.getKey());
 				addPlayerToTeam(p, entry.getKey());
 				ownerOfTeam.put(entry.getKey(), p.getUniqueId());
-			
 				foundTeam= true;
 				break;
 			}
@@ -420,12 +419,12 @@ public class TeamManager {
 	 * @return <code> True </code> if the player is invited to the given team
 	 */
 	public boolean isPlayerInvitedToTeam(Player p, String team){
-		if(invitedPlayers.get(team).contains(p.getUniqueId())){
-			return true;
+		if(invitedPlayers.containsKey(team)){
+			if(invitedPlayers.get(team).contains(p.getUniqueId())){
+				return true;
+			}
 		}
-		else{
-			return false;
-		}
+		return false;
 
 	}
 
@@ -503,14 +502,7 @@ public class TeamManager {
 	 */
 
 	public List<String> getActiveTeams(){
-		List<String> activeTeams = new ArrayList<String>();
-
-		for(Map.Entry<String, Integer> entry : playersOnCurrentTeam.entrySet()){
-			if(entry.getValue()>0){
-				activeTeams.add(entry.getKey());
-			}
-		}
-		return activeTeams;
+		return listOfActiveTeams;
 	}
 	
 	public boolean isTeamInactive(String team){
@@ -527,7 +519,7 @@ public class TeamManager {
 		return allOffline;
 	}
 	public void disbandTeam(String team){
-		
+		listOfActiveTeams.remove(team);
 		UUID owner = getOwnerOfTeam(team);
 		if(invitedPlayers.containsKey(team)){
 			for(UUID u: invitedPlayers.get(team)){
@@ -542,7 +534,7 @@ public class TeamManager {
 			removePlayerFromTeam(Bukkit.getServer().getOfflinePlayer(u));
 		}
 		ownerOfTeam.remove(owner);
-		//unregisterScoreboardTeam(team);
+		boardM.removeTeam(team);
 	}
 	
 	/**
