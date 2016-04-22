@@ -1,5 +1,6 @@
 package com.goldornetwork.uhc.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -33,7 +34,7 @@ public class JoinEvent implements Listener{
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onJoin(PlayerJoinEvent e){
 		Player p = e.getPlayer();
-	
+		
 		if(teamM.isPlayerInGame(p)){
 			if(teamM.isTeamsEnabled()){
 				teamM.displayName(p, teamM.getTeamOfPlayer(p));
@@ -74,14 +75,6 @@ public class JoinEvent implements Listener{
 			if(teamM.isPlayerInGame(e.getPlayer())){
 					if(scatterM.getLateScatters().contains(p.getUniqueId())){
 						scatterM.handleLateScatter(p);
-						scatterM.removePlayerFromLateScatters(p);
-						MessageSender.send(ChatColor.GREEN, p, "You have been late scattered!");
-					}
-				
-					if(scatterM.getLateScatters().contains(p.getUniqueId())){
-						scatterM.handleLateScatter(p);
-						scatterM.removePlayerFromLateScatters(p);
-						MessageSender.send(ChatColor.GREEN, p, "You have been late scattered to your teams spawn!");
 					}
 				
 			}

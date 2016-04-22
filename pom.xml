@@ -27,8 +27,8 @@
 		</repository>
 
 		<repository>
-			<id>dmulloy2-repo</id>
-			<url>http://repo.dmulloy2.net/content/groups/public/</url>
+			<id>overcast-repo</id>
+			<url>https://repo.oc.tc/content/groups/public/</url>
 		</repository>
 	</repositories>
 
@@ -41,8 +41,6 @@
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
-
-
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>craftbukkit</artifactId>
@@ -52,9 +50,14 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.comphenix.protocol</groupId>
-			<artifactId>ProtocolLib</artifactId>
-			<version>3.6.5</version>
+			<groupId>tc.oc</groupId>
+			<artifactId>sportbukkit</artifactId>
+			<version>1.8.7-R0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>tc.oc</groupId>
+			<artifactId>sportbukkit-api</artifactId>
+			<version>1.8.7-R0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

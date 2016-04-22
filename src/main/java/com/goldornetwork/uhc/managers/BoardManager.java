@@ -159,11 +159,10 @@ public class BoardManager implements Listener{
 		Player p = e.getEntity();
 		if(teamOfPlayer.containsKey(p.getUniqueId())){
 			for(Team team : activeTeams){
-				for(UUID u : teamM.getPlayersInGame()){
-					if(!(team.getPlayers().contains(Bukkit.getOfflinePlayer(u)))){
-						team.getScoreboard().getTeam("others").removePlayer(Bukkit.getOfflinePlayer(u));
+					if(!(team.getPlayers().contains(Bukkit.getOfflinePlayer(p.getUniqueId())))){
+						team.getScoreboard().getTeam("others").removePlayer(Bukkit.getOfflinePlayer(p.getUniqueId()));
 					}
-				}
+				
 			}
 			getScoreboardOfPlayer(p).getTeam(teamOfPlayer.get(p.getUniqueId())).removePlayer(p);
 			p.setScoreboard(mainBoard);

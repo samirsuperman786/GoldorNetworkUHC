@@ -94,15 +94,16 @@ public class WorldFactory implements Listener{
 		creator.generateStructures(true);
 		World world = Bukkit.createWorld(creator);
 		world.setSpawnLocation(0, world.getHighestBlockYAt(0, 0), 0);
+		world.setAutoSave(false);
 		return world;
 	}
 	
 	
 	@EventHandler
 	public void on(WorldInitEvent e){
-		if(e.getWorld().getName().equals("world")){
-			//e.getWorld().setKeepSpawnInMemory(false);	
-		}
+			e.getWorld().setAutoSave(false);
+			e.getWorld().setKeepSpawnInMemory(false);	
+		
 	}
 	
 }

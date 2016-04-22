@@ -22,6 +22,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -30,6 +32,7 @@ import com.goldornetwork.uhc.listeners.BackGround;
 import com.goldornetwork.uhc.listeners.MoveEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.managers.world.ChunkGenerator;
 import com.goldornetwork.uhc.managers.world.WorldFactory;
 import com.goldornetwork.uhc.utils.MessageSender;
 import com.google.common.collect.ImmutableSet;
@@ -45,14 +48,13 @@ public class ScatterManager implements Listener{
 	private MoveEvent moveE;
 	private BackGround backG;
 	private WorldFactory worldF;
-	private static Runtime rt = Runtime.getRuntime();
+	private ChunkGenerator chunkG;
 	//storage
 	private boolean scatterComplete;
 	private int radius;
 	private World uhcWorld;
 	private final int LOADS_PER_SECOND = 1;
-	private int k;
-	private final int fillMemoryTolerance = 500;
+	private int timer;
 	private BlockFace[] faces = new BlockFace[] { BlockFace.SELF, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH_EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH_WEST, BlockFace.NORTH_WEST};
 
 	//storage
@@ -65,12 +67,13 @@ public class ScatterManager implements Listener{
 	private List<String> nameOfTeams = new ArrayList<String>();
 	private List<UUID> FFAToScatter= new ArrayList<UUID>();
 
-	public ScatterManager(UHC plugin, TeamManager teamM, MoveEvent moveE, BackGround backG, WorldFactory worldF) {
+	public ScatterManager(UHC plugin, TeamManager teamM, MoveEvent moveE, BackGround backG, WorldFactory worldF, ChunkGenerator chunkG) {
 		this.plugin=plugin;
 		this.teamM=teamM;
 		this.moveE=moveE;
 		this.backG=backG;
 		this.worldF=worldF;
+		this.chunkG=chunkG;
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
@@ -109,8 +112,7 @@ public class ScatterManager implements Listener{
 				e.remove();
 			}
 		}
-		//Test code here
-
+		chunkG.generate(getUHCWorld(), getCenter(), radius);
 
 	}
 
@@ -122,6 +124,7 @@ public class ScatterManager implements Listener{
 			}
 		}
 	}
+
 	/**
 	 * Used to check state of scattering
 	 * @return <code> True </code> if scattering has completed
@@ -142,16 +145,20 @@ public class ScatterManager implements Listener{
 	}
 
 	private void findLocations(int numberOfLocationsToFind){
+		chunkG.cancelGeneration();
+		timer=0;
 		MessageSender.broadcast("Finding locations...");
-		k=0;
 		new BukkitRunnable() {
-			
+
 			@Override
 			public void run() {
-				if(availableMemoryTooLow()){
+				int availMem = plugin.AvailableMemory();
+				if(availMem<200){
+					MessageSender.broadcast("low mem!");
 					return;
 				}
-				else if(k ==numberOfLocationsToFind){
+
+				else if(timer >=numberOfLocationsToFind){
 					if(teamM.isFFAEnabled()){
 						int j = 0;
 						for(UUID u : teamM.getPlayersInGame()){
@@ -171,26 +178,31 @@ public class ScatterManager implements Listener{
 				}
 				else{
 					for(int i = 0; i<LOADS_PER_SECOND; i++){
-						validatedLocs.add(findValidLocation(getUHCWorld(), radius));
-						k++;
+						Location vLoc = findValidLocation(getUHCWorld(), radius);
+						vLoc.add(0, 1, 0);
+						validatedLocs.add(vLoc);
+						++timer;
 					}
 				}
-				
-				
+
+
 			}
 		}.runTaskTimer(plugin, 0L, 20L);
 	}
 	private void generate(List<Location> loc){
+		timer=0;
 		MessageSender.broadcast("Generating...");
-		k=0;
 		new BukkitRunnable() {
 
 			@Override
 			public void run() {
-				if(availableMemoryTooLow()){
+				int availMem = plugin.AvailableMemory();
+				if(availMem<200){
+					MessageSender.broadcast("low mem!");
 					return;
 				}
-				if(k==loc.size()){
+				if(timer>=loc.size()){
+					timer=0;
 					if(teamM.isFFAEnabled()){
 						scatterFFA();
 					}
@@ -199,44 +211,44 @@ public class ScatterManager implements Listener{
 					}
 					cancel();
 				}
-				getUHCWorld().loadChunk(loc.get(k).getBlockX(), loc.get(k).getBlockZ(), true);
-				chunksToKeepLoaded.add(getUHCWorld().getChunkAt(loc.get(k)));
-				k++;
+				else{
+					getUHCWorld().loadChunk(loc.get(timer).getBlockX(), loc.get(timer).getBlockZ(), true);
+					chunksToKeepLoaded.add(getUHCWorld().getChunkAt(loc.get(timer)));
+					++timer;
+				}
+
 			}
 		}.runTaskTimer(plugin, 0L, 20L);
-	}
-	public static int AvailableMemory()
-	{
-		return (int)((rt.maxMemory() - rt.totalMemory() + rt.freeMemory()) / 1048576);  // 1024*1024 = 1048576 (bytes in 1 MB)
-	}
-	private boolean availableMemoryTooLow(){
-		
-		return AvailableMemory() < fillMemoryTolerance;
 	}
 	/**
 	 * Will scatter all teams and freeze them until scattering has completed
 	 */
 	private void scatterTeams(){
+		timer=0;
 		MessageSender.broadcast("Scattering teams...");
-		k=0;
 		moveE.freezePlayers();
 		new BukkitRunnable() {
 			@Override
 			public void run() {
+				int availMem = plugin.AvailableMemory();
+				if(availMem<200){
+					return;
+				}
 				if(teamToScatter.isEmpty()){
 					Bukkit.getServer().getLogger().info("Error at scattering");
 					cancel();
 					return;
 				}
 				else{
-					if(k==teamM.getActiveTeams().size()){
+					if(timer>=teamM.getActiveTeams().size()){
 						setupStartingOptions();
 						scatterComplete=true;
 						cancel();
 					}
 					else{
-						for(UUID u : teamToScatter.get(nameOfTeams.get(k))){
-							Location location = locationsOfTeamSpawn.get(nameOfTeams.get(k));
+						for(UUID u : teamToScatter.get(nameOfTeams.get(timer))){
+							Location location = locationsOfTeamSpawn.get(nameOfTeams.get(timer)).clone();
+							Location safeLocation = new Location(location.getWorld(), location.getBlockX(), location.getWorld().getHighestBlockYAt(location), location.getZ());
 							OfflinePlayer p = Bukkit.getOfflinePlayer(u);
 							if(p.isOnline()==false){
 								lateScatters.add(u);
@@ -244,17 +256,17 @@ public class ScatterManager implements Listener{
 							else if(p.isOnline()==true){
 								Player target = (Player) p;
 								initializePlayer(target);
-								target.teleport(location);
+								target.teleport(safeLocation);
 
 							}
 						}
-						k++;
+						++timer;
 					}
 
 				}
 
 			}
-		}.runTaskTimer(plugin, 0L, 20L);
+		}.runTaskTimer(plugin, 0L, 40L);
 	}
 
 
@@ -262,30 +274,34 @@ public class ScatterManager implements Listener{
 	 * Will scatter all players in game and freeze them until complete
 	 */
 	private void scatterFFA(){
+		timer=0;
 		MessageSender.broadcast("Scattering players...");
 		moveE.freezePlayers();
-		k=0;
 		new BukkitRunnable() {
 			@Override
 			public void run() {
 				for(int i = 0; i<LOADS_PER_SECOND; i++){
-					if(k>=FFAToScatter.size()){
+					if(timer>=FFAToScatter.size()){
 						scatterComplete=true;
 						setupStartingOptions();
 						cancel();
 						return;
 					}
-					OfflinePlayer p = Bukkit.getOfflinePlayer(FFAToScatter.get(k));
-					Location location = locationsOfFFA.get(FFAToScatter.get(k));
-					if(p.isOnline()==false){
-						lateScatters.add(p.getUniqueId());
+					else{
+						OfflinePlayer p = Bukkit.getOfflinePlayer(FFAToScatter.get(timer));
+						Location location = locationsOfFFA.get(FFAToScatter.get(timer));
+						Location safeLocation = new Location(location.getWorld(), location.getBlockX(), location.getWorld().getHighestBlockYAt(location), location.getZ());
+						if(p.isOnline()==false){
+							lateScatters.add(p.getUniqueId());
+						}
+						else if(p.isOnline()==true){
+							Player target = (Player) p;
+							initializePlayer(target);
+							target.teleport(safeLocation);
+						}
+						++timer;
 					}
-					else if(p.isOnline()==true){
-						Player target = (Player) p;
-						initializePlayer(target);
-						target.teleport(location);
-					}
-					k++;
+
 				}
 
 			}
@@ -307,18 +323,15 @@ public class ScatterManager implements Listener{
 	 */
 	private Location findValidLocation(World world, int radius){
 		boolean valid = false;
-		Location location = new Location(world, 0, 0, 0);
+		Location location = null;
 		while(valid ==false){
 			Random random = new Random();
 			int x = random.nextInt(radius * 2) - radius;
 			int z = random.nextInt(radius * 2) - radius;
 			x= x+ getCenter().getBlockX();
 			z= z+ getCenter().getBlockZ();
-			location.setX(x);
-			location.setZ(z);
 			world.loadChunk(x, z, true);
-			location.setY(world.getHighestBlockYAt(location.getBlockX(), location.getBlockZ()));
-			
+			location = new Location(world, x, world.getHighestBlockYAt(x, z), z);
 			if(validate(location.clone())){
 				valid=true;
 				break;
@@ -341,29 +354,49 @@ public class ScatterManager implements Listener{
 		if(loc.getBlockY()<60){
 			valid =false;
 		}
+		//value performance more than safety
+		else if(loc.clone().add(0, -1, 0).getBlock().getType().isSolid()==false){
+			valid = false;
+		}
+		else if(loc.clone().add(0, 0, 0).getBlock().getType().isSolid()){
+			valid = false;
+		}
+		else if(loc.clone().add(0, 1, 0).getBlock().getType().isSolid()){
+			valid = false;
+		}
+		else if(INVALID_SPAWN_BLOCKS.contains(loc.clone().add(0, -1, 0).getBlock().getType())){
+			valid =false;
+		}
+
 		/*else{
-			for(Material notValid : INVALID_SPAWN_BLOCKS){
-				for(BlockFace face : faces){
-					//getting the block at land
-					if(loc.getBlock().getRelative(face).getType().equals(notValid) || loc.getBlock().getRelative(face).getType().equals(Material.AIR)){
-						valid=false;
-						break;
-					}
+			for(BlockFace face : faces){
+				//getting the block at land
+				if(INVALID_SPAWN_BLOCKS.contains(loc.clone().add(0, -1, 0).getBlock().getRelative(face).getType())){
+					MessageSender.broadcast("Check 1: " + loc.getBlock().getRelative(face).getType().toString());
+					valid=false;
+					break;
+				}
 
-					//getting the block above land
-					else if(!(loc.clone().add(0, 1, 0).getBlock().getRelative(face).getType().equals(Material.AIR))){
-						valid=false;
-						break;
-					}
+				//getting the block above land
+				else if(loc.clone().add(0, 0, 0).getBlock().getRelative(face).getType().isSolid()){
+					MessageSender.broadcast("Check 2: solid @ " + face.toString());
+					valid=false;
+					break;
+				}
 
-					//getting the block 2 above land
-					else if(!(loc.clone().add(0, 2, 0).getBlock().getRelative(face).getType().equals(Material.AIR))){
-						valid = false;
-						break;
-					}
+				//getting the block 2 above land
+				else if(loc.clone().add(0, 1, 0).getBlock().getRelative(face).getType().isSolid()){
+					MessageSender.broadcast("Check 3: solid @ " + face.toString());
+					valid = false;
+					break;
 				}
 			}
+
 		}*/
+
+
+
+
 
 		return valid;
 	}
@@ -372,9 +405,11 @@ public class ScatterManager implements Listener{
 	public void handleLateScatter(Player p){
 		if(teamM.isFFAEnabled()){
 			lateScatterAPlayerInFFA(p);
+			removePlayerFromLateScatters(p);
 		}
 		else if(teamM.isTeamsEnabled()){
 			lateScatterAPlayerInATeam(teamM.getTeamOfPlayer(p), p);
+			removePlayerFromLateScatters(p);
 		}
 	}
 	/**
@@ -383,8 +418,9 @@ public class ScatterManager implements Listener{
 	 */
 	private void lateScatterAPlayerInFFA(Player p){
 		Location location = locationsOfFFA.get(p.getUniqueId());
+		Location safeLocation = new Location(location.getWorld(), location.getBlockX(), location.getWorld().getHighestBlockYAt(location), location.getZ());
 		initializePlayer(p);
-		p.teleport(location);
+		p.teleport(safeLocation);
 	}
 
 	/**
@@ -394,7 +430,9 @@ public class ScatterManager implements Listener{
 	 */
 	private void lateScatterAPlayerInATeam(String team, Player p){
 		initializePlayer(p);
-		p.teleport(locationsOfTeamSpawn.get(team.toLowerCase()));
+		Location location = locationsOfTeamSpawn.get(team.toLowerCase());
+		Location safeLocation = new Location(location.getWorld(), location.getBlockX(), location.getWorld().getHighestBlockYAt(location), location.getZ());
+		p.teleport(safeLocation);
 	}
 	private void initializePlayer(Player p){
 		p.getInventory().clear();
@@ -458,7 +496,8 @@ public class ScatterManager implements Listener{
 			Material.STATIONARY_WATER, 
 			Material.CACTUS,
 			Material.LEAVES,
-			Material.LEAVES_2
+			Material.LEAVES_2,
+			Material.AIR
 			);
 
 	/**

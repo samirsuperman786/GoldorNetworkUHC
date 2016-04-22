@@ -2,13 +2,14 @@ package com.goldornetwork.uhc;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -21,13 +22,13 @@ import com.goldornetwork.uhc.listeners.MoveEvent;
 import com.goldornetwork.uhc.listeners.WeatherChange;
 import com.goldornetwork.uhc.listeners.team.TeamChat;
 import com.goldornetwork.uhc.managers.BoardManager;
-import com.goldornetwork.uhc.managers.ChunkGenerator;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.SpectatorRegionManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.VoteManager;
 import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
+import com.goldornetwork.uhc.managers.world.ChunkGenerator;
 import com.goldornetwork.uhc.managers.world.WorldFactory;
 import com.goldornetwork.uhc.managers.world.WorldManager;
 import com.goldornetwork.uhc.utils.AntiXray;
@@ -57,6 +58,10 @@ public class UHC extends JavaPlugin {
 	private BackGround backG;
 	private WorldFactory worldF;
 	private SpectatorRegionManager spectM;
+	private Runtime rt = Runtime.getRuntime();
+	private OperatingSystemMXBean compHandler = ManagementFactory.getOperatingSystemMXBean();
+	
+	private final static int fillMemoryTolerance = 500;
 	
 	public void instances(){
 		
@@ -75,7 +80,7 @@ public class UHC extends JavaPlugin {
 		
 		moveE= new MoveEvent(plugin, teamM);
 		
-		scatterM= new ScatterManager(plugin, teamM, moveE, backG, worldF);
+		scatterM= new ScatterManager(plugin, teamM, moveE, backG, worldF, chunkG);
 		
 		voteM = new VoteManager(plugin, gameModeM, teamM);
 		
@@ -166,17 +171,32 @@ public class UHC extends JavaPlugin {
 			
 			@Override
 			public void run() {
-				setup();
 				
+				setup();
+				for(World world: Bukkit.getWorlds()){
+					world.setAutoSave(false);
+				}
 			}
 		}.runTaskLater(plugin, 20L);
 		
 	}
+	public int AvailableMemory(){
+		return (int)((rt.maxMemory() - rt.totalMemory() + rt.freeMemory()) / 1048576);  // 1024*1024 = 1048576 (bytes in 1 MB)
+	}
 	
+	
+	public boolean availableMemoryTooLow(){
+
+		return AvailableMemory() < fillMemoryTolerance;
+	}
 
 
 	@Override
 	public void onDisable(){
+		for(World world: Bukkit.getWorlds()){
+			world.setAutoSave(false);
+			Bukkit.unloadWorld(world, false);
+		}
 		plugin=null;
 	}
 

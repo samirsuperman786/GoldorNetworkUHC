@@ -63,8 +63,10 @@ public class LandIsBad extends Gamemode implements Listener{
 								BukkitTask task = plugin.getServer().getScheduler().runTaskTimer(plugin, new Runnable(){
 									@Override
 									public void run() {
-										Bukkit.getServer().getPlayer(u).damage(2);
-										MessageSender.send(ChatColor.RED, Bukkit.getServer().getPlayer(u), "Get to water!");
+										if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
+											Bukkit.getServer().getPlayer(u).damage(2);
+											MessageSender.send(ChatColor.RED, Bukkit.getServer().getPlayer(u), "Get to water!");
+										}
 									}
 
 								}, 0L, 200L);
