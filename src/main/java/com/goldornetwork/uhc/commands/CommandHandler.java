@@ -15,17 +15,17 @@ import org.bukkit.entity.Player;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.commands.game.CancelCommand;
-import com.goldornetwork.uhc.commands.game.ChunkGenerateCommand;
 import com.goldornetwork.uhc.commands.game.StartCommand;
 import com.goldornetwork.uhc.commands.team.CreateCommand;
 import com.goldornetwork.uhc.commands.team.InvitePlayerCommand;
 import com.goldornetwork.uhc.commands.team.JoinCommand;
+import com.goldornetwork.uhc.commands.team.LeaveCommand;
 import com.goldornetwork.uhc.commands.team.UnInvitePlayerCommand;
 import com.goldornetwork.uhc.commands.team.VoteCommand;
-import com.goldornetwork.uhc.managers.ChunkGenerator;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.VoteManager;
+import com.goldornetwork.uhc.managers.world.ChunkGenerator;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 
@@ -147,8 +147,6 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 		//game
 		cmds.add(new StartCommand(timerM, teamM));
 		cmds.add(new CancelCommand(timerM));
-		cmds.add(new ChunkGenerateCommand(chunkG));
-	
 		
 		//team
 		cmds.add(new CreateCommand(teamM));
@@ -156,6 +154,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 		cmds.add(new JoinCommand(teamM));
 		cmds.add(new UnInvitePlayerCommand(teamM));
 		cmds.add(new VoteCommand(voteM));
+		cmds.add(new LeaveCommand(teamM));
 		
 		for(UHCCommand cmd : cmds){
 			PluginCommand pCmd = plugin.getCommand(cmd.getName());

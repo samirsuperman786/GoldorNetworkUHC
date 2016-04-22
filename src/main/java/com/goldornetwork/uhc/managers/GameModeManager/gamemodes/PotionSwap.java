@@ -3,6 +3,7 @@ package com.goldornetwork.uhc.managers.GameModeManager.gamemodes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -20,6 +21,7 @@ import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.google.common.collect.ImmutableSet;
 
 public class PotionSwap extends Gamemode implements Listener{
 
@@ -27,6 +29,7 @@ public class PotionSwap extends Gamemode implements Listener{
 	//instances
 	private UHC plugin;
 	private TeamManager teamM;
+	private Random random = new Random();
 	//storage
 	private List<UUID> latePotionPlayers = new ArrayList<UUID>();
 	
@@ -65,7 +68,7 @@ public class PotionSwap extends Gamemode implements Listener{
 			@Override
 			public void run() {
 				for(UUID u : teamM.getPlayersInGame()){
-					if(Bukkit.getServer().getPlayer(u).isOnline()){
+					if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
 						giveAPlayerARandomPotion(Bukkit.getServer().getPlayer(u));
 					}
 					else{
@@ -78,52 +81,38 @@ public class PotionSwap extends Gamemode implements Listener{
 	}
 	
 	private void giveAPlayerARandomPotion(Player p){
-		p.addPotionEffect(new PotionEffect(getRandomPotion(), 5980, 1));
+		for(PotionEffect effect : p.getActivePotionEffects()){
+			p.removePotionEffect(effect.getType());
+		}
+		p.addPotionEffect(new PotionEffect(getRandomPotion(), 6200, 0));
 		p.getWorld().playEffect(p.getLocation(), Effect.POTION_BREAK, 10);
 	}
 	public void removePlayerFromLateGive(Player p){
 		latePotionPlayers.remove(p.getUniqueId());
 	}
 	
+	private static final Set<PotionEffectType> ValidPotions = ImmutableSet.of(
+			PotionEffectType.BLINDNESS, 
+			PotionEffectType.CONFUSION,
+			PotionEffectType.DAMAGE_RESISTANCE,
+			PotionEffectType.FAST_DIGGING,
+			PotionEffectType.FIRE_RESISTANCE,
+			PotionEffectType.HUNGER,
+			PotionEffectType.JUMP,
+			PotionEffectType.NIGHT_VISION,
+			PotionEffectType.SLOW,
+			PotionEffectType.SLOW_DIGGING,
+			PotionEffectType.SPEED,
+			PotionEffectType.WATER_BREATHING,
+			PotionEffectType.WEAKNESS,
+			PotionEffectType.INVISIBILITY,
+			PotionEffectType.INCREASE_DAMAGE
+			);
 	private PotionEffectType getRandomPotion(){
-		Random random = new Random();
-		PotionEffectType potion = null;
-		switch(random.nextInt(15)){
-		
-		case 1: potion = PotionEffectType.BLINDNESS;
-				break;
-		case 2: potion = PotionEffectType.CONFUSION;
-				break;
-		case 3: potion = PotionEffectType.DAMAGE_RESISTANCE;
-				break;
-		case 4: potion = PotionEffectType.FAST_DIGGING;
-				break;
-		case 5: potion = PotionEffectType.FIRE_RESISTANCE;
-				break;
-		case 6: potion = PotionEffectType.HUNGER;
-				break;
-		case 7: potion = PotionEffectType.JUMP;
-				break;
-		case 8: potion = PotionEffectType.NIGHT_VISION;
-				break;
-		case 9: potion = PotionEffectType.SLOW;
-				break;
-		case 10: potion = PotionEffectType.SLOW_DIGGING;
-				break;
-		case 11: potion = PotionEffectType.SPEED;
-				break;
-		case 12: potion = PotionEffectType.WATER_BREATHING;
-				break;
-		case 13: potion = PotionEffectType.WEAKNESS;
-				break;
-		case 14: potion = PotionEffectType.INVISIBILITY;
-				break;
-		case 15: potion = PotionEffectType.INCREASE_DAMAGE;
-				break;
-		default: Bukkit.getServer().getLogger().info("Unexpected error at executing PotionSwap");
-		
-		}
-		return potion;
+		List<PotionEffectType> toReturn = new ArrayList<PotionEffectType>();
+		toReturn.addAll(ValidPotions);
+		int index = random.nextInt(toReturn.size());
+		return toReturn.get(index);
 	}
 	
 	

@@ -1,5 +1,6 @@
 name: GoldorNetworkUHC
 main: com.goldornetwork.uhc.UHC
+load: STARTUP
 author: g0ldmanpox
 description: This is property of GoldorNetwork.
 version: 1.1
@@ -17,6 +18,10 @@ commands:
       description: Use this to either join a team or join the FFA!
       usage: /<command> [team] 
       aliases: [j]
+   leave:
+      description: Use this to leave a team or the game!
+      usage: /<command> [option] 
+      aliases: [l]
    invite:
       description: Use this to invite a player to your team!
       usage: /<command> [player]  
@@ -30,4 +35,4 @@ commands:
       usage: /<command> [world] [radius]
    vote:
       description: Use this to vote for a poll!
-      usage: /<command> [option]        
+      usage: /<command> [option]     

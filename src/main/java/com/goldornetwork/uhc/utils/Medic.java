@@ -34,7 +34,7 @@ public class Medic implements Listener {
 			@Override
 			public void run() {
 				if(timeTillHeal == 0){
-					MessageSender.broadcast(ChatColor.GOLD + "All players have been healed.");
+					MessageSender.broadcast("All players have been healed.");
 					for(UUID u : teamM.getPlayersInGame()){
 						if(Bukkit.getOfflinePlayer(u).isOnline()){
 							Bukkit.getPlayer(u).setHealth(Bukkit.getPlayer(u).getMaxHealth());

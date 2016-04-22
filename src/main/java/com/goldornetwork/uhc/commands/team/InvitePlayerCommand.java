@@ -60,12 +60,12 @@ public class InvitePlayerCommand extends UHCCommand{
 			MessageSender.send(ChatColor.RED, p, "Player " + args[0].toLowerCase() + " is not online!");
 			return true;
 		}
-		else if(teamM.isPlayerInGame(Bukkit.getServer().getPlayer(args[0]))==true){
+		else if(teamM.isPlayerOnTeam(Bukkit.getPlayer(args[0]))){
 			MessageSender.send(ChatColor.RED, p, "Player " + args[0] + " is already on a team!");
 			return true;
 		}
 		else {
-			teamM.invitePlayer(p, Bukkit.getServer().getPlayer(args[0]));
+			teamM.invitePlayer(teamM.getTeamOfPlayer(p), Bukkit.getServer().getPlayer(args[0]));
 			MessageSender.alertMessage(Bukkit.getServer().getPlayer(args[0]), ChatColor.GREEN, "You have been invited to team " + teamM.getColorOfPlayer(p) + teamM.getTeamOfPlayer(p) + ChatColor.GREEN + " by " + teamM.getColorOfPlayer(p) + p.getName());
 			MessageSender.alertMessage(p, ChatColor.GREEN, "You have invited player " + Bukkit.getServer().getPlayer(args[0]).getName());
 			return true;

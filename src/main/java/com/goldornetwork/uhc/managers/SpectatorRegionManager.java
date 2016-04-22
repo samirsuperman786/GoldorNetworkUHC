@@ -28,10 +28,13 @@ public class SpectatorRegionManager implements Listener {
 	Location center;
 
 	public SpectatorRegionManager(UHC plugin, TeamManager teamM,ScatterManager scatterM) {
-		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.plugin=plugin;
 		this.teamM=teamM;
 		this.scatterM=scatterM;
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
+	}
+	
+	public void setup(){
 		center= scatterM.getCenter();
 	}
 	@EventHandler

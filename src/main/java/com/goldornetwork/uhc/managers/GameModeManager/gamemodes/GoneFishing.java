@@ -15,6 +15,7 @@ import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
@@ -83,7 +84,7 @@ public class GoneFishing extends Gamemode implements Listener {
 	}
 	private void distributeItems(){
 		for(UUID u : teamM.getPlayersInGame()){//INFINITE LEVELS, 20 ANVILS, FISHING ROD WITH LOFTS 250 & UNBREAKING 150, ENCHANT TABLES DISABLED
-			if(Bukkit.getServer().getPlayer(u).isOnline()){
+			if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
 				Player p = Bukkit.getServer().getPlayer(u);
 				giveAPlayerGoneFishingItems(p);
 				

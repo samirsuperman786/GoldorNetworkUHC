@@ -1,12 +1,15 @@
 package com.goldornetwork.uhc.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 import com.goldornetwork.uhc.UHC;
@@ -31,7 +34,7 @@ public class JoinEvent implements Listener{
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onJoin(PlayerJoinEvent e){
 		Player p = e.getPlayer();
-	
+		
 		if(teamM.isPlayerInGame(p)){
 			if(teamM.isTeamsEnabled()){
 				teamM.displayName(p, teamM.getTeamOfPlayer(p));
@@ -44,33 +47,36 @@ public class JoinEvent implements Listener{
 			p.setDisplayName(ChatColor.AQUA + "[Observer] " + p.getName()+ ChatColor.WHITE);
 		}
 		
+		if(State.getState().equals(State.OPEN)){
+			if(teamM.isPlayerInGame(p)==false){
+				if(teamM.isTeamsEnabled()){
+					MessageSender.alertMessage(p, ChatColor.RED, "You are currently not on a team! Use /create");
+				}
+				else if(teamM.isFFAEnabled()){
+					MessageSender.alertMessage(p, ChatColor.RED, "You are not in the FFA yet! Use /join");
+				}
+			}
+		}
 		if(State.getState().equals(State.OPEN) || State.getState().equals(State.NOT_RUNNING)){
 			for(PotionEffect effect : p.getActivePotionEffects()){
 				p.removePotionEffect(effect.getType());
 			}
-			if(!p.isOp()){
-				p.setGameMode(GameMode.ADVENTURE);
-			}
+			p.setMaxHealth(20);
+			p.setGameMode(GameMode.ADVENTURE);
+			p.setDisplayName(p.getName());
 			p.getInventory().clear();
+			p.setLevel(0);
+			p.setExp(0L);
+			p.getInventory().setArmorContents(null);
 			p.teleport(scatterM.getLobby().getSpawnLocation());
 			Medic.heal(p);
 		}
 		if(State.getState().equals(State.INGAME)|| State.getState().equals(State.SCATTER)){
 			if(teamM.isPlayerInGame(e.getPlayer())){
-				if(teamM.isFFAEnabled()){
 					if(scatterM.getLateScatters().contains(p.getUniqueId())){
-						scatterM.lateScatterAPlayerInFFA(p);
-						scatterM.removePlayerFromLateScatters(p);
-						MessageSender.send(ChatColor.GREEN, p, "You have been late scattered!");
+						scatterM.handleLateScatter(p);
 					}
-				}
-				else if(teamM.isTeamsEnabled()){
-					if(scatterM.getLateScatters().contains(p.getUniqueId())){
-						scatterM.lateScatterAPlayerInATeam(teamM.getTeamOfPlayer(p), p);
-						scatterM.removePlayerFromLateScatters(p);
-						MessageSender.send(ChatColor.GREEN, p, "You have been late scattered to your teams spawn!");
-					}
-				}
+				
 			}
 			else if(teamM.isPlayerInGame(e.getPlayer())==false){
 				if(p.getWorld().equals(scatterM.getUHCWorld())==false){
@@ -79,7 +85,10 @@ public class JoinEvent implements Listener{
 				if(teamM.isPlayerAnObserver(p)==false){
 					teamM.addPlayerToObservers(p);
 				}
-				MessageSender.send(ChatColor.AQUA, p, "You are now spectating the game");
+				else{
+					MessageSender.send(ChatColor.AQUA, p, "You are now spectating the game");
+				}
+				
 			}
 		}
 
