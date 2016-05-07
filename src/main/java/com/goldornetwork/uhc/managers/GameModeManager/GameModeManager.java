@@ -7,13 +7,17 @@ import java.util.Random;
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
+import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.BedBombs;
 import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.BlockRush;
+import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.Bows;
+import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.CutClean;
 import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.FlowerPower;
 import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.KillSwitch;
 import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.KingsManager;
 import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.LandIsBad;
 import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.PotionSwap;
 import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.RewardingLongshots;
+import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.RunBabyRun;
 import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.SkyHigh;
 import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.Switcheroo;
 import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.TheHobbitManager;
@@ -45,6 +49,7 @@ public class GameModeManager {
 		for(Gamemode game : getEnabledGamemodes()){
 			game.disable();
 		}
+		defaultGamemodes(teamM);
 		gamemodes.add(new BlockRush(scatterM));
 		gamemodes.add(new FlowerPower(teamM));
 		gamemodes.add(new KillSwitch());
@@ -55,7 +60,17 @@ public class GameModeManager {
 		gamemodes.add(new SkyHigh(plugin, teamM));
 		gamemodes.add(new Switcheroo(teamM));
 		gamemodes.add(new TheHobbitManager(teamM));
+		gamemodes.add(new BedBombs(teamM));
+		gamemodes.add(new Bows(teamM));
+		gamemodes.add(new RunBabyRun(plugin, teamM));
+	}
+	private void defaultGamemodes(TeamManager teamM){
+		List<Gamemode> toEnable = new ArrayList<Gamemode>();
+		toEnable.add(new CutClean(teamM));
 		
+		for(Gamemode game : toEnable){
+			game.enable(plugin);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
