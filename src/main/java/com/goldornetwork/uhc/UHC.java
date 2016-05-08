@@ -95,7 +95,7 @@ public class UHC extends JavaPlugin {
 		//cmds
 		cmd = new CommandHandler(plugin);
 		
-		cmd.registerCommands(teamM, timerM, chunkG, voteM);
+		cmd.registerCommands(teamM, timerM, gameModeM, chunkG, voteM);
 		
 		//listeners
 		

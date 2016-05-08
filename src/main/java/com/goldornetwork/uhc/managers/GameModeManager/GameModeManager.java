@@ -49,7 +49,9 @@ public class GameModeManager {
 		for(Gamemode game : getEnabledGamemodes()){
 			game.disable();
 		}
+		
 		defaultGamemodes(teamM);
+		
 		gamemodes.add(new BlockRush(scatterM));
 		gamemodes.add(new FlowerPower(teamM));
 		gamemodes.add(new KillSwitch());
@@ -82,7 +84,15 @@ public class GameModeManager {
 		}
 		return null;
 	}
-
+	
+	public Gamemode getGamemode(String name){
+		for(Gamemode game : gamemodes){
+			if(game.getName().equalsIgnoreCase(name)){
+				return game;
+			}
+		}
+		return null;
+	}
 
 	
 
