@@ -20,6 +20,7 @@ import com.goldornetwork.uhc.listeners.JoinEvent;
 import com.goldornetwork.uhc.listeners.LeaveEvent;
 import com.goldornetwork.uhc.listeners.MoveEvent;
 import com.goldornetwork.uhc.listeners.WeatherChange;
+import com.goldornetwork.uhc.listeners.team.ChatManager;
 import com.goldornetwork.uhc.listeners.team.TeamChat;
 import com.goldornetwork.uhc.managers.BoardManager;
 import com.goldornetwork.uhc.managers.ScatterManager;
@@ -55,7 +56,7 @@ public class UHC extends JavaPlugin {
 	private VoteManager voteM;
 	private Medic medic;
 	private WorldManager worldM;
-	private BackGround backG;
+	private ChatManager chatM;
 	private WorldFactory worldF;
 	private SpectatorRegionManager spectM;
 	private Runtime rt = Runtime.getRuntime();
@@ -68,7 +69,6 @@ public class UHC extends JavaPlugin {
 		//instances
 		worldF= new WorldFactory(plugin);
 		
-		backG = new BackGround(plugin);
 		
 		gameModeM= new GameModeManager(plugin);
 		
@@ -78,13 +78,15 @@ public class UHC extends JavaPlugin {
 		
 		teamM= new TeamManager(plugin, boardM);
 		
+		chatM = new ChatManager(plugin, teamM);
+		
 		moveE= new MoveEvent(plugin, teamM);
 		
-		scatterM= new ScatterManager(plugin, teamM, moveE, backG, worldF, chunkG);
+		scatterM= new ScatterManager(plugin, teamM, moveE, chatM, worldF, chunkG);
 		
 		voteM = new VoteManager(plugin, gameModeM, teamM);
 		
-		timerM = new TimerManager(plugin, scatterM, teamM, voteM, backG);
+		timerM = new TimerManager(plugin, scatterM, teamM, voteM, chatM);
 		
 		spectM = new SpectatorRegionManager(plugin, teamM, scatterM);
 		
@@ -100,6 +102,7 @@ public class UHC extends JavaPlugin {
 		//listeners
 		
 		new TeamChat(plugin, teamM);
+		new BackGround(plugin);
 		new DeathEvent(plugin, teamM, scatterM, worldM);
 		new JoinEvent(plugin, teamM, scatterM);
 		new LeaveEvent(plugin,teamM, scatterM);

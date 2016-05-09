@@ -22,14 +22,12 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
-import com.goldornetwork.uhc.listeners.BackGround;
 import com.goldornetwork.uhc.listeners.MoveEvent;
+import com.goldornetwork.uhc.listeners.team.ChatManager;
 import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.managers.world.ChunkGenerator;
@@ -46,7 +44,7 @@ public class ScatterManager implements Listener{
 	private UHC plugin;
 	private TeamManager teamM;
 	private MoveEvent moveE;
-	private BackGround backG;
+	private ChatManager chatM;
 	private WorldFactory worldF;
 	private ChunkGenerator chunkG;
 	//storage
@@ -67,11 +65,11 @@ public class ScatterManager implements Listener{
 	private List<String> nameOfTeams = new ArrayList<String>();
 	private List<UUID> FFAToScatter= new ArrayList<UUID>();
 
-	public ScatterManager(UHC plugin, TeamManager teamM, MoveEvent moveE, BackGround backG, WorldFactory worldF, ChunkGenerator chunkG) {
+	public ScatterManager(UHC plugin, TeamManager teamM, MoveEvent moveE, ChatManager chatM, WorldFactory worldF, ChunkGenerator chunkG) {
 		this.plugin=plugin;
 		this.teamM=teamM;
 		this.moveE=moveE;
-		this.backG=backG;
+		this.chatM=chatM;
 		this.worldF=worldF;
 		this.chunkG=chunkG;
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -513,7 +511,7 @@ public class ScatterManager implements Listener{
 				State.setState(State.INGAME);
 				moveE.unfreezePlayers();
 				MessageSender.broadcast("Scattering complete!");
-				backG.unMutePlayers();
+				chatM.unMutePlayers();
 				getUHCWorld().setGameRuleValue("doMobSpawning", "true");
 				getUHCWorld().setGameRuleValue("dodaylightcycle", "true");
 				getUHCWorld().setTime(0);

@@ -1,9 +1,12 @@
 package com.goldornetwork.uhc.managers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -34,6 +37,7 @@ public class TeamManager {
 	//instances
 	private UHC plugin;
 	private BoardManager boardM;
+	private Random random = new Random();
 	//storage
 	private int playersPerTeam;
 	private int MaxFFASize;
@@ -92,11 +96,8 @@ public class TeamManager {
 		ALPHA, BETA, GAMMA, DELTA, EPSILON, ZETA, ETA, THETA, IOTA, KAPPA, LAMBDA, MU, NU, XI, OMICRON, PI, RHO, SIGMA, TAU, UPSILON, PHI, CHI, PSI, OMEGA
 	}
 
-	public enum MODIFIERS{
-		WHITE, UNDERLINE, BOLD, ITALIC
-	}
 	public enum BASECOLORS{
-		BLACK, BLUE, BOLD, DARK_AQUA, DARK_BLUE, DARK_GRAY, DARK_GREEN, DARK_PURPLE, DARK_RED, GRAY, GREEN, LIGHT_PURPLE, YELLOW
+		BLUE, DARK_AQUA, DARK_BLUE, DARK_GRAY, DARK_PURPLE, DARK_RED, GRAY, LIGHT_PURPLE
 	}
 
 	/**
@@ -104,17 +105,11 @@ public class TeamManager {
 	 * @param numberOfTeams - the number of teams to create
 	 */
 	private void initializeT(){
-		List<String> colorsCombinations = new ArrayList<String>();
-		colorsCombinations.clear();
-		for(BASECOLORS colors : BASECOLORS.values()){
-			for(MODIFIERS modifier : MODIFIERS.values()){
-				colorsCombinations.add(ChatColor.valueOf(modifier.toString()).toString() + ChatColor.valueOf(colors.toString()).toString());
-			}
-		}
+		List<BASECOLORS> colorsCombinations = Arrays.asList(BASECOLORS.values());
 		int i = 0;
 		for(String team : plugin.getTeamConfig().getStringList("TEAM-NAMES")){
 			playersOnCurrentTeam.put(team.toString().toLowerCase(), 0);
-			this.colorOfTeam.put(team.toString().toLowerCase(), colorsCombinations.get(i));
+			this.colorOfTeam.put(team.toString().toLowerCase(), ChatColor.valueOf(colorsCombinations.get(random.nextInt(colorsCombinations.size())).toString()).toString());
 			i++;
 			if(i>=MaxTeams){
 				break;
@@ -227,7 +222,9 @@ public class TeamManager {
 		if(State.getState().equals(State.OPEN)){
 			disbandTeam(getTeamOfPlayer(p));
 		}
-
+		else{
+			removePlayerFromTeam(p);
+		}
 		ownerOfTeam.remove(p.getUniqueId());
 	}
 
@@ -462,10 +459,13 @@ public class TeamManager {
 	}
 	public String getColorOfPlayer(Player p){
 		if(isFFAEnabled){
-			return ChatColor.YELLOW.toString();
+			return isPlayerInGame(p) ? ChatColor.YELLOW.toString() : ChatColor.AQUA.toString();
 		}
 		else if(isTeamsEnabled){
-			return colorOfTeam.get(getTeamOfPlayer(p).toLowerCase());
+			return isPlayerOnTeam(p) ? colorOfTeam.get(getTeamOfPlayer(p).toLowerCase()) : ChatColor.AQUA.toString();
+		}
+		else if(isPlayerAnObserver(p)){
+			return ChatColor.AQUA.toString();
 		}
 		else{
 			return ChatColor.GRAY.toString();
@@ -531,10 +531,18 @@ public class TeamManager {
 		}
 		
 		for(UUID u : getPlayersOnATeam(team)){
+			if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
+				MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.RED, "Your team has been disbanded.");
+			}
 			removePlayerFromTeam(Bukkit.getServer().getOfflinePlayer(u));
 		}
 		ownerOfTeam.remove(owner);
 		boardM.removeTeam(team);
+	}
+	
+	public String getTeamNameProper(String team){
+		String output = team.substring(0, 1).toUpperCase() + team.toLowerCase().substring(1);
+		return output;
 	}
 	
 	/**
@@ -562,7 +570,7 @@ public class TeamManager {
 	 * @param team - the text to display in front of a players name
 	 */
 	public void displayName(Player p, String team){
-		p.setDisplayName(getColorOfPlayer(p) + "["  + team + "] " + p.getName() + ChatColor.WHITE);
+		p.setDisplayName(getColorOfPlayer(p) + "["  + getTeamNameProper(team) + "] " + ChatColor.RED + p.getName() + ChatColor.WHITE);
 	}
 
 

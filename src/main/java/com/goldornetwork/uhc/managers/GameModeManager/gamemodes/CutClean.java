@@ -18,7 +18,6 @@ import org.bukkit.inventory.ItemStack;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
-import com.sun.jna.platform.win32.WinNT.TOKEN_TYPE;
 
 public class CutClean extends Gamemode implements Listener{
 

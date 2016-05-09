@@ -26,10 +26,6 @@
 			<url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
 		</repository>
 
-		<repository>
-			<id>overcast-repo</id>
-			<url>https://repo.oc.tc/content/groups/public/</url>
-		</repository>
 	</repositories>
 
 
@@ -49,16 +45,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>tc.oc</groupId>
-			<artifactId>sportbukkit</artifactId>
-			<version>1.8.7-R0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>tc.oc</groupId>
-			<artifactId>sportbukkit-api</artifactId>
-			<version>1.8.7-R0.1-SNAPSHOT</version>
-		</dependency>
 	</dependencies>
 
 

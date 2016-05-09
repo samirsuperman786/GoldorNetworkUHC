@@ -46,7 +46,7 @@ public class SpectatorRegionManager implements Listener {
 				runTask();
 			}
 			
-		}, 0L, 20L);
+		}, 0L, 40L);
 	}
 	/**
 	 * Checks the region of spectators and teleports them if they are not inside of the world border
