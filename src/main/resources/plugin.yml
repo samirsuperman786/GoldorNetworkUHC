@@ -35,4 +35,7 @@ commands:
       usage: /<command> [world] [radius]
    vote:
       description: Use this to vote for a poll!
-      usage: /<command> [option]     
+      usage: /<command> [option] 
+   info:
+      description: Use this to learn the gamemodes!
+      usage: /<command> [gamemode] 

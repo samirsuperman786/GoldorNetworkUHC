@@ -11,7 +11,10 @@ public class MessageSender {
 	private static String getPrefix(){
 		return (ChatColor.GOLD + "[GN] ");
 	}
-
+	
+	public static void send(CommandSender sender, String msg){
+		sender.sendMessage(getPrefix() + msg);
+	}
 	public static void send(ChatColor cc, Player p, String msg){
 		p.sendMessage(getPrefix() + cc + msg);
 	}

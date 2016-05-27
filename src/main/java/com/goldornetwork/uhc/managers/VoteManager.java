@@ -11,13 +11,11 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
-import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.BlockRush;
 import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.KingsManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 import com.google.common.collect.ImmutableSet;
@@ -62,8 +60,8 @@ public class VoteManager {
 			List<Gamemode> toAdd = new ArrayList<Gamemode>();
 			toAdd.clear();
 			for(int i =0; i<AMOUNTTOENABLE; i++){
-				boolean matched = true;
-				while(matched){
+				boolean matched = false;
+				while(matched==false){
 					Gamemode game;
 					int index;
 					index = random.nextInt(gamemodeM.getNumberOfGamemodes()) ;
@@ -72,12 +70,13 @@ public class VoteManager {
 						index = random.nextInt(gamemodeM.getNumberOfGamemodes());
 						game = gamemodeM.getGameMode(gamemodeM.getGamemodes().get(index).getClass());
 					}
+					//TODO loop through options and check if selected gamemode is already an option
 					if(toAdd.contains(game)){
-						matched=true;
+						matched=false;
 					}
 					else{
 						toAdd.add(game);
-						matched = false;
+						matched = true;
 						break;
 					}
 				}

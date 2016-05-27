@@ -15,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
-import com.google.common.collect.ImmutableSet;
 
 public class BlockRush extends Gamemode implements Listener{
 

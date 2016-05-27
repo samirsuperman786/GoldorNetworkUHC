@@ -2,8 +2,7 @@ package com.goldornetwork.uhc.managers.world;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.lang.reflect.Field;
 import java.util.Random;
 import java.util.UUID;
 
@@ -18,7 +17,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldInitEvent;
 
 import com.goldornetwork.uhc.UHC;
-import com.goldornetwork.uhc.utils.MessageSender;
+
+import net.minecraft.server.v1_8_R3.BiomeBase;
 
 public class WorldFactory implements Listener{
 
@@ -26,7 +26,7 @@ public class WorldFactory implements Listener{
 	private File dir;
 	private World Lobby;
 	private Random random = new Random();
-	private ArrayList<String> ignore = new ArrayList<String>(Arrays.asList("session.dat", "session.lock"));
+	//private ArrayList<String> ignore = new ArrayList<String>(Arrays.asList("session.dat", "session.lock"));
 	
 	public WorldFactory(UHC plugin) {
 		this.plugin=plugin;
@@ -92,6 +92,33 @@ public class WorldFactory implements Listener{
 		creator.type(WorldType.NORMAL);
 		creator.seed(random.nextLong());
 		creator.generateStructures(true);
+		Field biomesField = null;
+		try {
+			biomesField = BiomeBase.class.getDeclaredField("biomes");
+		} catch (NoSuchFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		biomesField.setAccessible(true);
+
+		try {
+			if (biomesField.get(null) instanceof BiomeBase[]) {
+			    BiomeBase[] biomes = (BiomeBase[]) biomesField.get(null);
+			    biomes[BiomeBase.DEEP_OCEAN.id] = BiomeBase.PLAINS;
+			    biomes[BiomeBase.OCEAN.id] = BiomeBase.FOREST;
+
+			    biomesField.set(null, biomes);
+			}
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		World world = Bukkit.createWorld(creator);
 		world.setSpawnLocation(0, world.getHighestBlockYAt(0, 0), 0);
 		world.setAutoSave(false);

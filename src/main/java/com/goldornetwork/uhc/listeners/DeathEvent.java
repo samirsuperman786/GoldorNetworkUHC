@@ -11,7 +11,6 @@ import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.managers.world.WorldManager;
-import com.goldornetwork.uhc.utils.MessageSender;
 
 public class DeathEvent implements Listener {
 
@@ -38,19 +37,12 @@ public class DeathEvent implements Listener {
 			if(teamM.getOwnerOfTeam(teamM.getTeamOfPlayer(p)).equals(p.getUniqueId())){
 				teamM.removePlayerFromOwner(p);
 			}
-			teamM.removePlayerFromTeam(p);
-			if(teamM.getActiveTeams().size()==1){
-				worldM.endGame(teamM.getPlayersOnATeam(teamM.getActiveTeams().get(0)));
+			else{
+				teamM.removePlayerFromTeam(p);
 			}
 		}
 		else if(teamM.isFFAEnabled()){
 			teamM.removePlayerFromFFA(p);
-			if(teamM.getPlayersInGame().size()==1){
-				worldM.endGame(teamM.getPlayersInGame());
-			}
-			else if(teamM.getPlayersInGame().size()<1){
-				worldM.endGame();
-			}
 		}
 		
 	}

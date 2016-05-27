@@ -64,19 +64,18 @@ public class LeaveCommand extends UHCCommand{
 			else{
 				return false;
 			}
-			
+
 		}
 		else{
 			return false;
 		}
-		
+
 	}
 
 	@Override
 	public List<String> tabComplete(CommandSender sender, String[] args) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	
+
 }

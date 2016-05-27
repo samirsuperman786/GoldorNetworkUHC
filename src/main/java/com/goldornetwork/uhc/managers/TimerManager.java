@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
-import com.goldornetwork.uhc.listeners.BackGround;
+import com.goldornetwork.uhc.listeners.team.ChatManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.PVPEnableEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
@@ -18,7 +18,7 @@ public class TimerManager {
 	private ScatterManager scatterM;
 	private TeamManager teamM;
 	private VoteManager voteM;
-	private BackGround backG;
+	private ChatManager chatM;
 
 	//storage
 	private int timeTillMatchStart;
@@ -28,12 +28,12 @@ public class TimerManager {
 	private boolean isPVPEnabled;
 
 
-	public TimerManager(UHC plugin, ScatterManager scatterM, TeamManager teamM, VoteManager voteM, BackGround backG) {
+	public TimerManager(UHC plugin, ScatterManager scatterM, TeamManager teamM, VoteManager voteM, ChatManager chatM) {
 		this.plugin=plugin;
 		this.scatterM=scatterM;
 		this.teamM=teamM;
 		this.voteM=voteM;
-		this.backG=backG;
+		this.chatM=chatM;
 	}
 
 	/**
@@ -67,7 +67,7 @@ public class TimerManager {
 		State.setState(State.OPEN);
 		isPVPEnabled= false;
 		matchStart = true;
-		backG.mutePlayers();
+		chatM.mutePlayers();
 		countdownTimer();
 		voteTimer();
 	}

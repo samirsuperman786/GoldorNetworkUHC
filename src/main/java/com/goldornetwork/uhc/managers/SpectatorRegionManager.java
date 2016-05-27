@@ -12,8 +12,6 @@ import org.bukkit.util.Vector;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
-import com.goldornetwork.uhc.managers.GameModeManager.State;
-import com.goldornetwork.uhc.utils.MessageSender;
 
 public class SpectatorRegionManager implements Listener {
 
@@ -46,7 +44,7 @@ public class SpectatorRegionManager implements Listener {
 				runTask();
 			}
 			
-		}, 0L, 20L);
+		}, 0L, 40L);
 	}
 	/**
 	 * Checks the region of spectators and teleports them if they are not inside of the world border

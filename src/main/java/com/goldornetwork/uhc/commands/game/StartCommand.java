@@ -42,6 +42,7 @@ public class StartCommand extends UHCCommand{
 				else{
 					teamM.setupTeams(teamSize);
 					MessageSender.broadcast("Teams have been enabled with a size of " + ChatColor.GRAY + teamSize + ChatColor.GOLD + " players per team!");
+					
 				}
 				timerM.startMatch();
 				return true;
