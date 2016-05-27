@@ -21,7 +21,7 @@ import com.goldornetwork.uhc.listeners.LeaveEvent;
 import com.goldornetwork.uhc.listeners.MoveEvent;
 import com.goldornetwork.uhc.listeners.WeatherChange;
 import com.goldornetwork.uhc.listeners.team.ChatManager;
-import com.goldornetwork.uhc.listeners.team.TeamChat;
+import com.goldornetwork.uhc.listeners.team.TeamInteraction;
 import com.goldornetwork.uhc.managers.BoardManager;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.SpectatorRegionManager;
@@ -101,7 +101,7 @@ public class UHC extends JavaPlugin {
 		
 		//listeners
 		
-		new TeamChat(plugin, teamM);
+		new TeamInteraction(teamM);
 		new BackGround(plugin);
 		new DeathEvent(plugin, teamM, scatterM, worldM);
 		new JoinEvent(plugin, teamM, scatterM);
@@ -115,7 +115,6 @@ public class UHC extends JavaPlugin {
 	private void setup(){
 		worldF.setup();
 		teamM.setup();
-		boardM.setup(teamM);
 		timerM.setup();
 		moveE.setup();
 		voteM.setup();
@@ -123,6 +122,7 @@ public class UHC extends JavaPlugin {
 		gameModeM.setupGamemodes(teamM, scatterM);
 		scatterM.setup();
 		spectM.setup();
+		boardM.setup(teamM, scatterM);
 	}
 
 	private void createConfig() {

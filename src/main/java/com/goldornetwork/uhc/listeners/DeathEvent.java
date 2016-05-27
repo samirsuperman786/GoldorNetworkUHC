@@ -11,7 +11,6 @@ import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.managers.world.WorldManager;
-import com.goldornetwork.uhc.utils.MessageSender;
 
 public class DeathEvent implements Listener {
 

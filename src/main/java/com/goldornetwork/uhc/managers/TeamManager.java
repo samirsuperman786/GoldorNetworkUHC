@@ -2,7 +2,6 @@ package com.goldornetwork.uhc.managers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,15 +15,10 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
-import org.bukkit.scoreboard.Team;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.utils.MessageSender;
-
-import net.minecraft.server.v1_8_R3.PlayerList;
 
 
 
@@ -455,7 +449,7 @@ public class TeamManager {
 		p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
 		p.setDisplayName(ChatColor.AQUA + "[Observer] " + p.getName()+ ChatColor.WHITE);
 		MessageSender.send(ChatColor.AQUA, p, "You are now spectating.");
-		
+		boardM.addPlayerToObserver(p);
 	}
 	public String getColorOfPlayer(Player p){
 		if(isFFAEnabled){

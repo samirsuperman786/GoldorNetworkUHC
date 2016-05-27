@@ -11,13 +11,11 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
-import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.BlockRush;
 import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.KingsManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 import com.google.common.collect.ImmutableSet;

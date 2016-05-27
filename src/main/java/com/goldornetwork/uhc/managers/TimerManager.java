@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
-import com.goldornetwork.uhc.listeners.BackGround;
 import com.goldornetwork.uhc.listeners.team.ChatManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.PVPEnableEvent;

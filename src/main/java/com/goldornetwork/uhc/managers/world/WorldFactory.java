@@ -3,8 +3,6 @@ package com.goldornetwork.uhc.managers.world;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.UUID;
 
@@ -17,7 +15,6 @@ import org.bukkit.WorldType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldInitEvent;
-import org.bukkit.generator.ChunkGenerator;
 
 import com.goldornetwork.uhc.UHC;
 
@@ -29,7 +26,7 @@ public class WorldFactory implements Listener{
 	private File dir;
 	private World Lobby;
 	private Random random = new Random();
-	private ArrayList<String> ignore = new ArrayList<String>(Arrays.asList("session.dat", "session.lock"));
+	//private ArrayList<String> ignore = new ArrayList<String>(Arrays.asList("session.dat", "session.lock"));
 	
 	public WorldFactory(UHC plugin) {
 		this.plugin=plugin;

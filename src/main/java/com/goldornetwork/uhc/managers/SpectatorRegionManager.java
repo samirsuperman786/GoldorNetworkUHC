@@ -12,8 +12,6 @@ import org.bukkit.util.Vector;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
-import com.goldornetwork.uhc.managers.GameModeManager.State;
-import com.goldornetwork.uhc.utils.MessageSender;
 
 public class SpectatorRegionManager implements Listener {
 

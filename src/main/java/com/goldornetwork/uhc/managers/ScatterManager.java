@@ -111,7 +111,8 @@ public class ScatterManager implements Listener{
 			}
 		}
 		chunkG.generate(getUHCWorld(), getCenter(), radius);
-
+		
+		
 	}
 
 	@EventHandler
@@ -208,6 +209,7 @@ public class ScatterManager implements Listener{
 						scatterTeams();
 					}
 					cancel();
+					
 				}
 				else{
 					getUHCWorld().loadChunk(loc.get(timer).getBlockX(), loc.get(timer).getBlockZ(), true);
@@ -246,6 +248,7 @@ public class ScatterManager implements Listener{
 					else{
 						for(UUID u : teamToScatter.get(nameOfTeams.get(timer))){
 							Location location = locationsOfTeamSpawn.get(nameOfTeams.get(timer)).clone();
+							location.getChunk().load(true);
 							Location safeLocation = new Location(location.getWorld(), location.getBlockX(), location.getWorld().getHighestBlockYAt(location), location.getZ());
 							OfflinePlayer p = Bukkit.getOfflinePlayer(u);
 							if(p.isOnline()==false){
