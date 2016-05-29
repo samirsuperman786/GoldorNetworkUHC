@@ -41,9 +41,6 @@ public class DeathEvent implements Listener {
 				teamM.removePlayerFromTeam(p);
 			}
 		}
-		else if(teamM.isFFAEnabled()){
-			teamM.removePlayerFromFFA(p);
-		}
 		
 	}
 

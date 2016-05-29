@@ -14,7 +14,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.commands.CommandHandler;
-import com.goldornetwork.uhc.listeners.BackGround;
 import com.goldornetwork.uhc.listeners.DeathEvent;
 import com.goldornetwork.uhc.listeners.JoinEvent;
 import com.goldornetwork.uhc.listeners.LeaveEvent;
@@ -48,6 +47,7 @@ public class UHC extends JavaPlugin {
 	private GameModeManager gameModeM;
 	private TeamManager teamM;
 	private TimerManager timerM;
+	private TeamInteraction teamI;
 	private BoardManager boardM;
 	private ChunkGenerator chunkG;
 	private ScatterManager scatterM;
@@ -90,19 +90,19 @@ public class UHC extends JavaPlugin {
 		
 		spectM = new SpectatorRegionManager(plugin, teamM, scatterM);
 		
-		worldM = new WorldManager(plugin, scatterM);
+		worldM = new WorldManager(plugin, scatterM, teamM);
 		
 		medic= new Medic(plugin, teamM);
 		
+		teamI = new TeamInteraction(teamM);
 		//cmds
 		cmd = new CommandHandler(plugin);
 		
-		cmd.registerCommands(teamM, timerM, gameModeM, chunkG, voteM);
+		cmd.registerCommands(teamM, timerM, gameModeM, chunkG, voteM, teamI);
 		
 		//listeners
 		
 		new TeamInteraction(teamM);
-		new BackGround(plugin);
 		new DeathEvent(plugin, teamM, scatterM, worldM);
 		new JoinEvent(plugin, teamM, scatterM);
 		new LeaveEvent(plugin,teamM, scatterM);

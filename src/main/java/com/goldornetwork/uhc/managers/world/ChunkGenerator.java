@@ -102,7 +102,14 @@ public class ChunkGenerator {
 								}
 							}
 							world.loadChunk(x, z, true);
+							boolean isXPos= x >= 0;
+							boolean isZPos= z >= 0;
+							int popX = isXPos ? x-16 : x+16;
+							int popZ = isZPos ? z-16 : z+16;
+							world.loadChunk(popX, popZ, false);
+							
 							storedChunks.add(new CoordXZ(x, z));
+							storedChunks.add(new CoordXZ(popX, popZ));
 							
 							while(storedChunks.size()>8){
 								CoordXZ coord = storedChunks.remove(0);

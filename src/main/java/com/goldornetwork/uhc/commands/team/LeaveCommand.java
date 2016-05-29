@@ -38,12 +38,7 @@ public class LeaveCommand extends UHCCommand{
 				return true;
 			}
 			else if(State.getState().equals(State.OPEN)){
-				if(teamM.isFFAEnabled()){
-					teamM.removePlayerFromFFA(p);
-					MessageSender.send(ChatColor.GOLD, p, "You have left the FFA!");
-					return true;
-				}
-				else if(teamM.isTeamsEnabled()){
+				if(teamM.isTeamsEnabled()){
 					if(teamM.isPlayerOwner(p)){
 						teamM.removePlayerFromOwner(p);
 					}

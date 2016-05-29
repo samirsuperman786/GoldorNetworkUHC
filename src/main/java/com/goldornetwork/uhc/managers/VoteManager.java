@@ -87,19 +87,9 @@ public class VoteManager {
 	}
 	private boolean isValid(Gamemode game){
 		boolean valid = true;
-		if(teamM.isFFAEnabled()){
-			for(Class<?> gameClass : INCOMPATABLE_WITH_FFA){
-				if(game.equals(gamemodeM.getGameMode(gameClass))){
-					valid=false;
-					break;
-				}
-			}
-		}
 		return valid;
 	}
-	private static final Set<Class<?>> INCOMPATABLE_WITH_FFA = ImmutableSet.of(
-			KingsManager.class
-			);
+	
 	
 	public List<List<Gamemode>> getOptions(){
 		return options;

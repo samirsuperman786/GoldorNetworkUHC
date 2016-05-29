@@ -36,9 +36,6 @@ public class JoinEvent implements Listener{
 			if(teamM.isTeamsEnabled()){
 				teamM.displayName(p, teamM.getTeamOfPlayer(p));
 			}
-			else if(teamM.isFFAEnabled()){
-				teamM.displayName(p, "FFA");
-			}
 		}
 		else if(teamM.isPlayerAnObserver(p)){
 			p.setDisplayName(ChatColor.AQUA + "[Observer] " + p.getName()+ ChatColor.WHITE);
@@ -48,9 +45,6 @@ public class JoinEvent implements Listener{
 			if(teamM.isPlayerInGame(p)==false){
 				if(teamM.isTeamsEnabled()){
 					MessageSender.alertMessage(p, ChatColor.RED, "You are currently not on a team! Use /create");
-				}
-				else if(teamM.isFFAEnabled()){
-					MessageSender.alertMessage(p, ChatColor.RED, "You are not in the FFA yet! Use /join");
 				}
 			}
 		}
@@ -68,26 +62,7 @@ public class JoinEvent implements Listener{
 			p.teleport(scatterM.getLobby().getSpawnLocation());
 			Medic.heal(p);
 		}
-		if(State.getState().equals(State.INGAME)|| State.getState().equals(State.SCATTER)){
-			if(teamM.isPlayerInGame(e.getPlayer())){
-					if(scatterM.getLateScatters().contains(p.getUniqueId())){
-						scatterM.handleLateScatter(p);
-					}
-				
-			}
-			else if(teamM.isPlayerInGame(e.getPlayer())==false){
-				if(p.getWorld().equals(scatterM.getUHCWorld())==false){
-					p.teleport(scatterM.getUHCWorld().getSpawnLocation());
-				}
-				if(teamM.isPlayerAnObserver(p)==false){
-					teamM.addPlayerToObservers(p);
-				}
-				else{
-					MessageSender.send(ChatColor.AQUA, p, "You are now spectating the game");
-				}
-				
-			}
-		}
+		
 
 	}
 

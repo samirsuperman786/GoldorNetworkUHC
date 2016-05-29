@@ -1,8 +1,8 @@
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\listeners\MoveEvent.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\team\JoinCommand.java
+E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\listeners\team\TeamInteraction.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\UHCCommand.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\utils\Parser.java
-E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\listeners\BackGround.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\team\VoteCommand.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\GameModeManager.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\utils\PlayerUtils.java
@@ -17,13 +17,14 @@ E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\team\InfoCommand.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\utils\CombatLog.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\CommandHandler.java
+E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\team\PMCoordsCommand.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\gamemodes\RewardingLongshots.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\State.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\gamemodes\Bows.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\WorldFactory.java
-E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\listeners\team\TeamChat.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\PVPEnableEvent.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\team\CreateCommand.java
+E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\team\TeamChatCommand.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\listeners\team\ChatManager.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\listeners\WeatherChange.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\VoteManager.java

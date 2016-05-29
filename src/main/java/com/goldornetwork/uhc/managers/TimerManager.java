@@ -52,9 +52,10 @@ public class TimerManager {
 		plugin.getConfig().addDefault("TIME-TILL-PVP-START", 40);
 		plugin.getConfig().addDefault("TIME-TILL-VOTE-END", 5);
 		plugin.saveConfig();
-		this.timeTillMatchStart = (plugin.getConfig().getInt("TIME-TILL-MATCH-START")*60);
+		//TODO multiply by 60
+		this.timeTillMatchStart = (plugin.getConfig().getInt("TIME-TILL-MATCH-START")*30);
 		this.timeTillPVPStart = (plugin.getConfig().getInt("TIME-TILL-PVP-START")*60);
-		this.timeTillVote = (plugin.getConfig().getInt("TIME-TILL-VOTE-END")*60);
+		this.timeTillVote = (plugin.getConfig().getInt("TIME-TILL-VOTE-END")*30);
 	}
 
 	/**
@@ -134,25 +135,21 @@ public class TimerManager {
 
 				}
 				else if(timeTillMatchStart == 0){
-					
-						MessageSender.broadcast("Match has started!");
-						State.setState(State.SCATTER);
 
-						if(teamM.isFFAEnabled()){
-							scatterM.enableFFA();
+					MessageSender.broadcast("Match has started!");
+					State.setState(State.SCATTER);
+					if(teamM.isTeamsEnabled()){
+						scatterM.enableTeams();
+					}
+					for(Player all : Bukkit.getServer().getOnlinePlayers()){
+						if(teamM.isPlayerInGame(all)==false){
+							teamM.addPlayerToObservers(all);
+							all.teleport(scatterM.getCenter());
 						}
-						else if(teamM.isTeamsEnabled()){
-							scatterM.enableTeams();
-						}
-						for(Player all : Bukkit.getServer().getOnlinePlayers()){
-							if(teamM.isPlayerInGame(all)==false){
-								teamM.addPlayerToObservers(all);
-								all.teleport(scatterM.getCenter());
-							}
-						}
-						pvpTimer();
-						cancel();
-					
+					}
+					pvpTimer();
+					cancel();
+
 				}
 
 				else if(timeTillMatchStart==-1){

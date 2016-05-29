@@ -34,9 +34,7 @@ public class TeamManager {
 	private Random random = new Random();
 	//storage
 	private int playersPerTeam;
-	private int MaxFFASize;
 	private int MaxTeams;
-	private boolean isFFAEnabled;
 	private boolean isTeamsEnabled;
 
 	private List<UUID> playersInGame = new ArrayList<UUID>();
@@ -59,7 +57,6 @@ public class TeamManager {
 	 */
 	public void setup(){
 		config();
-		isFFAEnabled=false;
 		isTeamsEnabled=false;
 		playersInGame.clear();
 		observers.clear();
@@ -76,12 +73,10 @@ public class TeamManager {
 		for(TEAMS team : TEAMS.values()){
 			toADD.add(team.toString());
 		}
-		plugin.getConfig().addDefault("MAX-FFA-SIZE", 100);
 		plugin.getConfig().addDefault("MAX-TEAMS", 24);
 		plugin.getTeamConfig().addDefault("TEAM-NAMES", toADD);
 		plugin.saveTeamConfig();
 		plugin.saveConfig();
-		this.MaxFFASize=plugin.getConfig().getInt("MAX-FFA-SIZE");
 		this.MaxTeams=plugin.getConfig().getInt("MAX-TEAMS");
 	}
 
@@ -114,12 +109,6 @@ public class TeamManager {
 
 
 
-	/**
-	 * Sets up FFA
-	 */
-	public void setupFFA(){
-		isFFAEnabled = true;
-	}
 
 	/**
 	 * Sets up teams with a give team size
@@ -132,13 +121,6 @@ public class TeamManager {
 		
 	}
 
-	/**
-	 * Checks if FFA is enabled
-	 * @return <code> True </code> if FFA is enabled
-	 */
-	public boolean isFFAEnabled(){
-		return isFFAEnabled;
-	}
 
 	/**
 	 * Checks if teams are enabled
@@ -146,20 +128,6 @@ public class TeamManager {
 	 */
 	public boolean isTeamsEnabled(){
 		return isTeamsEnabled;
-	}
-
-
-	/**
-	 * Checks if there is room in the FFA to join
-	 * @return <code> True </code> if there is room to join
-	 */
-	public boolean isFFARoomToJoin(){
-		if((MaxFFASize-playersInGame.size())>0){
-			return true;
-		}
-		else{
-			return false;
-		}
 	}
 
 	/**
@@ -177,14 +145,6 @@ public class TeamManager {
 	}
 
 	/**
-	 * Adds a given player to the FFA
-	 * @param p the player to add to FFA
-	 */
-	public void addPlayerToFFA(Player p){
-		playersInGame.add(p.getUniqueId());
-		displayName(p, "FFA");
-	}
-	/**
 	 * Checks if a given player is in game
 	 * @param p the player to check 
 	 * @return <code> True </code> if the player is in game
@@ -199,14 +159,6 @@ public class TeamManager {
 
 	}
 
-	/**
-	 * Removes a player from the FFA
-	 * @param p the player to remove
-	 */
-	public void removePlayerFromFFA(Player p){
-		playersInGame.remove(p.getUniqueId());
-		p.setDisplayName(p.getName());
-	}
 
 	/**
 	 * Removes a player from the status of owner and cancels invitations
@@ -397,9 +349,12 @@ public class TeamManager {
 	 * @param target - the person to un-invite
 	 */
 	public void unInvitePlayer(String team, OfflinePlayer target){
-		if(invitedPlayers.get(team).contains(target.getUniqueId())){
-			invitedPlayers.get(team).remove(target.getUniqueId());
+		if(invitedPlayers.containsKey(team)){
+			if(invitedPlayers.get(team).contains(target.getUniqueId())){
+				invitedPlayers.get(team).remove(target.getUniqueId());
+			}
 		}
+		
 	}
 
 
@@ -452,10 +407,7 @@ public class TeamManager {
 		boardM.addPlayerToObserver(p);
 	}
 	public String getColorOfPlayer(Player p){
-		if(isFFAEnabled){
-			return isPlayerInGame(p) ? ChatColor.YELLOW.toString() : ChatColor.AQUA.toString();
-		}
-		else if(isTeamsEnabled){
+		if(isTeamsEnabled){
 			return isPlayerOnTeam(p) ? colorOfTeam.get(getTeamOfPlayer(p).toLowerCase()) : ChatColor.AQUA.toString();
 		}
 		else if(isPlayerAnObserver(p)){
@@ -518,7 +470,7 @@ public class TeamManager {
 		if(invitedPlayers.containsKey(team)){
 			for(UUID u: invitedPlayers.get(team)){
 				if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
-					MessageSender.alertMessage(Bukkit.getServer().getPlayer(u),ChatColor.RED, "Your invitation to team " + getColorOfTeam(team) + " has been revoked!");
+					MessageSender.alertMessage(Bukkit.getServer().getPlayer(u),ChatColor.RED, "Your invitation to team " + getColorOfTeam(team) + getTeamNameProper(team) + " has been revoked!");
 				}
 			}
 			invitedPlayers.remove(team);

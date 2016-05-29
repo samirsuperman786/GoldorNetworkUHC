@@ -15,7 +15,7 @@ commands:
       description: Use this to create a team!
       usage: /<command> 
    join:
-      description: Use this to either join a team or join the FFA!
+      description: Use this to either join a team!
       usage: /<command> [team] 
       aliases: [j]
    leave:
@@ -30,12 +30,16 @@ commands:
       description: Use this to uninvite a player to your team!
       usage: /<command> [player]
       aliases: [ui] 
-   render:
-      description: Use this to render the world!
-      usage: /<command> [world] [radius]
    vote:
       description: Use this to vote for a poll!
       usage: /<command> [option] 
    info:
       description: Use this to learn the gamemodes!
       usage: /<command> [gamemode] 
+   pmc:
+      description: Use this to message your coordinates!
+      usage: /<command>
+   team:
+      description: Use this to only talk to your team!
+      usage: /<command> [message]
+      aliases: [t] 

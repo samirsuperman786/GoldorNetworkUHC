@@ -32,12 +32,6 @@ public class InvitePlayerCommand extends UHCCommand{
 			MessageSender.noConsole(sender);
 			return true;
 		}
-
-		else if(teamM.isFFAEnabled()==true){
-			MessageSender.send(ChatColor.RED, p, "Teams are not enabled!");
-			return true;
-		}
-
 		else if(State.getState().equals(State.INGAME)){
 			MessageSender.send(ChatColor.RED, p, "Match has already started!");
 			return true;
@@ -66,7 +60,7 @@ public class InvitePlayerCommand extends UHCCommand{
 		}
 		else {
 			teamM.invitePlayer(teamM.getTeamOfPlayer(p), Bukkit.getServer().getPlayer(args[0]));
-			MessageSender.alertMessage(Bukkit.getServer().getPlayer(args[0]), ChatColor.GREEN, "You have been invited to team " + teamM.getColorOfPlayer(p) + teamM.getTeamOfPlayer(p) + ChatColor.GREEN + " by " + teamM.getColorOfPlayer(p) + p.getName());
+			MessageSender.alertMessage(Bukkit.getServer().getPlayer(args[0]), ChatColor.GREEN, "You have been invited to team " + teamM.getColorOfPlayer(p) + teamM.getTeamNameProper(teamM.getTeamOfPlayer(p)) + ChatColor.GREEN + " by " + teamM.getColorOfPlayer(p) + p.getName());
 			MessageSender.alertMessage(p, ChatColor.GREEN, "You have invited player " + Bukkit.getServer().getPlayer(args[0]).getName());
 			return true;
 		}

@@ -17,7 +17,7 @@ public class StartCommand extends UHCCommand{
 	//instances
 	private TimerManager timerM;
 	private TeamManager teamM;
-	
+
 	public StartCommand(TimerManager timerM, TeamManager teamM) {
 		super("start", "[Teamsize]");
 		this.timerM=timerM;
@@ -27,7 +27,7 @@ public class StartCommand extends UHCCommand{
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		//TODO work on easier start implementation
-		
+
 		if(!State.getState().equals(State.NOT_RUNNING)){
 			MessageSender.send(ChatColor.RED, sender, "Match has already started!");
 			return true;
@@ -35,15 +35,11 @@ public class StartCommand extends UHCCommand{
 		else if(args.length==1){
 			if(Parser.isInt(args[0])){
 				int teamSize = Integer.valueOf(args[0]);
-				if(teamSize==1){
-					teamM.setupFFA();
-					MessageSender.broadcast("FFA has been enabled!");
-				}
-				else{
-					teamM.setupTeams(teamSize);
-					MessageSender.broadcast("Teams have been enabled with a size of " + ChatColor.GRAY + teamSize + ChatColor.GOLD + " players per team!");
-					
-				}
+
+				teamM.setupTeams(teamSize);
+				MessageSender.broadcast("Teams have been enabled with a size of " + ChatColor.GRAY + teamSize + ChatColor.GOLD + " players per team!");
+
+
 				timerM.startMatch();
 				return true;
 			}
@@ -54,7 +50,7 @@ public class StartCommand extends UHCCommand{
 		else{
 			return false;
 		}
-		
+
 	}
 
 	@Override

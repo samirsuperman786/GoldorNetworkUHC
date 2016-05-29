@@ -18,6 +18,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.block.BlockFace;
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,6 +35,8 @@ import com.goldornetwork.uhc.managers.world.ChunkGenerator;
 import com.goldornetwork.uhc.managers.world.WorldFactory;
 import com.goldornetwork.uhc.utils.MessageSender;
 import com.google.common.collect.ImmutableSet;
+
+import net.minecraft.server.v1_8_R3.MinecraftServer;
 
 
 public class ScatterManager implements Listener{
@@ -60,10 +63,8 @@ public class ScatterManager implements Listener{
 	private List<Chunk> chunksToKeepLoaded = new ArrayList<Chunk>();
 	private Map<String, List<UUID>> teamToScatter = new HashMap<String, List<UUID>>();
 	private Map<String, Location> locationsOfTeamSpawn = new HashMap<String, Location>();
-	private Map<UUID, Location> locationsOfFFA = new HashMap<UUID, Location>();
 	private List<UUID> lateScatters = new ArrayList<UUID>();
 	private List<String> nameOfTeams = new ArrayList<String>();
-	private List<UUID> FFAToScatter= new ArrayList<UUID>();
 
 	public ScatterManager(UHC plugin, TeamManager teamM, MoveEvent moveE, ChatManager chatM, WorldFactory worldF, ChunkGenerator chunkG) {
 		this.plugin=plugin;
@@ -111,8 +112,8 @@ public class ScatterManager implements Listener{
 			}
 		}
 		chunkG.generate(getUHCWorld(), getCenter(), radius);
-		
-		
+
+
 	}
 
 	@EventHandler
@@ -130,10 +131,6 @@ public class ScatterManager implements Listener{
 	 */
 	public boolean isScatteringComplete(){
 		return scatterComplete;
-	}
-	public void enableFFA(){
-		FFAToScatter.addAll(teamM.getPlayersInGame());
-		findLocations(FFAToScatter.size());
 	}
 	public void enableTeams(){
 		for(String team : teamM.getActiveTeams()){
@@ -158,14 +155,8 @@ public class ScatterManager implements Listener{
 				}
 
 				else if(timer >=numberOfLocationsToFind){
-					if(teamM.isFFAEnabled()){
-						int j = 0;
-						for(UUID u : teamM.getPlayersInGame()){
-							locationsOfFFA.put(u, validatedLocs.get(j));
-							j++;
-						}
-					}
-					else if(teamM.isTeamsEnabled()){
+					
+					if(teamM.isTeamsEnabled()){
 						int j = 0;
 						for(String team : teamM.getActiveTeams()){
 							locationsOfTeamSpawn.put(team, validatedLocs.get(j));
@@ -178,7 +169,7 @@ public class ScatterManager implements Listener{
 				else{
 					for(int i = 0; i<LOADS_PER_SECOND; i++){
 						Location vLoc = findValidLocation(getUHCWorld(), radius);
-						vLoc.add(0, 1, 0);
+						vLoc.add(0, 0, 0);
 						validatedLocs.add(vLoc);
 						++timer;
 					}
@@ -201,18 +192,44 @@ public class ScatterManager implements Listener{
 					return;
 				}
 				if(timer>=loc.size()){
+					new BukkitRunnable() {
+
+						@Override
+						public void run() {
+							if(teamM.isTeamsEnabled()){
+								scatterTeams();
+							}
+
+						}
+					}.runTaskLater(plugin, 100L);
 					timer=0;
-					if(teamM.isFFAEnabled()){
-						scatterFFA();
-					}
-					else if(teamM.isTeamsEnabled()){
+					/*
+					if(teamM.isTeamsEnabled()){
 						scatterTeams();
 					}
+					 */
 					cancel();
-					
+
 				}
 				else{
-					getUHCWorld().loadChunk(loc.get(timer).getBlockX(), loc.get(timer).getBlockZ(), true);
+					int x = loc.get(timer).getBlockX();
+					int z = loc.get(timer).getBlockZ();
+					//boolean isXPos= x >= 0;
+					//boolean isZPos= z >= 0;
+					//int popX = isXPos ? x-16 : x+16;
+					//int popZ = isZPos ? z-16 : z+16;
+
+					getUHCWorld().getChunkAt(x, z).load(true);
+					
+					
+					/*getUHCWorld().getChunkAt(x+16, z).load(true);
+					getUHCWorld().getChunkAt(x-16, z).load(true);
+					getUHCWorld().getChunkAt(x, z+16).load(true);
+					getUHCWorld().getChunkAt(x, z-16).load(true);
+					 */
+					//getUHCWorld().getChunkAt(popX, popZ).load(false);
+					//getUHCWorld().loadChunk(x, z, true);
+					//getUHCWorld().loadChunk(popX, popZ, false);
 					chunksToKeepLoaded.add(getUHCWorld().getChunkAt(loc.get(timer)));
 					++timer;
 				}
@@ -249,7 +266,7 @@ public class ScatterManager implements Listener{
 						for(UUID u : teamToScatter.get(nameOfTeams.get(timer))){
 							Location location = locationsOfTeamSpawn.get(nameOfTeams.get(timer)).clone();
 							location.getChunk().load(true);
-							Location safeLocation = new Location(location.getWorld(), location.getBlockX(), location.getWorld().getHighestBlockYAt(location), location.getZ());
+							//Location safeLocation = new Location(location.getWorld(), location.getBlockX(), location.getWorld().getHighestBlockYAt(location), location.getZ());
 							OfflinePlayer p = Bukkit.getOfflinePlayer(u);
 							if(p.isOnline()==false){
 								lateScatters.add(u);
@@ -257,9 +274,29 @@ public class ScatterManager implements Listener{
 							else if(p.isOnline()==true){
 								Player target = (Player) p;
 								initializePlayer(target);
-								target.teleport(safeLocation);
-
+								
+								//very ugly nms
+								((CraftWorld)location.getWorld()).getHandle().chunkProviderServer.getChunkAt(location.getBlockX(), location.getBlockZ(), new Runnable() {
+						            @Override
+						            public void run() {
+						                MinecraftServer.getServer().processQueue.add(new Runnable() {
+						                    @Override
+						                    public void run() {
+						                    	if(p.isOnline()){
+						                    		target.teleport(location);
+						                    	}
+						                    	else{
+						                    		lateScatters.add(u);
+						                    	}
+						                    }
+						                });
+						            }
+						        });
 							}
+
+
+
+
 						}
 						++timer;
 					}
@@ -267,47 +304,11 @@ public class ScatterManager implements Listener{
 				}
 
 			}
-		}.runTaskTimer(plugin, 0L, 40L);
+		}.runTaskTimer(plugin, 0L, 100L);
 	}
 
 
-	/**
-	 * Will scatter all players in game and freeze them until complete
-	 */
-	private void scatterFFA(){
-		timer=0;
-		MessageSender.broadcast("Scattering players...");
-		moveE.freezePlayers();
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				for(int i = 0; i<LOADS_PER_SECOND; i++){
-					if(timer>=FFAToScatter.size()){
-						scatterComplete=true;
-						setupStartingOptions();
-						cancel();
-						return;
-					}
-					else{
-						OfflinePlayer p = Bukkit.getOfflinePlayer(FFAToScatter.get(timer));
-						Location location = locationsOfFFA.get(FFAToScatter.get(timer));
-						Location safeLocation = new Location(location.getWorld(), location.getBlockX(), location.getWorld().getHighestBlockYAt(location), location.getZ());
-						if(p.isOnline()==false){
-							lateScatters.add(p.getUniqueId());
-						}
-						else if(p.isOnline()==true){
-							Player target = (Player) p;
-							initializePlayer(target);
-							target.teleport(safeLocation);
-						}
-						++timer;
-					}
-
-				}
-
-			}
-		}.runTaskTimer(plugin, 0L, 20L);
-	}
+	
 
 	/** Used to get the radius of the map
 	 * @return <code> Integer </code> radius of the map
@@ -404,24 +405,10 @@ public class ScatterManager implements Listener{
 
 
 	public void handleLateScatter(Player p){
-		if(teamM.isFFAEnabled()){
-			lateScatterAPlayerInFFA(p);
-			removePlayerFromLateScatters(p);
-		}
-		else if(teamM.isTeamsEnabled()){
+		if(teamM.isTeamsEnabled()){
 			lateScatterAPlayerInATeam(teamM.getTeamOfPlayer(p), p);
 			removePlayerFromLateScatters(p);
 		}
-	}
-	/**
-	 * Used to handle players who were disconnected and need to be scattered explicitly in a FFA context
-	 * @param p - the player who needs to be teleported
-	 */
-	private void lateScatterAPlayerInFFA(Player p){
-		Location location = locationsOfFFA.get(p.getUniqueId());
-		Location safeLocation = new Location(location.getWorld(), location.getBlockX(), location.getWorld().getHighestBlockYAt(location), location.getZ());
-		initializePlayer(p);
-		p.teleport(safeLocation);
 	}
 
 	/**

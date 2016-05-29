@@ -58,14 +58,7 @@ public class ChatManager implements Listener{
 						all.sendMessage(teamM.getColorOfPlayer(sender) + "[Observer] " + PlayerUtils.getPrefix(sender)+ ChatColor.AQUA + sender.getName() +  ChatColor.WHITE + ": " + e.getMessage());
 					}
 				}
-				else if(teamM.isFFAEnabled()){
-					if(teamM.isPlayerInGame(sender)){
-						all.sendMessage(teamM.getColorOfPlayer(sender) + "[FFA] " + PlayerUtils.getPrefix(sender) + ChatColor.RED + sender.getName() +  ChatColor.WHITE + ": " + e.getMessage());
-					}
-					else{
-						all.sendMessage(teamM.getColorOfPlayer(sender) + "[Observer] " + PlayerUtils.getPrefix(sender)+ ChatColor.AQUA + sender.getName() +  ChatColor.WHITE + ": " + e.getMessage());
-					}
-				}
+				
 				else{
 					all.sendMessage(PlayerUtils.getPrefix(sender) + ChatColor.WHITE + sender.getName() + ": " + e.getMessage());
 				}

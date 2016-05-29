@@ -7,61 +7,54 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.goldornetwork.uhc.commands.UHCCommand;
+import com.goldornetwork.uhc.listeners.team.TeamInteraction;
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.utils.MessageSender;
 
-public class CreateCommand extends UHCCommand{
+public class PMCoordsCommand extends UHCCommand {
 
-	//instances
 	private TeamManager teamM;
-	
-	public CreateCommand(TeamManager teamM) {
-		super("create", "");
+	private TeamInteraction teamI;
+	public PMCoordsCommand(TeamManager teamM, TeamInteraction teamI) {
+		super("pmc", "");
 		this.teamM=teamM;
+		this.teamI=teamI;
 	}
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		Player p = (Player) sender;
-
 		if(!(sender instanceof Player)){
 			MessageSender.noConsole(sender);
 			return true;
 		}
-
-		else if(teamM.isPlayerInGame(p)){
-			MessageSender.send(ChatColor.RED, p, "You are already on a team!");
-			return true;
-		}
-
-		else if(State.getState().equals(State.INGAME)){
-			MessageSender.send(ChatColor.RED, p, "Match has already started!");
-			return true;
-		}
-		else if(args.length==0){
-			if(teamM.isTeamsEnabled()){
-				if(teamM.createRandomTeam(p)==true){
-					MessageSender.alertMessage(p, ChatColor.GREEN, "You have created a team, please use /invite");
+		else if(teamM.isTeamsEnabled()){
+			if(teamM.isPlayerInGame(p)){
+				if(teamM.isPlayerOnTeam(p)){
+					teamI.sendCoords(teamM.getTeamOfPlayer(p), p);
 				}
 				else{
-					MessageSender.alertMessage(p, ChatColor.RED, "Teams are full!");
+					MessageSender.send(ChatColor.RED, p, "You are not on a team!");
 				}
-				return true;
 			}
 			else{
-				return false;
+				MessageSender.send(ChatColor.RED, p, "You are not in the game!");
 			}
+			return true;
 		}
-
+		else if(teamM.isTeamsEnabled()==false){
+			MessageSender.send(ChatColor.RED, p, "Teams are not enabled!");
+			return true;
+		}
 		else{
 			return false;
 		}
+		
 	}
 
 	@Override
 	public List<String> tabComplete(CommandSender sender, String[] args) {
 		return null;
 	}
-
+	
 }
