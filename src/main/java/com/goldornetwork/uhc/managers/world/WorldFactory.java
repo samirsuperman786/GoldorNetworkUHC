@@ -92,33 +92,6 @@ public class WorldFactory implements Listener{
 		creator.type(WorldType.NORMAL);
 		creator.seed(random.nextLong());
 		creator.generateStructures(true);
-		Field biomesField = null;
-		try {
-			biomesField = BiomeBase.class.getDeclaredField("biomes");
-		} catch (NoSuchFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		biomesField.setAccessible(true);
-
-		try {
-			if (biomesField.get(null) instanceof BiomeBase[]) {
-			    BiomeBase[] biomes = (BiomeBase[]) biomesField.get(null);
-			    biomes[BiomeBase.DEEP_OCEAN.id] = BiomeBase.PLAINS;
-			    biomes[BiomeBase.OCEAN.id] = BiomeBase.FOREST;
-
-			    biomesField.set(null, biomes);
-			}
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		World world = Bukkit.createWorld(creator);
 		world.setSpawnLocation(0, world.getHighestBlockYAt(0, 0), 0);
 		world.setAutoSave(false);

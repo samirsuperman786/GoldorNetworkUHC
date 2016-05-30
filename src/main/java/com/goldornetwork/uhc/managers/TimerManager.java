@@ -3,16 +3,19 @@ package com.goldornetwork.uhc.managers;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.listeners.team.ChatManager;
+import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.PVPEnableEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.utils.MessageSender;
 
-public class TimerManager {
+public class TimerManager implements Listener{
 	//instances
 	private UHC plugin;
 	private ScatterManager scatterM;
@@ -30,6 +33,7 @@ public class TimerManager {
 
 	public TimerManager(UHC plugin, ScatterManager scatterM, TeamManager teamM, VoteManager voteM, ChatManager chatM) {
 		this.plugin=plugin;
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.scatterM=scatterM;
 		this.teamM=teamM;
 		this.voteM=voteM;
@@ -147,7 +151,7 @@ public class TimerManager {
 							all.teleport(scatterM.getCenter());
 						}
 					}
-					pvpTimer();
+					//pvpTimer();
 					cancel();
 
 				}
@@ -159,6 +163,10 @@ public class TimerManager {
 		}.runTaskTimer(plugin, 0L, 20L);
 	}
 
+	@EventHandler
+	public void on(GameStartEvent e){
+		pvpTimer();
+	}
 	/**
 	 * When called, this will begin the count down till PVP is enabled
 	 */

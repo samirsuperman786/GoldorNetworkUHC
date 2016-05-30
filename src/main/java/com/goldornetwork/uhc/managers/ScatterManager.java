@@ -1,12 +1,16 @@
 package com.goldornetwork.uhc.managers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -31,6 +35,7 @@ import com.goldornetwork.uhc.listeners.MoveEvent;
 import com.goldornetwork.uhc.listeners.team.ChatManager;
 import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.managers.GameModeManager.TeleportTeamEvent;
 import com.goldornetwork.uhc.managers.world.ChunkGenerator;
 import com.goldornetwork.uhc.managers.world.WorldFactory;
 import com.goldornetwork.uhc.utils.MessageSender;
@@ -52,6 +57,7 @@ public class ScatterManager implements Listener{
 	private ChunkGenerator chunkG;
 	//storage
 	private boolean scatterComplete;
+	private boolean teleported;
 	private int radius;
 	private World uhcWorld;
 	private final int LOADS_PER_SECOND = 1;
@@ -65,6 +71,7 @@ public class ScatterManager implements Listener{
 	private Map<String, Location> locationsOfTeamSpawn = new HashMap<String, Location>();
 	private List<UUID> lateScatters = new ArrayList<UUID>();
 	private List<String> nameOfTeams = new ArrayList<String>();
+	private BlockingQueue<String> teamReadyToScatter;
 
 	public ScatterManager(UHC plugin, TeamManager teamM, MoveEvent moveE, ChatManager chatM, WorldFactory worldF, ChunkGenerator chunkG) {
 		this.plugin=plugin;
@@ -133,8 +140,11 @@ public class ScatterManager implements Listener{
 		return scatterComplete;
 	}
 	public void enableTeams(){
+		nameOfTeams.addAll(teamM.getActiveTeams());
+		this.teamReadyToScatter= new ArrayBlockingQueue<>(nameOfTeams.size());
+		teamReadyToScatter.addAll(nameOfTeams);
+
 		for(String team : teamM.getActiveTeams()){
-			nameOfTeams.add(team);
 			teamToScatter.put(team, teamM.getPlayersOnATeam(team));
 		}
 		findLocations(nameOfTeams.size());
@@ -155,7 +165,7 @@ public class ScatterManager implements Listener{
 				}
 
 				else if(timer >=numberOfLocationsToFind){
-					
+
 					if(teamM.isTeamsEnabled()){
 						int j = 0;
 						for(String team : teamM.getActiveTeams()){
@@ -192,50 +202,94 @@ public class ScatterManager implements Listener{
 					return;
 				}
 				if(timer>=loc.size()){
-					new BukkitRunnable() {
 
-						@Override
-						public void run() {
-							if(teamM.isTeamsEnabled()){
-								scatterTeams();
-							}
-
-						}
-					}.runTaskLater(plugin, 100L);
-					timer=0;
-					/*
 					if(teamM.isTeamsEnabled()){
 						scatterTeams();
 					}
-					 */
 					cancel();
 
 				}
 				else{
 					int x = loc.get(timer).getBlockX();
 					int z = loc.get(timer).getBlockZ();
-					//boolean isXPos= x >= 0;
-					//boolean isZPos= z >= 0;
-					//int popX = isXPos ? x-16 : x+16;
-					//int popZ = isZPos ? z-16 : z+16;
+					boolean isXPos= x >= 0;
+					boolean isZPos= z >= 0;
+					int popX = isXPos ? x-16 : x+16;
+					int popZ = isZPos ? z-16 : z+16;
 
 					getUHCWorld().getChunkAt(x, z).load(true);
-					
-					
-					/*getUHCWorld().getChunkAt(x+16, z).load(true);
-					getUHCWorld().getChunkAt(x-16, z).load(true);
-					getUHCWorld().getChunkAt(x, z+16).load(true);
-					getUHCWorld().getChunkAt(x, z-16).load(true);
-					 */
-					//getUHCWorld().getChunkAt(popX, popZ).load(false);
-					//getUHCWorld().loadChunk(x, z, true);
-					//getUHCWorld().loadChunk(popX, popZ, false);
+					getUHCWorld().getChunkAt(popX, popZ).load(false);
 					chunksToKeepLoaded.add(getUHCWorld().getChunkAt(loc.get(timer)));
 					++timer;
 				}
 
 			}
 		}.runTaskTimer(plugin, 0L, 20L);
+	}
+
+	@EventHandler
+	public void on(TeleportTeamEvent e) throws InterruptedException{
+		if(teamReadyToScatter.isEmpty()){
+			setupStartingOptions();
+			scatterComplete=true;
+		}
+		else{
+			String team = teamReadyToScatter.poll();
+			MessageSender.broadcast(team);
+
+			Location location = locationsOfTeamSpawn.get(team).clone();
+			location.getChunk().load(true);
+
+			((CraftWorld)location.getWorld()).getHandle().chunkProviderServer.getChunkAt(location.getBlockX(), location.getBlockZ(), new Runnable() {
+				@Override
+				public void run() {
+					MinecraftServer.getServer().processQueue.add(new Runnable() {
+						@Override
+						public void run() {
+							
+							Location safeLocation = new Location(location.getWorld(), location.getBlockX(), location.getWorld().getHighestBlockYAt(location), location.getBlockZ());
+							
+							for(UUID u : teamToScatter.get(team)){
+								OfflinePlayer p = Bukkit.getOfflinePlayer(u);
+								if(p.isOnline()==false){
+									lateScatters.add(u);
+								}
+								else if(p.isOnline()==true){
+									Player target = (Player) p;
+									initializePlayer(target);
+									teleported = target.teleport(safeLocation);
+								}
+
+							}
+							
+							new BukkitRunnable() {
+								
+								@Override
+								public void run() {
+									
+									if(teleported){
+										new BukkitRunnable() {
+											
+											@Override
+											public void run() {
+												Bukkit.getPluginManager().callEvent(new TeleportTeamEvent());
+												
+											}
+										}.runTaskLater(plugin, 120L);
+										cancel();
+									}
+									
+									
+								}
+							}.runTaskTimer(plugin, 20L, 20L);
+							
+						}
+					});
+				}
+			});
+		}
+		
+
 	}
 	/**
 	 * Will scatter all teams and freeze them until scattering has completed
@@ -244,71 +298,11 @@ public class ScatterManager implements Listener{
 		timer=0;
 		MessageSender.broadcast("Scattering teams...");
 		moveE.freezePlayers();
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				int availMem = plugin.AvailableMemory();
-				if(availMem<200){
-					return;
-				}
-				if(teamToScatter.isEmpty()){
-					Bukkit.getServer().getLogger().info("Error at scattering");
-					cancel();
-					return;
-				}
-				else{
-					if(timer>=teamM.getActiveTeams().size()){
-						setupStartingOptions();
-						scatterComplete=true;
-						cancel();
-					}
-					else{
-						for(UUID u : teamToScatter.get(nameOfTeams.get(timer))){
-							Location location = locationsOfTeamSpawn.get(nameOfTeams.get(timer)).clone();
-							location.getChunk().load(true);
-							//Location safeLocation = new Location(location.getWorld(), location.getBlockX(), location.getWorld().getHighestBlockYAt(location), location.getZ());
-							OfflinePlayer p = Bukkit.getOfflinePlayer(u);
-							if(p.isOnline()==false){
-								lateScatters.add(u);
-							}
-							else if(p.isOnline()==true){
-								Player target = (Player) p;
-								initializePlayer(target);
-								
-								//very ugly nms
-								((CraftWorld)location.getWorld()).getHandle().chunkProviderServer.getChunkAt(location.getBlockX(), location.getBlockZ(), new Runnable() {
-						            @Override
-						            public void run() {
-						                MinecraftServer.getServer().processQueue.add(new Runnable() {
-						                    @Override
-						                    public void run() {
-						                    	if(p.isOnline()){
-						                    		target.teleport(location);
-						                    	}
-						                    	else{
-						                    		lateScatters.add(u);
-						                    	}
-						                    }
-						                });
-						            }
-						        });
-							}
-
-
-
-
-						}
-						++timer;
-					}
-
-				}
-
-			}
-		}.runTaskTimer(plugin, 0L, 100L);
+		Bukkit.getPluginManager().callEvent(new TeleportTeamEvent());
 	}
 
 
-	
+
 
 	/** Used to get the radius of the map
 	 * @return <code> Integer </code> radius of the map
