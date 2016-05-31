@@ -63,6 +63,10 @@ public class WorldManager implements Listener{
 		Player target = e.getPlayer();
 		e.setJoinMessage(ChatColor.GREEN + "\u2713" + ChatColor.DARK_GRAY +  target.getName());
 		
+		for(Player online : Bukkit.getOnlinePlayers()){
+			online.hidePlayer(target);
+			online.showPlayer(target);
+		}
 		if(State.getState().equals(State.INGAME)|| State.getState().equals(State.SCATTER)){
 			if(teamM.isPlayerInGame(e.getPlayer())){
 					if(scatterM.getLateScatters().contains(target.getUniqueId())){
