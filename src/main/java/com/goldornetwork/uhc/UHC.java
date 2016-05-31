@@ -29,6 +29,7 @@ import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.VoteManager;
 import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
 import com.goldornetwork.uhc.managers.world.ChunkGenerator;
+import com.goldornetwork.uhc.managers.world.UHCBan;
 import com.goldornetwork.uhc.managers.world.WorldFactory;
 import com.goldornetwork.uhc.managers.world.WorldManager;
 import com.goldornetwork.uhc.utils.AntiXray;
@@ -58,6 +59,7 @@ public class UHC extends JavaPlugin {
 	private WorldManager worldM;
 	private ChatManager chatM;
 	private WorldFactory worldF;
+	private UHCBan uhcB;
 	private SpectatorRegionManager spectM;
 	private Runtime rt = Runtime.getRuntime();
 	private OperatingSystemMXBean compHandler = ManagementFactory.getOperatingSystemMXBean();
@@ -95,10 +97,11 @@ public class UHC extends JavaPlugin {
 		medic= new Medic(plugin, teamM);
 		
 		teamI = new TeamInteraction(teamM);
+		uhcB = new UHCBan();
 		//cmds
 		cmd = new CommandHandler(plugin);
 		
-		cmd.registerCommands(teamM, timerM, gameModeM, chunkG, voteM, teamI);
+		cmd.registerCommands(teamM, timerM, gameModeM, chunkG, voteM, teamI, uhcB);
 		
 		//listeners
 		

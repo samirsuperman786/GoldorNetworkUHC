@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.commands.game.CancelCommand;
 import com.goldornetwork.uhc.commands.game.StartCommand;
+import com.goldornetwork.uhc.commands.game.UHCBanCommand;
 import com.goldornetwork.uhc.commands.team.CreateCommand;
 import com.goldornetwork.uhc.commands.team.InfoCommand;
 import com.goldornetwork.uhc.commands.team.InvitePlayerCommand;
@@ -32,6 +33,7 @@ import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.VoteManager;
 import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
 import com.goldornetwork.uhc.managers.world.ChunkGenerator;
+import com.goldornetwork.uhc.managers.world.UHCBan;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 
@@ -149,7 +151,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 	 * @param timerM TimerManager
 	 * @param chunkG ChunkGenerator
 	 */
-	public void registerCommands(TeamManager teamM, TimerManager timerM, GameModeManager gamemodeM, ChunkGenerator chunkG, VoteManager voteM, TeamInteraction teamI){
+	public void registerCommands(TeamManager teamM, TimerManager timerM, GameModeManager gamemodeM, ChunkGenerator chunkG, VoteManager voteM, TeamInteraction teamI, UHCBan uhcB){
 		//game
 		cmds.add(new StartCommand(timerM, teamM));
 		cmds.add(new CancelCommand(timerM));
@@ -165,7 +167,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 		cmds.add(new PMCoordsCommand(teamM, teamI));
 		cmds.add(new TeamChatCommand(teamM, teamI));
 		cmds.add(new HelpopCommand(teamM));
-		
+		cmds.add(new UHCBanCommand(teamM, uhcB));
 		for(UHCCommand cmd : cmds){
 			PluginCommand pCmd = plugin.getCommand(cmd.getName());
 			
