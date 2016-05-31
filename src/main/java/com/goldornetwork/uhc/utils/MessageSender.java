@@ -41,7 +41,7 @@ public class MessageSender {
 	}
 	
 	public static void sendToOPS(String msg){
-		Bukkit.broadcast(ChatColor.GOLD + "[OPS] " + msg, Server.BROADCAST_CHANNEL_ADMINISTRATIVE);
+		Bukkit.broadcast(ChatColor.GOLD + "[OPS] " + msg, "uhc.broadcast.mod");
 	}
 	public static void broadcast(String msg){
 		Bukkit.getServer().broadcastMessage(getPrefix() + ChatColor.GOLD + msg);

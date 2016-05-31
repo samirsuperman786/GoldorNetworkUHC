@@ -34,7 +34,7 @@ public class BoardManager implements Listener{
 	private Scoreboard mainBoard;
 	private Team observerTeam;
 	private ScatterManager scatterM;
-	
+
 	private List<Team> activeTeams = new ArrayList<Team>(); 
 	private Map<String, Team> teamScoreBoards = new HashMap<String, Team>();
 	private Map<UUID, String> teamOfPlayer = new HashMap<UUID, String>();
@@ -42,7 +42,7 @@ public class BoardManager implements Listener{
 
 	public BoardManager(UHC plugin) {
 		this.plugin=plugin;
-		
+
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
@@ -68,19 +68,44 @@ public class BoardManager implements Listener{
 		toAdd.add(header.getScore(" "));
 		toAdd.add(header.getScore(ChatColor.AQUA + "Team Size: " + ChatColor.WHITE + "0"));
 		toAdd.add(header.getScore(ChatColor.AQUA + "Current Border: " + ChatColor.WHITE + (int) scatterM.getUHCWorld().getWorldBorder().getSize()));
+
+		for(Score score : toAdd){
+			score.setScore(0);
+		}
+
+		observerTeam = mainBoard.registerNewTeam("observers");
+		observerTeam.setPrefix(ChatColor.AQUA + "[Observer] ");
+	}
+
+	private Scoreboard getObserverBoard(){
+		return mainBoard;
+	}
+	private Scoreboard initializeTeamBoard(String team){
+		Scoreboard teamBoard = Bukkit.getScoreboardManager().getNewScoreboard();
+		String teamToAdd = teamM.getTeamNameProper(team);
+
+		Team newTeam = teamBoard.registerNewTeam(team);
+		newTeam.setCanSeeFriendlyInvisibles(true);
+		newTeam.setAllowFriendlyFire(false);
+		newTeam.setPrefix(ChatColor.GREEN + "");
+
+		Team otherPlayers = teamBoard.registerNewTeam("others");
+		otherPlayers.setPrefix(ChatColor.RED + "");
+
+		Objective header = teamBoard.registerNewObjective("header", "dummy");
+		header.setDisplaySlot(DisplaySlot.SIDEBAR);
+		header.setDisplayName(teamM.getColorOfTeam(team) + ChatColor.BOLD + teamToAdd);
+		
+		List<Score> toAdd = new LinkedList<Score>();
+		toAdd.add(header.getScore(ChatColor.AQUA + "Team Size: " + ChatColor.WHITE + "0"));
 		
 		for(Score score : toAdd){
 			score.setScore(0);
 		}
-	
-		observerTeam = mainBoard.registerNewTeam("observers");
-		observerTeam.setPrefix(ChatColor.AQUA + "[Observer] ");
-	}
-	
-	private Scoreboard getObserverBoard(){
-		return mainBoard;
-	}
-	private void initializeTeamBoard(Scoreboard board){
+		
+		teamScoreBoards.put(team, newTeam);
+		activeTeams.add(newTeam);
+		return teamBoard;
 
 	}
 
@@ -94,24 +119,8 @@ public class BoardManager implements Listener{
 	}
 
 	public void createTeam(String team){
-		Scoreboard teamBoard = Bukkit.getScoreboardManager().getNewScoreboard();
-		/*Objective o = teamBoard.registerNewObjective("showhealth", "health");
-		o.setDisplaySlot(DisplaySlot.BELOW_NAME);
-		o.setDisplayName("/ 20");
-		 */
-		Team newTeam = teamBoard.registerNewTeam(team);
-		newTeam.setCanSeeFriendlyInvisibles(true);
-		newTeam.setAllowFriendlyFire(false);
-		newTeam.setPrefix(ChatColor.GREEN + "");
+		initializeTeamBoard(team);
 
-		Team otherPlayers = teamBoard.registerNewTeam("others");
-		otherPlayers.setPrefix(ChatColor.RED + "");
-
-		teamScoreBoards.put(team, newTeam);
-		activeTeams.add(newTeam);
-
-
-		//updater(team, teamBoard);
 	}
 
 	public void removeTeam(String team){
@@ -171,7 +180,7 @@ public class BoardManager implements Listener{
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(PlayerJoinEvent e){
 		Player p = e.getPlayer();
-		
+
 		if(teamOfPlayer.containsKey(p.getUniqueId())){
 			p.setScoreboard(getScoreboardOfPlayer(p));
 		}

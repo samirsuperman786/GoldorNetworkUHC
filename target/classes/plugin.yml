@@ -46,4 +46,7 @@ commands:
    helpop:
       description: Use this to talk to the moderators and admins!
       usage: /<command> [message]
-      
+   playerban:
+      description: Use this to talk to the moderators and admins!
+      usage: /<command> [player] [reason]
+      aliases: [pban, pb]

@@ -5,7 +5,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 public class PlayerUtils {
-
+	
 	public static String getPrefix(OfflinePlayer p){
 		if(p.isOnline()){
 			Player target = (Player) p;
@@ -24,4 +24,6 @@ public class PlayerUtils {
 		}
 		
 	}
+	
+	
 }

@@ -42,7 +42,6 @@ public class TeamChatCommand extends UHCCommand{
 						}
 						String msg = str.toString();
 						teamI.sendMsgTeamates(teamM.getTeamOfPlayer(p), p, msg);
-						p.saveData();
 						return true;
 					}
 					

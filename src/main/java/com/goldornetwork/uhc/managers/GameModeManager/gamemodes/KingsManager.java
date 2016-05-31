@@ -27,6 +27,7 @@ import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.utils.MessageSender;
+import com.goldornetwork.uhc.utils.PlayerUtils;
 
 public class KingsManager extends Gamemode implements Listener{
 
@@ -134,7 +135,7 @@ public class KingsManager extends Gamemode implements Listener{
 			listOfKings.put(team, king.getUniqueId());
 			for(UUID u : teamM.getPlayersOnATeam(team)){
 				if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
-					MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.GOLD, "Your king is " + teamM.getColorOfTeam(team) + king.getName());
+					MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.GOLD, "Your king is " + PlayerUtils.getPrefix(king) + ChatColor.GREEN + king.getName());
 				}
 			}
 			if(king.isOnline()){

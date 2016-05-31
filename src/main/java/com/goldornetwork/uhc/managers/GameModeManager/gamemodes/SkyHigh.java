@@ -98,7 +98,7 @@ public class SkyHigh extends Gamemode implements Listener{
 							public void run() {
 								if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
 									Bukkit.getServer().getPlayer(u).damage(2);
-									MessageSender.send(ChatColor.RED, Bukkit.getServer().getPlayer(u), "You are below y = 101!");
+									MessageSender.send(ChatColor.RED, Bukkit.getServer().getPlayer(u), "You are below Y: 101");
 								}
 								
 							}
@@ -109,7 +109,7 @@ public class SkyHigh extends Gamemode implements Listener{
 				}
 				else if(Bukkit.getServer().getPlayer(u).getLocation().getBlockY()>=101){
 					if(playersToDamage.containsKey(u)){
-						MessageSender.send(ChatColor.GREEN, Bukkit.getServer().getPlayer(u), "You are now above y =100!");
+						MessageSender.send(ChatColor.GREEN, Bukkit.getServer().getPlayer(u), "You are now above Y: 100");
 						playersToDamage.get(u).cancel();
 						playersToDamage.remove(u);
 					}
