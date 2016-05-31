@@ -113,7 +113,6 @@ public class UHC extends JavaPlugin {
 	}
 
 	private void setup(){
-		worldF.setup();
 		teamM.setup();
 		timerM.setup();
 		moveE.setup();
@@ -170,15 +169,14 @@ public class UHC extends JavaPlugin {
 		plugin = this;
 		createConfig();
 		instances();
+		worldF.setup();
 		new BukkitRunnable() {
 			
 			@Override
 			public void run() {
 				
 				setup();
-				for(World world: Bukkit.getWorlds()){
-					world.setAutoSave(false);
-				}
+				
 			}
 		}.runTaskLater(plugin, 20L);
 		

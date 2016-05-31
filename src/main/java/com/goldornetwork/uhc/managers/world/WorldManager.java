@@ -1,15 +1,11 @@
 package com.goldornetwork.uhc.managers.world;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -20,7 +16,6 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -37,7 +32,6 @@ public class WorldManager implements Listener{
 	private ScatterManager scatterM;
 	private TeamManager teamM;
 	
-	private Map<UUID, Location> lastLocation = new HashMap<UUID, Location>();
 	
 	public WorldManager(UHC plugin, ScatterManager scatterM, TeamManager teamM) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -74,10 +68,6 @@ public class WorldManager implements Listener{
 					if(scatterM.getLateScatters().contains(target.getUniqueId())){
 						scatterM.handleLateScatter(target);
 					}
-					else if(lastLocation.containsKey(target.getUniqueId())){
-						target.teleport(lastLocation.get(target.getUniqueId()));
-						lastLocation.remove(target.getUniqueId());
-					}
 				
 			}
 			else if(teamM.isPlayerInGame(e.getPlayer())==false){
@@ -88,6 +78,7 @@ public class WorldManager implements Listener{
 					teamM.addPlayerToObservers(target);
 				}
 				else{
+					
 					MessageSender.send(ChatColor.AQUA, target, "You are now spectating the game");
 				}
 				
@@ -101,16 +92,6 @@ public class WorldManager implements Listener{
 	public void onPlayerLeave(PlayerQuitEvent e){
 		Player target = e.getPlayer();
 		e.setQuitMessage(ChatColor.RED + "\u2717" + ChatColor.DARK_GRAY+ target.getName());
-		if(State.getState().equals(State.INGAME)){
-			if(teamM.isPlayerInGame(target)){
-				lastLocation.put(target.getUniqueId(), target.getLocation());
-			}
-		}
-		else if(State.getState().equals(State.SCATTER)){
-			if(!(scatterM.getLateScatters().contains(target))){
-				lastLocation.put(target.getUniqueId(), target.getLocation());
-			}
-		}
 	}
 	
 	@EventHandler(priority = EventPriority.LOW)

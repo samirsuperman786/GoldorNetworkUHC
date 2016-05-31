@@ -2,7 +2,6 @@ package com.goldornetwork.uhc.managers.world;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.Random;
 import java.util.UUID;
 
@@ -12,13 +11,12 @@ import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldInitEvent;
 
 import com.goldornetwork.uhc.UHC;
-
-import net.minecraft.server.v1_8_R3.BiomeBase;
 
 public class WorldFactory implements Listener{
 
@@ -43,6 +41,9 @@ public class WorldFactory implements Listener{
 		for(World world : Bukkit.getWorlds()){
 			for(Chunk chunk : world.getLoadedChunks()){
 				chunk.unload();
+			}
+			for(Entity entity: world.getEntities()){
+				entity.remove();
 			}
 			Bukkit.unloadWorld(world, false);
 		}
@@ -86,13 +87,12 @@ public class WorldFactory implements Listener{
 	}
 	public World create(){
 		String fileName = UUID.randomUUID().toString();
-		//File map = new File(getContainer(), fileName);
 		WorldCreator creator = new WorldCreator(fileName);
 		creator.environment(World.Environment.NORMAL);
 		creator.type(WorldType.NORMAL);
 		creator.seed(random.nextLong());
 		creator.generateStructures(true);
-		World world = Bukkit.createWorld(creator);
+		World world = Bukkit.getServer().createWorld(creator);
 		world.setSpawnLocation(0, world.getHighestBlockYAt(0, 0), 0);
 		world.setAutoSave(false);
 		return world;
@@ -103,7 +103,6 @@ public class WorldFactory implements Listener{
 	public void on(WorldInitEvent e){
 			e.getWorld().setAutoSave(false);
 			e.getWorld().setKeepSpawnInMemory(false);	
-		
 	}
 	
 }

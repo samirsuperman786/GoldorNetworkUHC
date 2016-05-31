@@ -160,7 +160,6 @@ public class ScatterManager implements Listener{
 			public void run() {
 				int availMem = plugin.AvailableMemory();
 				if(availMem<200){
-					MessageSender.broadcast("low mem!");
 					return;
 				}
 
@@ -318,6 +317,7 @@ public class ScatterManager implements Listener{
 	 * @see validate()
 	 */
 	private Location findValidLocation(World world, int radius){
+		//TODO use nms
 		boolean valid = false;
 		Location location = null;
 		while(valid ==false){

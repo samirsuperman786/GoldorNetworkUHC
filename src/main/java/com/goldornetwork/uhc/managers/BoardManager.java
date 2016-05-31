@@ -171,13 +171,13 @@ public class BoardManager implements Listener{
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(PlayerJoinEvent e){
 		Player p = e.getPlayer();
-		//
-		p.setScoreboard(mainBoard);
-		p.sendMessage("test");
-		//
-		/*if(teamOfPlayer.containsKey(p.getUniqueId())){
+		
+		if(teamOfPlayer.containsKey(p.getUniqueId())){
 			p.setScoreboard(getScoreboardOfPlayer(p));
-		}*/
+		}
+		else{
+			p.setScoreboard(mainBoard);
+		}
 	}
 
 

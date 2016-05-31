@@ -52,7 +52,6 @@ public class DeathEvent implements Listener {
 		if(teamM.isPlayerInGame(p)){
 			if(State.getState().equals(State.INGAME) || State.getState().equals(State.SCATTER)){
 				p.getWorld().strikeLightningEffect(p.getLocation());
-				
 				//So no race conditions happen
 				new BukkitRunnable() {
 					
