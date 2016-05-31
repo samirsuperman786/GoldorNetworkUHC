@@ -25,6 +25,7 @@ import com.goldornetwork.uhc.commands.team.PMCoordsCommand;
 import com.goldornetwork.uhc.commands.team.TeamChatCommand;
 import com.goldornetwork.uhc.commands.team.UnInvitePlayerCommand;
 import com.goldornetwork.uhc.commands.team.VoteCommand;
+import com.goldornetwork.uhc.commands.utils.HelpopCommand;
 import com.goldornetwork.uhc.listeners.team.TeamInteraction;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
@@ -163,6 +164,8 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 		cmds.add(new InfoCommand(gamemodeM));
 		cmds.add(new PMCoordsCommand(teamM, teamI));
 		cmds.add(new TeamChatCommand(teamM, teamI));
+		cmds.add(new HelpopCommand(teamM));
+		
 		for(UHCCommand cmd : cmds){
 			PluginCommand pCmd = plugin.getCommand(cmd.getName());
 			
