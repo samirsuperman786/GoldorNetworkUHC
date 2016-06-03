@@ -97,10 +97,12 @@ public class VoteManager {
 	
 	public void enableOption(int choice){
 		voteActive=false;
+		List<String> toBroadcast = new LinkedList<String>();
 		for(Gamemode game : options.get(choice)){
 			game.enable(plugin);
-			MessageSender.broadcast(ChatColor.AQUA + game.getName() + " has been enabled");
+			toBroadcast.add(ChatColor.AQUA + game.getName() + " has been enabled");
 		}
+		MessageSender.broadcast(toBroadcast);
 	}
 	
 	public boolean hasVoted(Player p){

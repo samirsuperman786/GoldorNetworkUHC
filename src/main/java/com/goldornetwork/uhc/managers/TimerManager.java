@@ -1,5 +1,8 @@
 package com.goldornetwork.uhc.managers;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -84,17 +87,23 @@ public class TimerManager implements Listener{
 			@Override
 			public void run() {
 				voteM.generateOptions();
-				MessageSender.broadcast("-[Options]");
+				List<String> toBroadcast = new LinkedList<String>();
+				toBroadcast.add("-[Options]");
+				
 				for(int i = 0; i<voteM.getNumberOfOptions(); i++){
-					MessageSender.broadcast("Option " + (i + 1));
+					toBroadcast.add("Option " + (i + 1));
 					for(Gamemode game : voteM.getOptions().get(i)){
-						MessageSender.broadcast(ChatColor.AQUA + game.getName());
+						toBroadcast.add(ChatColor.AQUA + game.getName());
 
 					}
-					MessageSender.broadcast("---------------");
+					toBroadcast.add("---------------");
 
 				}
-				MessageSender.broadcast(ChatColor.LIGHT_PURPLE + "Please use /vote [option], also /info [gamemode]");
+				toBroadcast.add(ChatColor.LIGHT_PURPLE + "Please use /vote [option], also /info [gamemode]");
+				
+				MessageSender.broadcast(toBroadcast);
+				
+				
 
 			}
 		}.runTaskLater(plugin, 100L);

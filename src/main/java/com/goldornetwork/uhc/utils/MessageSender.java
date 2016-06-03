@@ -1,8 +1,10 @@
 package com.goldornetwork.uhc.utils;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -44,7 +46,23 @@ public class MessageSender {
 		Bukkit.broadcast(ChatColor.GOLD + "[OPS] " + msg, "uhc.broadcast.mod");
 	}
 	public static void broadcast(String msg){
-		Bukkit.getServer().broadcastMessage(getPrefix() + ChatColor.GOLD + msg);
+		for(Player online: Bukkit.getOnlinePlayers()){
+			online.sendMessage(getPrefix() + ChatColor.GOLD + msg);
+		}
+		
+	}
+	public static void broadcast(List<String> msg){
+		List<String> toEdit = new LinkedList<String>();
+		for(String messages : msg){
+			toEdit.add(getPrefix() + ChatColor.GOLD + messages);
+		}
+		
+		String[] toSend = new String[toEdit.size()];
+		toEdit.toArray(toSend);
+		
+		for(Player online: Bukkit.getOnlinePlayers()){
+			online.sendMessage(toSend);
+		}
 	}
 	
 }
