@@ -14,6 +14,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import com.goldornetwork.uhc.UHC;
+import com.goldornetwork.uhc.commands.game.HealthCommand;
 import com.goldornetwork.uhc.commands.game.HelpCommand;
 import com.goldornetwork.uhc.commands.game.HelpopCommand;
 import com.goldornetwork.uhc.commands.game.InfoCommand;
@@ -169,6 +170,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 		cmds.add(new HelpCommand());
 		cmds.add(new InfoCommand(gamemodeM));
 		cmds.add(new VoteCommand(voteM));
+		cmds.add(new HealthCommand(teamM));
 		
 		for(UHCCommand cmd : cmds){
 			PluginCommand pCmd = plugin.getCommand(cmd.getName());
