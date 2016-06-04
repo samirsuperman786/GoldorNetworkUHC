@@ -50,8 +50,7 @@ public class GameModeManager {
 			game.disable();
 		}
 		
-		defaultGamemodes(teamM);
-		
+		gamemodes.add(new CutClean(teamM));
 		gamemodes.add(new BlockRush(scatterM));
 		gamemodes.add(new FlowerPower(teamM));
 		gamemodes.add(new KillSwitch());
@@ -65,14 +64,6 @@ public class GameModeManager {
 		gamemodes.add(new BedBombs(teamM));
 		gamemodes.add(new Bows(teamM));
 		gamemodes.add(new RunBabyRun(plugin, teamM));
-	}
-	private void defaultGamemodes(TeamManager teamM){
-		List<Gamemode> toEnable = new ArrayList<Gamemode>();
-		toEnable.add(new CutClean(teamM));
-		
-		for(Gamemode game : toEnable){
-			game.enable(plugin);
-		}
 	}
 
 	@SuppressWarnings("unchecked")
