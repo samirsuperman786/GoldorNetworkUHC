@@ -197,7 +197,6 @@ public class ScatterManager implements Listener{
 			public void run() {
 				int availMem = plugin.AvailableMemory();
 				if(availMem<200){
-					MessageSender.broadcast("low mem!");
 					return;
 				}
 				if(timer>=loc.size()){
@@ -234,7 +233,6 @@ public class ScatterManager implements Listener{
 		}
 		else{
 			String team = teamReadyToScatter.poll();
-			MessageSender.broadcast(team);
 
 			Location location = locationsOfTeamSpawn.get(team).clone();
 			location.getChunk().load(true);
@@ -350,45 +348,29 @@ public class ScatterManager implements Listener{
 		if(loc.getBlockY()<60){
 			valid =false;
 		}
-		//value performance more than safety
-		else if(loc.clone().add(0, -1, 0).getBlock().getType().isSolid()==false){
-			valid = false;
-		}
-		else if(loc.clone().add(0, 0, 0).getBlock().getType().isSolid()){
-			valid = false;
-		}
-		else if(loc.clone().add(0, 1, 0).getBlock().getType().isSolid()){
-			valid = false;
-		}
-		else if(INVALID_SPAWN_BLOCKS.contains(loc.clone().add(0, -1, 0).getBlock().getType())){
-			valid =false;
-		}
-
-		/*else{
+		
+		else{
 			for(BlockFace face : faces){
 				//getting the block at land
 				if(INVALID_SPAWN_BLOCKS.contains(loc.clone().add(0, -1, 0).getBlock().getRelative(face).getType())){
-					MessageSender.broadcast("Check 1: " + loc.getBlock().getRelative(face).getType().toString());
 					valid=false;
 					break;
 				}
 
 				//getting the block above land
 				else if(loc.clone().add(0, 0, 0).getBlock().getRelative(face).getType().isSolid()){
-					MessageSender.broadcast("Check 2: solid @ " + face.toString());
 					valid=false;
 					break;
 				}
 
 				//getting the block 2 above land
 				else if(loc.clone().add(0, 1, 0).getBlock().getRelative(face).getType().isSolid()){
-					MessageSender.broadcast("Check 3: solid @ " + face.toString());
 					valid = false;
 					break;
 				}
 			}
 
-		}*/
+		}
 
 
 
@@ -503,7 +485,7 @@ public class ScatterManager implements Listener{
 		}.runTaskLater(plugin, 100L);
 
 	}
-
+	
 	public void prePVPSetup(){
 		getUHCWorld().setTime(0);
 		getUHCWorld().setGameRuleValue("dodaylightcycle", "false");
