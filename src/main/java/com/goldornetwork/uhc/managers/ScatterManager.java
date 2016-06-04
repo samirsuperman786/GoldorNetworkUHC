@@ -481,6 +481,10 @@ public class ScatterManager implements Listener{
 				getUHCWorld().setGameRuleValue("doMobSpawning", "true");
 				getUHCWorld().setGameRuleValue("dodaylightcycle", "true");
 				getUHCWorld().setTime(0);
+				for(Player online: Bukkit.getServer().getOnlinePlayers()){
+					online.setHealth(online.getHealth());
+				}
+				
 			}
 		}.runTaskLater(plugin, 100L);
 

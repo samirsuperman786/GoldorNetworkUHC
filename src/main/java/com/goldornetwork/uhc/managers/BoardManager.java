@@ -63,6 +63,11 @@ public class BoardManager implements Listener{
 		Objective header = mainBoard.registerNewObjective("header", "dummy");
 		header.setDisplayName(ChatColor.GOLD + ""+ ChatColor.BOLD + "GoldorNetwork");
 		header.setDisplaySlot(DisplaySlot.SIDEBAR);
+		
+		Objective objective = mainBoard.registerNewObjective("showhealth", "health");
+		objective.setDisplaySlot(DisplaySlot.BELOW_NAME);
+		objective.setDisplayName(ChatColor.RED + "\u2665");
+		
 		List<Score> toAdd = new LinkedList<Score>();
 		toAdd.add(header.getScore(ChatColor.AQUA + "Radius: " + ChatColor.WHITE + plugin.getConfig().getInt("radius")));
 		toAdd.add(header.getScore(" "));
@@ -96,6 +101,11 @@ public class BoardManager implements Listener{
 		header.setDisplaySlot(DisplaySlot.SIDEBAR);
 		header.setDisplayName(teamM.getColorOfTeam(team) + ChatColor.BOLD + teamToAdd);
 		
+		Objective objective = teamBoard.registerNewObjective("showhealth", "health");
+		objective.setDisplaySlot(DisplaySlot.BELOW_NAME);
+		objective.setDisplayName(ChatColor.RED + "\u2665");
+		
+		
 		List<Score> toAdd = new LinkedList<Score>();
 		toAdd.add(header.getScore(ChatColor.AQUA + "Team Size: " + ChatColor.WHITE + "0"));
 		
@@ -120,7 +130,6 @@ public class BoardManager implements Listener{
 
 	public void createTeam(String team){
 		initializeTeamBoard(team);
-
 	}
 
 	public void removeTeam(String team){

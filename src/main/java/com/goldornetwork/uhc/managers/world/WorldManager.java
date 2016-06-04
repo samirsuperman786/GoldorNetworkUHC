@@ -73,7 +73,7 @@ public class WorldManager implements Listener{
 	public void onPlayerJoin(PlayerJoinEvent e){
 		Player target = e.getPlayer();
 		e.setJoinMessage(ChatColor.GREEN + "\u2713" + ChatColor.DARK_GRAY +  target.getName());
-		
+		target.setHealth(target.getHealth());
 		for(Player online : Bukkit.getOnlinePlayers()){
 			online.hidePlayer(target);
 			online.showPlayer(target);
