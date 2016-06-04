@@ -201,6 +201,7 @@ public class UHC extends JavaPlugin {
 			world.setAutoSave(false);
 			Bukkit.unloadWorld(world, false);
 		}
+		Bukkit.getServer().getScheduler().cancelAllTasks();
 		plugin=null;
 	}
 

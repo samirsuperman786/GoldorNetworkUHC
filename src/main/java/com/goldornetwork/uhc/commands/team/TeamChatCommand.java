@@ -17,7 +17,7 @@ public class TeamChatCommand extends UHCCommand{
 	private TeamManager teamM;
 	
 	public TeamChatCommand(TeamManager teamM, TeamInteraction teamI) {
-		super("team", "[message]");
+		super("pmt", "[message]");
 		this.teamI=teamI;
 		this.teamM=teamM;
 	}

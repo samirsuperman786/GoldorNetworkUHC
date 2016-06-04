@@ -1,4 +1,4 @@
-package com.goldornetwork.uhc.commands.game;
+package com.goldornetwork.uhc.commands.staff;
 
 import java.util.List;
 

@@ -1,11 +1,19 @@
 package com.goldornetwork.uhc.managers.world;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -16,8 +24,10 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.ScatterManager;
@@ -31,7 +41,7 @@ public class WorldManager implements Listener{
 	private UHC plugin;
 	private ScatterManager scatterM;
 	private TeamManager teamM;
-	
+	private Random random = new Random();
 	
 	public WorldManager(UHC plugin, ScatterManager scatterM, TeamManager teamM) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -56,6 +66,7 @@ public class WorldManager implements Listener{
 			all.teleport(scatterM.getLobby().getSpawnLocation());
 			
 		}
+		//fireworks(scatterM.getLobby());
 	}
 	
 	@EventHandler
@@ -127,16 +138,58 @@ public class WorldManager implements Listener{
 	
 	public void endGame(List<UUID> winners){
 		MessageSender.broadcast("Game has ended!");
-		MessageSender.broadcast("Winners are: ");
-		for(UUID u : winners){
-			MessageSender.broadcast(Bukkit.getServer().getOfflinePlayer(u).getName());
-			if(Bukkit.getOfflinePlayer(u).isOnline()){
-				Player target = Bukkit.getServer().getPlayer(u);
-				target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 4));
+		
+		if(winners!=null){
+			List<String> toBroadcast = new ArrayList<String>();
+			toBroadcast.add("Winners are: ");
+			
+			fireworks(scatterM.getUHCWorld());
+			
+			
+			
+			for(UUID u : winners){
+				toBroadcast.add(teamM.getColorOfPlayer(Bukkit.getOfflinePlayer(u)) + Bukkit.getServer().getOfflinePlayer(u).getName());
+				if(Bukkit.getOfflinePlayer(u).isOnline()){
+					Player target = Bukkit.getServer().getPlayer(u);
+					target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 4));
+				}
 			}
+			
+			MessageSender.broadcast(toBroadcast);
 		}
+		
 	}
 	
+	private void fireworks(World world){
+		
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				for(Player online : Bukkit.getServer().getOnlinePlayers()){
+					Location pLoc = online.getLocation();
+					int variation = random.nextInt(10);
+					Color color = Color.RED;
+					Location fireLoc = new Location(world, pLoc.getBlockX() + variation, pLoc.getBlockY(), pLoc.getBlockZ() + variation);
+					Firework fw = (Firework) world.spawn(fireLoc, Firework.class);
+					FireworkMeta fwMeta = fw.getFireworkMeta();
+					fwMeta.addEffect(FireworkEffect.builder()
+							.flicker(false)
+							.trail(true)
+							.with(FireworkEffect.Type.BALL_LARGE)
+							.withColor(color)
+							.withFade(Color.BLUE)
+							.build());
+					fwMeta.setPower(3);
+					fw.setFireworkMeta(fwMeta);
+					fw.detonate();
+					
+				}
+				
+			}
+		}.runTaskTimer(plugin, 0L, 30L);
+		
+	}
 	public void endGame(){
 		MessageSender.broadcast("Game has ended!");
 		MessageSender.broadcast("No one has won!");

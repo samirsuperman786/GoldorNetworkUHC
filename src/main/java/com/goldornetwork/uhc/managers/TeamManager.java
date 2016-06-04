@@ -197,7 +197,7 @@ public class TeamManager {
 	 * @param p the player to check
 	 * @return <code> True </code> if the give player is observing
 	 */
-	public boolean isPlayerAnObserver(Player p){
+	public boolean isPlayerAnObserver(OfflinePlayer p){
 		if(observers.contains(p.getUniqueId())){
 			return true;
 		}
@@ -406,9 +406,9 @@ public class TeamManager {
 		MessageSender.send(ChatColor.AQUA, p, "You are now spectating.");
 		boardM.addPlayerToObserver(p);
 	}
-	public String getColorOfPlayer(Player p){
+	public String getColorOfPlayer(OfflinePlayer p){
 		if(isTeamsEnabled){
-			return isPlayerOnTeam(p) ? colorOfTeam.get(getTeamOfPlayer(p).toLowerCase()) : ChatColor.AQUA.toString();
+			return isPlayerOnTeam(p) ? getColorOfTeam(getTeamOfPlayer(p)) : ChatColor.AQUA.toString();
 		}
 		else if(isPlayerAnObserver(p)){
 			return ChatColor.AQUA.toString();

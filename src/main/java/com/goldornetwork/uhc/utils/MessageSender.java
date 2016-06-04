@@ -23,6 +23,30 @@ public class MessageSender {
 	public static void send(ChatColor cc, CommandSender sender, String msg){
 		sender.sendMessage(getPrefix() + cc + msg);
 	}
+	public static void send(List<String> msg, Player p){
+		List<String> toEdit = new LinkedList<String>();
+		for(String messages : msg){
+			toEdit.add(getPrefix() + ChatColor.GOLD + messages);
+		}
+		
+		String[] toSend = new String[toEdit.size()];
+		toEdit.toArray(toSend);
+		
+		p.sendMessage(toSend);
+	}
+	
+	public static void send(List<String> msg, CommandSender sender){
+		List<String> toEdit = new LinkedList<String>();
+		for(String messages : msg){
+			toEdit.add(getPrefix() + ChatColor.GOLD + messages);
+		}
+		
+		String[] toSend = new String[toEdit.size()];
+		toEdit.toArray(toSend);
+		
+		sender.sendMessage(toSend);
+	}
+	
 	
 	public static void noPerms(Player p){
 		p.sendMessage(getPrefix() + ChatColor.RED + "No permission.");

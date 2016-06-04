@@ -1,4 +1,4 @@
-package com.goldornetwork.uhc.commands.game;
+package com.goldornetwork.uhc.commands.staff;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +13,9 @@ import com.goldornetwork.uhc.utils.MessageSender;
 
 public class CancelCommand extends UHCCommand {
 
+	/*
+	 * CURRENTLY DISABLED
+	 */
 	//instances
 	private TimerManager timerM;
 

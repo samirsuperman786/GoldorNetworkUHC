@@ -88,7 +88,7 @@ public class TimerManager implements Listener{
 			public void run() {
 				voteM.generateOptions();
 				List<String> toBroadcast = new LinkedList<String>();
-				toBroadcast.add("-[Options]");
+				toBroadcast.add("[Options]");
 				
 				for(int i = 0; i<voteM.getNumberOfOptions(); i++){
 					toBroadcast.add("Option " + (i + 1));

@@ -8,9 +8,6 @@ commands:
    start:
       description: Use this to start the match!
       usage: /<command> 
-   cancel:
-      description: Use this to cancel the match!
-      usage: /<command> 
    create:
       description: Use this to create a team!
       usage: /<command> 
@@ -39,12 +36,15 @@ commands:
    pmc:
       description: Use this to message your coordinates!
       usage: /<command>
-   team:
+   pmt:
       description: Use this to only talk to your team!
       usage: /<command> [message]
       aliases: [t] 
    helpop:
       description: Use this to talk to the moderators and admins!
+      usage: /<command> [message]
+   help:
+      description: Use this to understand commands!
       usage: /<command> [message]
    playerban:
       description: Use this to talk to the moderators and admins!

@@ -14,19 +14,20 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import com.goldornetwork.uhc.UHC;
-import com.goldornetwork.uhc.commands.game.CancelCommand;
-import com.goldornetwork.uhc.commands.game.StartCommand;
-import com.goldornetwork.uhc.commands.game.UHCBanCommand;
+import com.goldornetwork.uhc.commands.game.HelpCommand;
+import com.goldornetwork.uhc.commands.game.HelpopCommand;
+import com.goldornetwork.uhc.commands.game.InfoCommand;
+import com.goldornetwork.uhc.commands.game.VoteCommand;
+import com.goldornetwork.uhc.commands.staff.CancelCommand;
+import com.goldornetwork.uhc.commands.staff.StartCommand;
+import com.goldornetwork.uhc.commands.staff.UHCBanCommand;
 import com.goldornetwork.uhc.commands.team.CreateCommand;
-import com.goldornetwork.uhc.commands.team.InfoCommand;
 import com.goldornetwork.uhc.commands.team.InvitePlayerCommand;
 import com.goldornetwork.uhc.commands.team.JoinCommand;
 import com.goldornetwork.uhc.commands.team.LeaveCommand;
 import com.goldornetwork.uhc.commands.team.PMCoordsCommand;
 import com.goldornetwork.uhc.commands.team.TeamChatCommand;
 import com.goldornetwork.uhc.commands.team.UnInvitePlayerCommand;
-import com.goldornetwork.uhc.commands.team.VoteCommand;
-import com.goldornetwork.uhc.commands.utils.HelpopCommand;
 import com.goldornetwork.uhc.listeners.team.TeamInteraction;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
@@ -40,7 +41,7 @@ import com.goldornetwork.uhc.utils.MessageSender;
 public class CommandHandler implements CommandExecutor, TabCompleter{
 
 	private final UHC plugin;
-	
+
 	public CommandHandler(UHC plugin) {
 		this.plugin=plugin;
 	}
@@ -78,29 +79,27 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		UHCCommand command = getCommand(cmd.getName());
-		
+
 		if(command==null){
 			return null;
 		}
 		if(!(sender.hasPermission(command.getPermission()))){
 			return null;
 		}
-		
+
 		try {
 			List<String> list = command.tabComplete(sender, args);
-			
-			// if the list is null, replace it with everyone online.
+
 			if (list == null) {
 				list = getAllPlayerNames(sender);
 			}
-			
-			// I don't want anything done if the list is empty.
+
 			if (list.isEmpty()) {
 				return list;
 			}
-			
+
 			List<String> toReturn = new ArrayList<String>();
-			
+
 			if (args[args.length - 1].isEmpty()) {
 				for (String type : list) {
 					toReturn.add(type);
@@ -112,14 +111,13 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 					}
 				}
 			}
-			
+
 			return toReturn;
 		} catch (Exception ex) {
-			// send them the error message in red if anything failed.
 			sender.sendMessage(ChatColor.RED + ex.getMessage());
 		}
 		return null;
-		
+
 	}
 
 	protected UHCCommand getCommand(String name) {
@@ -133,18 +131,18 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 	}
 	private List<String> getAllPlayerNames(CommandSender sender) {
 		List<String> list = new ArrayList<String>();
-		
+
 		for (Player all : Bukkit.getOnlinePlayers()) {
 			if(sender instanceof Player){
 				continue;
 			}
 			list.add(all.getName());
 		}
-		
+
 		return list;
 	}
-	
-	
+
+
 	/**
 	 * Will register all commands 
 	 * @param teamM TeamManager
@@ -152,25 +150,29 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 	 * @param chunkG ChunkGenerator
 	 */
 	public void registerCommands(TeamManager teamM, TimerManager timerM, GameModeManager gamemodeM, ChunkGenerator chunkG, VoteManager voteM, TeamInteraction teamI, UHCBan uhcB){
-		//game
+		//staff
 		cmds.add(new StartCommand(timerM, teamM));
-		cmds.add(new CancelCommand(timerM));
-		
+		cmds.add(new UHCBanCommand(teamM, uhcB));
+
 		//team
 		cmds.add(new CreateCommand(teamM));
 		cmds.add(new InvitePlayerCommand(teamM));
 		cmds.add(new JoinCommand(teamM));
 		cmds.add(new UnInvitePlayerCommand(teamM));
-		cmds.add(new VoteCommand(voteM));
 		cmds.add(new LeaveCommand(teamM));
-		cmds.add(new InfoCommand(gamemodeM));
 		cmds.add(new PMCoordsCommand(teamM, teamI));
 		cmds.add(new TeamChatCommand(teamM, teamI));
+
+
+		//game
 		cmds.add(new HelpopCommand(teamM));
-		cmds.add(new UHCBanCommand(teamM, uhcB));
+		cmds.add(new HelpCommand());
+		cmds.add(new InfoCommand(gamemodeM));
+		cmds.add(new VoteCommand(voteM));
+		
 		for(UHCCommand cmd : cmds){
 			PluginCommand pCmd = plugin.getCommand(cmd.getName());
-			
+
 			if(pCmd ==null){
 				MessageSender.sendToOPS(cmd.getName() + " is not working properly");
 				continue;
@@ -178,8 +180,8 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 			pCmd.setExecutor(this);
 			pCmd.setTabCompleter(this);
 		}
-		
+
 	}
-	
+
 
 }
