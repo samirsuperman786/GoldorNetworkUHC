@@ -32,7 +32,7 @@ public class LookupCommand extends UHCCommand{
 			if(teamM.isActiveTeam(args[0])){
 				List<String> toReturn = new LinkedList<String>();
 				String team = teamM.getTeamNameProper(args[0]);
-				String header = "Team " + teamM.getColorOfTeam(team) + team;
+				String header = teamM.getColorOfTeam(team) + "" + ChatColor.UNDERLINE + "Team " + team;
 				toReturn.add(header);
 				for(UUID u : teamM.getPlayersOnATeam(team)){
 					if(Bukkit.getOfflinePlayer(u).isOnline()){

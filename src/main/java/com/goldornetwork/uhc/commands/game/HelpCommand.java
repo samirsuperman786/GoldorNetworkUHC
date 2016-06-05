@@ -46,7 +46,8 @@ public class HelpCommand extends UHCCommand{
 				toReturn.add(formatCommand("/helpop [message]", "Use this to message staff."));
 				toReturn.add(formatCommand("/info", "Use this to learn the gamemodes."));
 				toReturn.add(formatCommand("/vote [option]", "Use this to vote when a poll is active."));
-				toReturn.add(formatCommand("/health [player]", "Get the health of a player!"));
+				toReturn.add(formatCommand("/health [player]", "Get the health of a player."));
+				toReturn.add(formatCommand("/lookup [team]", "Use this to lookup a team."));
 				MessageSender.send(toReturn, sender);
 				return true;
 			}
