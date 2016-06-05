@@ -18,7 +18,6 @@ commands:
    leave:
       description: Use this to leave a team or the game!
       usage: /<command> [option] 
-      aliases: [l]
    invite:
       description: Use this to invite a player to your team!
       usage: /<command> [player]  
@@ -33,6 +32,10 @@ commands:
    health:
       description: Use this to get the health of a player!
       usage: /<command> [player] 
+   lookup:
+      description: Use this to lookup a team!
+      usage: /<command> [team]
+      aliases: [l]
    info:
       description: Use this to learn the gamemodes!
       usage: /<command> [gamemode] 

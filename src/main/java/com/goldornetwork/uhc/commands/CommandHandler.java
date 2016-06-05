@@ -18,6 +18,7 @@ import com.goldornetwork.uhc.commands.game.HealthCommand;
 import com.goldornetwork.uhc.commands.game.HelpCommand;
 import com.goldornetwork.uhc.commands.game.HelpopCommand;
 import com.goldornetwork.uhc.commands.game.InfoCommand;
+import com.goldornetwork.uhc.commands.game.LookupCommand;
 import com.goldornetwork.uhc.commands.game.VoteCommand;
 import com.goldornetwork.uhc.commands.staff.CancelCommand;
 import com.goldornetwork.uhc.commands.staff.StartCommand;
@@ -171,6 +172,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 		cmds.add(new InfoCommand(gamemodeM));
 		cmds.add(new VoteCommand(voteM));
 		cmds.add(new HealthCommand(teamM));
+		cmds.add(new LookupCommand(teamM));
 		
 		for(UHCCommand cmd : cmds){
 			PluginCommand pCmd = plugin.getCommand(cmd.getName());

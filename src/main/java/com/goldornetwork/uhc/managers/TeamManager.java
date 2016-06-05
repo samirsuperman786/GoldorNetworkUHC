@@ -86,7 +86,7 @@ public class TeamManager {
 	}
 
 	public enum BASECOLORS{
-		BLUE, DARK_AQUA, DARK_BLUE, DARK_GRAY, DARK_PURPLE, DARK_RED, GRAY, LIGHT_PURPLE
+		BLUE, DARK_AQUA, DARK_BLUE, DARK_GRAY, DARK_PURPLE, DARK_RED, LIGHT_PURPLE, YELLOW, DARK_GREEN
 	}
 
 	/**
@@ -449,6 +449,9 @@ public class TeamManager {
 
 	public List<String> getActiveTeams(){
 		return listOfActiveTeams;
+	}
+	public boolean isActiveTeam(String team){
+		return listOfActiveTeams.contains(team.toLowerCase());
 	}
 	
 	public boolean isTeamInactive(String team){
