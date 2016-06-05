@@ -120,7 +120,10 @@ public class TeamManager {
 		initializeT();
 		
 	}
-
+	
+	public int getTeamSize(){
+		return this.playersPerTeam;
+	}
 
 	/**
 	 * Checks if teams are enabled
@@ -407,11 +410,11 @@ public class TeamManager {
 		boardM.addPlayerToObserver(p);
 	}
 	public String getColorOfPlayer(OfflinePlayer p){
-		if(isTeamsEnabled){
-			return isPlayerOnTeam(p) ? getColorOfTeam(getTeamOfPlayer(p)) : ChatColor.AQUA.toString();
-		}
-		else if(isPlayerAnObserver(p)){
+		if(isPlayerAnObserver(p)){
 			return ChatColor.AQUA.toString();
+		}
+		else if(isTeamsEnabled){
+			return isPlayerOnTeam(p) ? getColorOfTeam(getTeamOfPlayer(p)) : ChatColor.WHITE.toString();
 		}
 		else{
 			return ChatColor.GRAY.toString();

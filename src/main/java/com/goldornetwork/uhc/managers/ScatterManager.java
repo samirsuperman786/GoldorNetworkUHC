@@ -1,8 +1,6 @@
 package com.goldornetwork.uhc.managers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +11,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
@@ -27,6 +26,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -38,6 +38,8 @@ import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.managers.GameModeManager.TeleportTeamEvent;
 import com.goldornetwork.uhc.managers.world.ChunkGenerator;
 import com.goldornetwork.uhc.managers.world.WorldFactory;
+import com.goldornetwork.uhc.managers.world.events.LateScatterEvent;
+import com.goldornetwork.uhc.utils.Medic;
 import com.goldornetwork.uhc.utils.MessageSender;
 import com.google.common.collect.ImmutableSet;
 
@@ -58,6 +60,7 @@ public class ScatterManager implements Listener{
 	//storage
 	private boolean scatterComplete;
 	private boolean teleported;
+	private boolean lateScatterComplete;
 	private int radius;
 	private World uhcWorld;
 	private final int LOADS_PER_SECOND = 1;
@@ -72,6 +75,8 @@ public class ScatterManager implements Listener{
 	private List<UUID> lateScatters = new ArrayList<UUID>();
 	private List<String> nameOfTeams = new ArrayList<String>();
 	private BlockingQueue<String> teamReadyToScatter;
+	private BlockingQueue<UUID> lateScatterReadyToScatter;
+	private Map<String, Boolean> isTeamOnline = new HashMap<String, Boolean>();
 
 	public ScatterManager(UHC plugin, TeamManager teamM, MoveEvent moveE, ChatManager chatM, WorldFactory worldF, ChunkGenerator chunkG) {
 		this.plugin=plugin;
@@ -142,10 +147,12 @@ public class ScatterManager implements Listener{
 	public void enableTeams(){
 		nameOfTeams.addAll(teamM.getActiveTeams());
 		this.teamReadyToScatter= new ArrayBlockingQueue<>(nameOfTeams.size());
+		this.lateScatterReadyToScatter= new ArrayBlockingQueue<>((nameOfTeams.size() * teamM.getTeamSize()) + 1);
 		teamReadyToScatter.addAll(nameOfTeams);
 
 		for(String team : teamM.getActiveTeams()){
 			teamToScatter.put(team, teamM.getPlayersOnATeam(team));
+			this.isTeamOnline.put(team, false);
 		}
 		findLocations(nameOfTeams.size());
 	}
@@ -225,6 +232,16 @@ public class ScatterManager implements Listener{
 		}.runTaskTimer(plugin, 0L, 20L);
 	}
 
+	private boolean moveToNextTeam(String currentTeam){
+		boolean move=false;
+		if(teleported){
+			move=true;
+		}
+		if(isTeamOnline.get(currentTeam)==false){
+			move=true;
+		}
+		return move;
+	}
 	@EventHandler
 	public void on(TeleportTeamEvent e) throws InterruptedException{
 		if(teamReadyToScatter.isEmpty()){
@@ -243,49 +260,50 @@ public class ScatterManager implements Listener{
 					MinecraftServer.getServer().processQueue.add(new Runnable() {
 						@Override
 						public void run() {
-							
+
 							Location safeLocation = new Location(location.getWorld(), location.getBlockX(), location.getWorld().getHighestBlockYAt(location), location.getBlockZ());
-							
+
 							for(UUID u : teamToScatter.get(team)){
 								OfflinePlayer p = Bukkit.getOfflinePlayer(u);
 								if(p.isOnline()==false){
 									lateScatters.add(u);
 								}
 								else if(p.isOnline()==true){
+									isTeamOnline.put(team, true);
 									Player target = (Player) p;
 									initializePlayer(target);
 									teleported = target.teleport(safeLocation);
 								}
 
 							}
-							
+
 							new BukkitRunnable() {
-								
+
 								@Override
 								public void run() {
-									
-									if(teleported){
+
+									if(moveToNextTeam(team)){
 										new BukkitRunnable() {
-											
+
 											@Override
 											public void run() {
 												Bukkit.getPluginManager().callEvent(new TeleportTeamEvent());
-												
+
 											}
 										}.runTaskLater(plugin, 120L);
 										cancel();
 									}
-									
-									
+
+
 								}
 							}.runTaskTimer(plugin, 20L, 20L);
-							
+
 						}
 					});
 				}
 			});
 		}
-		
+
 
 	}
 	/**
@@ -348,7 +366,7 @@ public class ScatterManager implements Listener{
 		if(loc.getBlockY()<60){
 			valid =false;
 		}
-		
+
 		else{
 			for(BlockFace face : faces){
 				//getting the block at land
@@ -379,26 +397,112 @@ public class ScatterManager implements Listener{
 		return valid;
 	}
 
+	@EventHandler
+	public void on(PlayerJoinEvent e){
+		Player target = e.getPlayer();
+		if(State.getState().equals(State.INGAME)|| State.getState().equals(State.SCATTER)){
+			if(teamM.isPlayerInGame(e.getPlayer())){
+				if(getLateScatters().contains(target.getUniqueId()) && !(lateScatterReadyToScatter.contains(target.getUniqueId()))){
+					handleLateScatter(target);
+				}
 
-	public void handleLateScatter(Player p){
-		if(teamM.isTeamsEnabled()){
-			lateScatterAPlayerInATeam(teamM.getTeamOfPlayer(p), p);
-			removePlayerFromLateScatters(p);
+			}
+			else if(teamM.isPlayerInGame(e.getPlayer())==false){
+				if(target.getWorld().equals(getUHCWorld())==false){
+					target.teleport(getUHCWorld().getSpawnLocation());
+				}
+				if(teamM.isPlayerAnObserver(target)==false){
+					teamM.addPlayerToObservers(target);
+				}
+				else{
+
+					MessageSender.send(ChatColor.AQUA, target, "You are now spectating the game");
+				}
+
+			}
 		}
 	}
 
-	/**
-	 * Used to handle players who were disconnected and need to be scattered explicitly in a team context
-	 * @param team - the team of the player
-	 * @param p - the player who needs to be teleported 
-	 */
-	private void lateScatterAPlayerInATeam(String team, Player p){
-		initializePlayer(p);
-		Location location = locationsOfTeamSpawn.get(team.toLowerCase());
-		Location safeLocation = new Location(location.getWorld(), location.getBlockX(), location.getWorld().getHighestBlockYAt(location), location.getZ());
-		p.teleport(safeLocation);
+	@EventHandler
+	public void on(LateScatterEvent e){
+		if(lateScatterReadyToScatter.isEmpty()){
+			return;
+		}
+		else if(!(teamM.isPlayerOnTeam(Bukkit.getOfflinePlayer(lateScatterReadyToScatter.peek())))){
+			lateScatterReadyToScatter.poll();
+			Bukkit.getPluginManager().callEvent(new LateScatterEvent());
+		}
+		else{
+			UUID u = lateScatterReadyToScatter.poll();
+			Location location = locationsOfTeamSpawn.get(teamM.getTeamOfPlayer(Bukkit.getOfflinePlayer(u)));
+			location.getChunk().load(true);
+
+			((CraftWorld)location.getWorld()).getHandle().chunkProviderServer.getChunkAt(location.getBlockX(), location.getBlockZ(), new Runnable() {
+				@Override
+				public void run() {
+					MinecraftServer.getServer().processQueue.add(new Runnable() {
+						@Override
+						public void run() {
+
+							Location safeLocation = new Location(location.getWorld(), location.getBlockX(), location.getWorld().getHighestBlockYAt(location), location.getBlockZ());
+
+
+							OfflinePlayer p = Bukkit.getOfflinePlayer(u);
+							if(teamM.isPlayerOnTeam(p)){
+								if(p.isOnline()==false){
+									lateScatters.add(u);
+									Bukkit.getPluginManager().callEvent(new LateScatterEvent());
+								}
+								else if(p.isOnline()==true){
+									Player target = (Player) p;
+									initializePlayer(target);
+									lateScatterComplete = target.teleport(safeLocation);
+									new BukkitRunnable() {
+
+										@Override
+										public void run() {
+
+											if(lateScatterComplete){
+												new BukkitRunnable() {
+
+													@Override
+													public void run() {
+														Bukkit.getPluginManager().callEvent(new LateScatterEvent());
+
+													}
+												}.runTaskLater(plugin, 120L);
+												cancel();
+											}
+
+
+										}
+									}.runTaskTimer(plugin, 20L, 20L);
+
+
+								}
+							}
+
+
+						}
+					});
+				}
+			});
+		}
+
+
 	}
+	public void handleLateScatter(Player p){
+		if(teamM.isTeamsEnabled()){
+			removePlayerFromLateScatters(p);
+			lateScatterReadyToScatter.offer(p.getUniqueId());
+			Bukkit.getPluginManager().callEvent(new LateScatterEvent());
+		}
+	}
+
 	private void initializePlayer(Player p){
+		Medic.heal(p);
+		p.setMaxHealth(20);
+		p.teleport(getLobby().getSpawnLocation());
 		p.getInventory().clear();
 		p.getInventory().setArmorContents(null);
 		p.setGameMode(GameMode.SURVIVAL);
@@ -484,12 +588,12 @@ public class ScatterManager implements Listener{
 				for(Player online: Bukkit.getServer().getOnlinePlayers()){
 					online.setHealth(online.getHealth());
 				}
-				
+
 			}
 		}.runTaskLater(plugin, 100L);
 
 	}
-	
+
 	public void prePVPSetup(){
 		getUHCWorld().setTime(0);
 		getUHCWorld().setGameRuleValue("dodaylightcycle", "false");

@@ -72,32 +72,11 @@ public class WorldManager implements Listener{
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e){
 		Player target = e.getPlayer();
-		e.setJoinMessage(ChatColor.GREEN + "\u2713" + ChatColor.DARK_GRAY +  target.getName());
+		e.setJoinMessage(ChatColor.GREEN + "\u2713" + teamM.getColorOfPlayer(target) +  target.getName());
 		target.setHealth(target.getHealth());
 		for(Player online : Bukkit.getOnlinePlayers()){
 			online.hidePlayer(target);
 			online.showPlayer(target);
-		}
-		if(State.getState().equals(State.INGAME)|| State.getState().equals(State.SCATTER)){
-			if(teamM.isPlayerInGame(e.getPlayer())){
-					if(scatterM.getLateScatters().contains(target.getUniqueId())){
-						scatterM.handleLateScatter(target);
-					}
-				
-			}
-			else if(teamM.isPlayerInGame(e.getPlayer())==false){
-				if(target.getWorld().equals(scatterM.getUHCWorld())==false){
-					target.teleport(scatterM.getUHCWorld().getSpawnLocation());
-				}
-				if(teamM.isPlayerAnObserver(target)==false){
-					teamM.addPlayerToObservers(target);
-				}
-				else{
-					
-					MessageSender.send(ChatColor.AQUA, target, "You are now spectating the game");
-				}
-				
-			}
 		}
 		
 	}
@@ -106,7 +85,7 @@ public class WorldManager implements Listener{
 	@EventHandler
 	public void onPlayerLeave(PlayerQuitEvent e){
 		Player target = e.getPlayer();
-		e.setQuitMessage(ChatColor.RED + "\u2717" + ChatColor.DARK_GRAY+ target.getName());
+		e.setQuitMessage(ChatColor.RED + "\u2717" + teamM.getColorOfPlayer(target) + target.getName());
 	}
 	
 	@EventHandler(priority = EventPriority.LOW)
