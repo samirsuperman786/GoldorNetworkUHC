@@ -1,4 +1,4 @@
-package com.goldornetwork.uhc.listeners;
+package com.goldornetwork.uhc.managers.world.listeners;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

@@ -30,13 +30,13 @@ import com.goldornetwork.uhc.commands.team.LeaveCommand;
 import com.goldornetwork.uhc.commands.team.PMCoordsCommand;
 import com.goldornetwork.uhc.commands.team.TeamChatCommand;
 import com.goldornetwork.uhc.commands.team.UnInvitePlayerCommand;
-import com.goldornetwork.uhc.listeners.team.TeamInteraction;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.VoteManager;
 import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
 import com.goldornetwork.uhc.managers.world.ChunkGenerator;
 import com.goldornetwork.uhc.managers.world.UHCBan;
+import com.goldornetwork.uhc.managers.world.listeners.team.TeamInteraction;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 

@@ -14,13 +14,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.commands.CommandHandler;
-import com.goldornetwork.uhc.listeners.DeathEvent;
-import com.goldornetwork.uhc.listeners.JoinEvent;
-import com.goldornetwork.uhc.listeners.LeaveEvent;
-import com.goldornetwork.uhc.listeners.MoveEvent;
-import com.goldornetwork.uhc.listeners.WeatherChange;
-import com.goldornetwork.uhc.listeners.team.ChatManager;
-import com.goldornetwork.uhc.listeners.team.TeamInteraction;
 import com.goldornetwork.uhc.managers.BoardManager;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.SpectatorRegionManager;
@@ -32,6 +25,13 @@ import com.goldornetwork.uhc.managers.world.ChunkGenerator;
 import com.goldornetwork.uhc.managers.world.UHCBan;
 import com.goldornetwork.uhc.managers.world.WorldFactory;
 import com.goldornetwork.uhc.managers.world.WorldManager;
+import com.goldornetwork.uhc.managers.world.listeners.DeathEvent;
+import com.goldornetwork.uhc.managers.world.listeners.JoinEvent;
+import com.goldornetwork.uhc.managers.world.listeners.LeaveEvent;
+import com.goldornetwork.uhc.managers.world.listeners.MoveEvent;
+import com.goldornetwork.uhc.managers.world.listeners.WeatherChange;
+import com.goldornetwork.uhc.managers.world.listeners.team.ChatManager;
+import com.goldornetwork.uhc.managers.world.listeners.team.TeamInteraction;
 import com.goldornetwork.uhc.utils.AntiXray;
 import com.goldornetwork.uhc.utils.Medic;
 

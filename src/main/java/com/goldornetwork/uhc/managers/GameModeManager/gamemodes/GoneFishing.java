@@ -17,9 +17,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
 
 public class GoneFishing extends Gamemode implements Listener {
 

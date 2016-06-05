@@ -1,6 +1,7 @@
 package com.goldornetwork.uhc.managers.world;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -12,7 +13,6 @@ import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -33,6 +33,7 @@ import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.managers.world.events.GameEndEvent;
 import com.goldornetwork.uhc.utils.Medic;
 import com.goldornetwork.uhc.utils.MessageSender;
 
@@ -42,6 +43,7 @@ public class WorldManager implements Listener{
 	private ScatterManager scatterM;
 	private TeamManager teamM;
 	private Random random = new Random();
+	private int timer;
 	
 	public WorldManager(UHC plugin, ScatterManager scatterM, TeamManager teamM) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -51,6 +53,8 @@ public class WorldManager implements Listener{
 	}
 	
 	public void setup(){
+		plugin.getConfig().addDefault("ENDGAME-GRACE-PERIOD", 2);
+		this.timer=((plugin.getConfig().getInt("ENDGAME-GRACE-PERIOD")) *60);
 		for(Player all : Bukkit.getOnlinePlayers()){
 			all.setGameMode(GameMode.ADVENTURE);
 			all.setMaxHealth(20);
@@ -114,28 +118,63 @@ public class WorldManager implements Listener{
 		}
 	}
 	
-	
+	@EventHandler
+	public void on(GameEndEvent e){
+		endGame(e.getWinners());
+	}
 	public void endGame(List<UUID> winners){
-		MessageSender.broadcast("Game has ended!");
-		
-		if(winners!=null){
-			List<String> toBroadcast = new ArrayList<String>();
-			toBroadcast.add("Winners are: ");
-			
-			fireworks(scatterM.getUHCWorld());
-			
-			
-			
-			for(UUID u : winners){
-				toBroadcast.add(teamM.getColorOfPlayer(Bukkit.getOfflinePlayer(u)) + Bukkit.getServer().getOfflinePlayer(u).getName());
-				if(Bukkit.getOfflinePlayer(u).isOnline()){
-					Player target = Bukkit.getServer().getPlayer(u);
-					target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 4));
-				}
-			}
-			
-			MessageSender.broadcast(toBroadcast);
+		timer=0;
+		List<String> toBroadcast = new LinkedList<String>();
+		for(int i = 0; i<11; i++){
+			toBroadcast.add(ChatColor.AQUA + "------------");
 		}
+		toBroadcast.add("Game has ended, thanks for playing!");
+		
+		MessageSender.broadcast(toBroadcast);
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				if(winners!=null){
+					List<String> toReturn = new ArrayList<String>();
+					toReturn.add("Winners are: ");
+					
+					fireworks(scatterM.getUHCWorld());
+					
+					
+					for(UUID u : winners){
+						toReturn.add(teamM.getColorOfPlayer(Bukkit.getOfflinePlayer(u)) + Bukkit.getServer().getOfflinePlayer(u).getName());
+						if(Bukkit.getOfflinePlayer(u).isOnline()){
+							Player target = Bukkit.getServer().getPlayer(u);
+							target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 4));
+						}
+					}
+					
+					MessageSender.broadcast(toReturn);
+				}
+				
+			}
+		}.runTaskLater(plugin, 10L);
+		
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				timer--;
+				if(timer>=60 && timer%60==0){
+					MessageSender.broadcast("Server closing in " + (timer/60) + "minute(s)");
+				}
+				else if(timer<60 && timer>=15 && timer%15==0){
+					MessageSender.broadcast("Server closing in " + timer + "seconds");
+				}
+				else if(timer <=5){
+					MessageSender.broadcast("Server closing in " + timer + "second(s)");
+				}
+				
+				Bukkit.getServer().shutdown();
+			}
+		}.runTaskTimer(plugin, 0L, 20L);
+		
 		
 	}
 	

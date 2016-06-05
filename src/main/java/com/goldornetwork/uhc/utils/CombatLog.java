@@ -16,10 +16,10 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.goldornetwork.uhc.UHC;
-import com.goldornetwork.uhc.listeners.DeathEvent;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.managers.world.listeners.DeathEvent;
 
 public class CombatLog implements Listener{
 	

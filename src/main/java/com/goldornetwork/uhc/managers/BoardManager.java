@@ -25,7 +25,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import com.goldornetwork.uhc.UHC;
-import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
+import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
 
 public class BoardManager implements Listener{
 

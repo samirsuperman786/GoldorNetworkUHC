@@ -11,7 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
 
 import com.goldornetwork.uhc.UHC;
-import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
+import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
 
 public class SpectatorRegionManager implements Listener {
 

@@ -31,14 +31,14 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
-import com.goldornetwork.uhc.listeners.MoveEvent;
-import com.goldornetwork.uhc.listeners.team.ChatManager;
-import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
-import com.goldornetwork.uhc.managers.GameModeManager.TeleportTeamEvent;
 import com.goldornetwork.uhc.managers.world.ChunkGenerator;
 import com.goldornetwork.uhc.managers.world.WorldFactory;
+import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
 import com.goldornetwork.uhc.managers.world.events.LateScatterEvent;
+import com.goldornetwork.uhc.managers.world.events.TeleportTeamEvent;
+import com.goldornetwork.uhc.managers.world.listeners.MoveEvent;
+import com.goldornetwork.uhc.managers.world.listeners.team.ChatManager;
 import com.goldornetwork.uhc.utils.Medic;
 import com.goldornetwork.uhc.utils.MessageSender;
 import com.google.common.collect.ImmutableSet;

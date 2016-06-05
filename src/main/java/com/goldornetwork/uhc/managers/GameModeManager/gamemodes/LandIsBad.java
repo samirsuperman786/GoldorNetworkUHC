@@ -14,7 +14,7 @@ import org.bukkit.scheduler.BukkitTask;
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
-import com.goldornetwork.uhc.managers.GameModeManager.PVPEnableEvent;
+import com.goldornetwork.uhc.managers.world.events.PVPEnableEvent;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class LandIsBad extends Gamemode implements Listener{

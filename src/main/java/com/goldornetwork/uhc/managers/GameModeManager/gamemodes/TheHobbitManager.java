@@ -19,9 +19,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class TheHobbitManager extends Gamemode implements Listener{

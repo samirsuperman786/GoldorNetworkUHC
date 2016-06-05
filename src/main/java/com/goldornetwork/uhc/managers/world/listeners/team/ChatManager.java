@@ -1,4 +1,4 @@
-package com.goldornetwork.uhc.listeners.team;
+package com.goldornetwork.uhc.managers.world.listeners.team;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

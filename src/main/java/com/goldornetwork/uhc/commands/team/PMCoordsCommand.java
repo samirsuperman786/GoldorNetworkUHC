@@ -7,8 +7,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.goldornetwork.uhc.commands.UHCCommand;
-import com.goldornetwork.uhc.listeners.team.TeamInteraction;
 import com.goldornetwork.uhc.managers.TeamManager;
+import com.goldornetwork.uhc.managers.world.listeners.team.TeamInteraction;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class PMCoordsCommand extends UHCCommand {

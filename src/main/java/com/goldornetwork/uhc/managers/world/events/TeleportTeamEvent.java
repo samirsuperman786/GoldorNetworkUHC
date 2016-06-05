@@ -1,4 +1,4 @@
-package com.goldornetwork.uhc.managers.GameModeManager;
+package com.goldornetwork.uhc.managers.world.events;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;

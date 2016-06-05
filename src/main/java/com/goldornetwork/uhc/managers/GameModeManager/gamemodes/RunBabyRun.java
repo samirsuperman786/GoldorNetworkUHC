@@ -14,8 +14,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
+import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
 
 public class RunBabyRun extends Gamemode implements Listener{
 
