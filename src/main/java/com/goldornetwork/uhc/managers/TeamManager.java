@@ -86,7 +86,7 @@ public class TeamManager {
 	}
 
 	public enum BASECOLORS{
-		BLUE, DARK_AQUA, DARK_BLUE, DARK_GRAY, DARK_PURPLE, DARK_RED, LIGHT_PURPLE, YELLOW, DARK_GREEN
+		BLUE, DARK_AQUA, DARK_BLUE, DARK_GRAY, DARK_PURPLE, DARK_RED, LIGHT_PURPLE, YELLOW
 	}
 
 	/**
@@ -265,12 +265,7 @@ public class TeamManager {
 			}
 
 		}
-		if(foundTeam==true){
-			return true;
-		}
-		else{
-			return false;
-		}
+		return foundTeam;
 
 	}
 
@@ -280,13 +275,7 @@ public class TeamManager {
 	 * @return <code> True </code> if there is room to join
 	 */
 	public boolean isTeamRoomToJoin(String team){
-		if((playersPerTeam - playersOnCurrentTeam.get(team.toLowerCase()))>0){
-			return true;
-		}
-		else{
-			return false;
-		}
-
+		return (playersPerTeam - playersOnCurrentTeam.get(team.toLowerCase())>0);
 
 	}
 
@@ -370,12 +359,7 @@ public class TeamManager {
 	 * @return <code> True </code> if the player is the owner
 	 */
 	public boolean isPlayerOwner(Player p){
-		if(ownerOfTeam.containsValue(p.getUniqueId())){
-			return true;
-		}
-		else{
-			return false;
-		}
+		return ownerOfTeam.containsValue(p.getUniqueId());
 	}
 
 	/**
@@ -451,7 +435,9 @@ public class TeamManager {
 					break;
 				}
 			}
-			break;
+			if(allOffline==false){
+				break;
+			}
 		}
 		return allOffline;
 	}
@@ -475,10 +461,6 @@ public class TeamManager {
 		boardM.removeTeam(team);
 	}
 
-	public void teamHasDied(String team){
-		listOfActiveTeams.remove(team);
-		boardM.removeTeam(team);
-	}
 
 	public String getTeamNameProper(String team){
 		String output = team.substring(0, 1).toUpperCase() + team.toLowerCase().substring(1);

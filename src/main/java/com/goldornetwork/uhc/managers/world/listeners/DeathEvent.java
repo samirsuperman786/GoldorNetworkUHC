@@ -40,7 +40,7 @@ public class DeathEvent implements Listener {
 			}
 			teamM.removePlayerFromTeam(p.getUniqueId());
 			if(teamM.getPlayersOnATeam(team).isEmpty()){
-				teamM.teamHasDied(team);
+				teamM.disbandTeam(team);
 			}
 
 		}
