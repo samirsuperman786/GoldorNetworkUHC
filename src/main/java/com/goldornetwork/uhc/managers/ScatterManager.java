@@ -13,16 +13,13 @@ import java.util.concurrent.BlockingQueue;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
-import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
-import org.bukkit.WorldBorder;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -34,8 +31,11 @@ import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.managers.world.ChunkGenerator;
 import com.goldornetwork.uhc.managers.world.WorldFactory;
+import com.goldornetwork.uhc.managers.world.WorldManager;
 import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
 import com.goldornetwork.uhc.managers.world.events.LateScatterEvent;
+import com.goldornetwork.uhc.managers.world.events.ScatterEndEvent;
+import com.goldornetwork.uhc.managers.world.events.ScatterStartEvent;
 import com.goldornetwork.uhc.managers.world.events.TeleportTeamEvent;
 import com.goldornetwork.uhc.managers.world.listeners.MoveEvent;
 import com.goldornetwork.uhc.managers.world.listeners.team.ChatManager;
@@ -57,12 +57,12 @@ public class ScatterManager implements Listener{
 	private ChatManager chatM;
 	private WorldFactory worldF;
 	private ChunkGenerator chunkG;
+	private WorldManager worldM;
 	//storage
 	private boolean scatterComplete;
 	private boolean teleported;
 	private boolean lateScatterComplete;
 	private int radius;
-	private World uhcWorld;
 	private final int LOADS_PER_SECOND = 1;
 	private int timer;
 	private BlockFace[] faces = new BlockFace[] { BlockFace.SELF, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH_EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH_WEST, BlockFace.NORTH_WEST};
@@ -78,13 +78,14 @@ public class ScatterManager implements Listener{
 	private BlockingQueue<UUID> lateScatterReadyToScatter;
 	private Map<String, Boolean> isTeamOnline = new HashMap<String, Boolean>();
 
-	public ScatterManager(UHC plugin, TeamManager teamM, MoveEvent moveE, ChatManager chatM, WorldFactory worldF, ChunkGenerator chunkG) {
+	public ScatterManager(UHC plugin, TeamManager teamM, MoveEvent moveE, ChatManager chatM, WorldFactory worldF, ChunkGenerator chunkG, WorldManager worldM) {
 		this.plugin=plugin;
 		this.teamM=teamM;
 		this.moveE=moveE;
 		this.chatM=chatM;
 		this.worldF=worldF;
 		this.chunkG=chunkG;
+		this.worldM=worldM;
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
@@ -99,33 +100,12 @@ public class ScatterManager implements Listener{
 	 */
 	public void setup(){
 		config();
-		newUHCWorld();
-		moveE.unfreezePlayers();
 		radius = plugin.getConfig().getInt("radius");
-		getUHCWorld().setPVP(false);
-		getUHCWorld().setGameRuleValue("doMobSpawning", "false");
-		getUHCWorld().setGameRuleValue("naturalRegeneration", "false");
-		getUHCWorld().setDifficulty(Difficulty.HARD);
 		scatterComplete=false;
 		teamToScatter.clear();
 		locationsOfTeamSpawn.clear();
 		lateScatters.clear();
 		nameOfTeams.clear();
-		WorldBorder wb = getUHCWorld().getWorldBorder();
-		wb.setCenter(getUHCWorld().getSpawnLocation());
-		wb.setSize(radius*2);
-		wb.setDamageBuffer(0);
-		wb.setDamageAmount(.5);
-		wb.setWarningTime(15);
-		wb.setWarningDistance(20);
-		for(Entity e : getUHCWorld().getEntities()){
-			if(!(e instanceof Player)){
-				e.remove();
-			}
-		}
-		chunkG.generate(getUHCWorld(), getCenter(), radius);
-
-
 	}
 
 	@EventHandler
@@ -144,7 +124,7 @@ public class ScatterManager implements Listener{
 	public boolean isScatteringComplete(){
 		return scatterComplete;
 	}
-	public void enableTeams(){
+	public void scatter(){
 		nameOfTeams.addAll(teamM.getActiveTeams());
 		this.teamReadyToScatter= new ArrayBlockingQueue<>(nameOfTeams.size());
 		this.lateScatterReadyToScatter= new ArrayBlockingQueue<>((nameOfTeams.size() * teamM.getTeamSize()) + 1);
@@ -154,6 +134,7 @@ public class ScatterManager implements Listener{
 			teamToScatter.put(team, teamM.getPlayersOnATeam(team));
 			this.isTeamOnline.put(team, false);
 		}
+		plugin.getServer().getPluginManager().callEvent(new ScatterStartEvent());
 		findLocations(nameOfTeams.size());
 	}
 
@@ -184,7 +165,7 @@ public class ScatterManager implements Listener{
 				}
 				else{
 					for(int i = 0; i<LOADS_PER_SECOND; i++){
-						Location vLoc = findValidLocation(getUHCWorld(), radius);
+						Location vLoc = findValidLocation(worldM.getUHCWorld(), radius);
 						vLoc.add(0, 0, 0);
 						validatedLocs.add(vLoc);
 						++timer;
@@ -222,9 +203,9 @@ public class ScatterManager implements Listener{
 					int popX = isXPos ? x-16 : x+16;
 					int popZ = isZPos ? z-16 : z+16;
 
-					getUHCWorld().getChunkAt(x, z).load(true);
-					getUHCWorld().getChunkAt(popX, popZ).load(false);
-					chunksToKeepLoaded.add(getUHCWorld().getChunkAt(loc.get(timer)));
+					worldM.getUHCWorld().getChunkAt(x, z).load(true);
+					worldM.getUHCWorld().getChunkAt(popX, popZ).load(false);
+					chunksToKeepLoaded.add(worldM.getUHCWorld().getChunkAt(loc.get(timer)));
 					++timer;
 				}
 
@@ -245,8 +226,9 @@ public class ScatterManager implements Listener{
 	@EventHandler
 	public void on(TeleportTeamEvent e) throws InterruptedException{
 		if(teamReadyToScatter.isEmpty()){
-			setupStartingOptions();
 			scatterComplete=true;
+			plugin.getServer().getPluginManager().callEvent(new ScatterEndEvent());
+			return;
 		}
 		else{
 			String team = teamReadyToScatter.poll();
@@ -340,8 +322,8 @@ public class ScatterManager implements Listener{
 			Random random = new Random();
 			int x = random.nextInt(radius * 2) - radius;
 			int z = random.nextInt(radius * 2) - radius;
-			x= x+ getCenter().getBlockX();
-			z= z+ getCenter().getBlockZ();
+			x= x+ worldM.getCenter().getBlockX();
+			z= z+ worldM.getCenter().getBlockZ();
 			world.loadChunk(x, z, true);
 			location = new Location(world, x, world.getHighestBlockYAt(x, z), z);
 			if(validate(location.clone())){
@@ -408,8 +390,8 @@ public class ScatterManager implements Listener{
 
 			}
 			else if(teamM.isPlayerInGame(e.getPlayer().getUniqueId())==false){
-				if(target.getWorld().equals(getUHCWorld())==false){
-					target.teleport(getUHCWorld().getSpawnLocation());
+				if(target.getWorld().equals(worldM.getUHCWorld())==false){
+					target.teleport(worldM.getUHCWorld().getSpawnLocation());
 				}
 				if(teamM.isPlayerAnObserver(target.getUniqueId())==false){
 					teamM.addPlayerToObservers(target);
@@ -502,11 +484,11 @@ public class ScatterManager implements Listener{
 	private void initializePlayer(Player p){
 		Medic.heal(p);
 		p.setMaxHealth(20);
-		p.teleport(getLobby().getSpawnLocation());
+		p.teleport(worldF.getLobby().getSpawnLocation());
 		p.getInventory().clear();
 		p.getInventory().setArmorContents(null);
 		p.setGameMode(GameMode.SURVIVAL);
-		p.setBedSpawnLocation(getCenter());
+		p.setBedSpawnLocation(worldM.getCenter());
 		p.setLevel(0);
 		p.setExp(0L);
 	}
@@ -526,31 +508,9 @@ public class ScatterManager implements Listener{
 		return this.lateScatters;
 	}
 
-	public void newUHCWorld(){
-		uhcWorld = worldF.create();
-	}
-	/**
-	 * Used to get the world the match is being played in
-	 * @return <code> World </code> of match
-	 */
-	public World getUHCWorld(){
-		return this.uhcWorld;
-	}
-	/**
-	 * Used to retrieve the center of the match
-	 * @return <code> Location </code> of the center of the match
-	 */
-	public Location getCenter(){
-		return uhcWorld.getSpawnLocation();
-	}
+	
 
-	/**
-	 * Used to shrink the border of the world, ideally when PVP is enabled
-	 */
-	public void shrinkBorder(){
-		getUHCWorld().getWorldBorder().setSize(400, 15*60);
-		MessageSender.broadcast("The worldborder will now slowly shrink to a radius of 400.");
-	}
+	
 
 	/**
 	 * A list of blocks that we do not want players to spawn on
@@ -568,11 +528,12 @@ public class ScatterManager implements Listener{
 			Material.AIR
 			);
 
-	/**
-	 * Called when scattering has completed, it sets up world conditions
-	 */
-	private void setupStartingOptions() {
-		//adding a slight delay 
+	
+	@EventHandler
+	public void on(ScatterEndEvent e){
+		setupStartingOptions();
+	}
+	public void setupStartingOptions() {
 		new BukkitRunnable() {
 
 			@Override
@@ -582,9 +543,6 @@ public class ScatterManager implements Listener{
 				moveE.unfreezePlayers();
 				MessageSender.broadcast("Scattering complete!");
 				chatM.unMutePlayers();
-				getUHCWorld().setGameRuleValue("doMobSpawning", "true");
-				getUHCWorld().setGameRuleValue("dodaylightcycle", "true");
-				getUHCWorld().setTime(0);
 				for(Player online: Bukkit.getServer().getOnlinePlayers()){
 					online.setHealth(online.getHealth());
 				}
@@ -595,11 +553,8 @@ public class ScatterManager implements Listener{
 	}
 
 	public void prePVPSetup(){
-		getUHCWorld().setTime(0);
-		getUHCWorld().setGameRuleValue("dodaylightcycle", "false");
-	}
-	public World getLobby(){
-		return worldF.getLobby();
+		worldM.getUHCWorld().setTime(0);
+		worldM.getUHCWorld().setGameRuleValue("dodaylightcycle", "false");
 	}
 
 }

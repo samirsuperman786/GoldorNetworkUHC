@@ -11,6 +11,7 @@ import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.managers.world.WorldManager;
+import com.goldornetwork.uhc.managers.world.events.GameEndEvent;
 
 public class DeathEvent implements Listener {
 
@@ -39,8 +40,13 @@ public class DeathEvent implements Listener {
 				teamM.removePlayerFromOwner(p);
 			}
 			teamM.removePlayerFromTeam(p.getUniqueId());
+			
 			if(teamM.getPlayersOnATeam(team).isEmpty()){
 				teamM.disbandTeam(team);
+				if(teamM.getActiveTeams().size()==1){
+					String winner = teamM.getActiveTeams().get(0);
+					plugin.getServer().getPluginManager().callEvent(new GameEndEvent(teamM.getPlayersOnATeam(winner)));
+				}
 			}
 
 		}

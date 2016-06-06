@@ -25,6 +25,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import com.goldornetwork.uhc.UHC;
+import com.goldornetwork.uhc.managers.world.WorldManager;
 import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
 
 public class BoardManager implements Listener{
@@ -33,7 +34,7 @@ public class BoardManager implements Listener{
 	private TeamManager teamM;
 	private Scoreboard mainBoard;
 	private Team observerTeam;
-	private ScatterManager scatterM;
+	private WorldManager worldM;
 
 	private List<Team> activeTeams = new ArrayList<Team>(); 
 	private Map<String, Team> teamScoreBoards = new HashMap<String, Team>();
@@ -47,9 +48,9 @@ public class BoardManager implements Listener{
 	}
 
 
-	public void setup(TeamManager teamM, ScatterManager scatterM){
+	public void setup(TeamManager teamM, WorldManager worldM){
 		this.teamM=teamM;
-		this.scatterM=scatterM;
+		this.worldM=worldM;
 		mainBoard=Bukkit.getServer().getScoreboardManager().getNewScoreboard();
 		initializeObserverBoard();
 		for(Player all : Bukkit.getServer().getOnlinePlayers()){
@@ -72,7 +73,7 @@ public class BoardManager implements Listener{
 		toAdd.add(header.getScore(ChatColor.AQUA + "Radius: " + ChatColor.WHITE + plugin.getConfig().getInt("radius")));
 		toAdd.add(header.getScore(" "));
 		toAdd.add(header.getScore(ChatColor.AQUA + "Team Size: " + ChatColor.WHITE + "0"));
-		toAdd.add(header.getScore(ChatColor.AQUA + "Current Border: " + ChatColor.WHITE + (int) scatterM.getUHCWorld().getWorldBorder().getSize()));
+		toAdd.add(header.getScore(ChatColor.AQUA + "Current Border: " + ChatColor.WHITE + (int) worldM.getUHCWorld().getWorldBorder().getSize()));
 
 		for(Score score : toAdd){
 			score.setScore(0);

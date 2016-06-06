@@ -4,6 +4,7 @@ E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\utils\Parser.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\GameModeManager.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\utils\PlayerUtils.java
+E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\events\ScatterEndEvent.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\utils\AntiXray.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\gamemodes\BedBombs.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\gamemodes\RunBabyRun.java
@@ -15,7 +16,6 @@ E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\UHC.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\CommandException.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\CoordXZ.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\gamemodes\CutClean.java
-E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\utils\CombatLog.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\game\HelpopCommand.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\CommandHandler.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\team\PMCoordsCommand.java
@@ -59,6 +59,7 @@ E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\gamemodes\Switcheroo.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\game\LookupCommand.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\events\TeleportTeamEvent.java
+E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\events\ScatterStartEvent.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\TimerManager.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\team\LeaveCommand.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\listeners\WeatherChange.java

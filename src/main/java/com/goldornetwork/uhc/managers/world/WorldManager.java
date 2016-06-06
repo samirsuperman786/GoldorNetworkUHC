@@ -9,10 +9,14 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.Difficulty;
 import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.WorldBorder;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,25 +38,54 @@ import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.managers.world.events.GameEndEvent;
+import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
+import com.goldornetwork.uhc.managers.world.events.PVPEnableEvent;
+import com.goldornetwork.uhc.managers.world.events.ScatterEndEvent;
+import com.goldornetwork.uhc.managers.world.events.ScatterStartEvent;
 import com.goldornetwork.uhc.utils.Medic;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class WorldManager implements Listener{
 
 	private UHC plugin;
-	private ScatterManager scatterM;
 	private TeamManager teamM;
+	private WorldFactory worldF;
+	private ChunkGenerator chunkG;
 	private Random random = new Random();
 	private int timer;
-	
-	public WorldManager(UHC plugin, ScatterManager scatterM, TeamManager teamM) {
+	private int radius;
+	private World uhcWorld;
+
+	public WorldManager(UHC plugin, TeamManager teamM, WorldFactory worldF, ChunkGenerator chunkG) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.plugin=plugin;
-		this.scatterM=scatterM;
 		this.teamM=teamM;
+		this.worldF=worldF;
+		this.chunkG=chunkG;
 	}
-	
+
 	public void setup(){
+		newUHCWorld();
+		plugin.getServer().setSpawnRadius(0);
+		getUHCWorld().setPVP(false);
+		getUHCWorld().setGameRuleValue("doMobSpawning", "false");
+		getUHCWorld().setGameRuleValue("naturalRegeneration", "false");
+		getUHCWorld().setDifficulty(Difficulty.HARD);
+		radius = plugin.getConfig().getInt("radius");
+		WorldBorder wb = getUHCWorld().getWorldBorder();
+		wb.setCenter(getUHCWorld().getSpawnLocation());
+		wb.setSize(radius*2);
+		wb.setDamageBuffer(0);
+		wb.setDamageAmount(.5);
+		wb.setWarningTime(15);
+		wb.setWarningDistance(20);
+		for(Entity e : getUHCWorld().getEntities()){
+			if(!(e instanceof Player)){
+				e.remove();
+			}
+		}
+		chunkG.generate(getUHCWorld(), getCenter(), radius);
+
 		plugin.getConfig().addDefault("ENDGAME-GRACE-PERIOD", 2);
 		this.timer=((plugin.getConfig().getInt("ENDGAME-GRACE-PERIOD")) *60);
 		for(Player all : Bukkit.getOnlinePlayers()){
@@ -67,12 +100,30 @@ public class WorldManager implements Listener{
 			all.setDisplayName(all.getName());
 			all.getInventory().clear();
 			all.getInventory().setArmorContents(null);
-			all.teleport(scatterM.getLobby().getSpawnLocation());
-			
+			all.teleport(worldF.getLobby().getSpawnLocation());
+
 		}
-		//fireworks(scatterM.getLobby());
+		plugin.getServer().setIdleTimeout(plugin.getConfig().getInt("TIME-TILL-PVP-START") * 2);
+		plugin.getServer().setWhitelist(true);
+
 	}
-	
+	@EventHandler
+	public void on(GameStartEvent e){
+		getUHCWorld().setGameRuleValue("doMobSpawning", "true");
+		getUHCWorld().setGameRuleValue("dodaylightcycle", "true");
+		getUHCWorld().setTime(60);
+		plugin.getServer().setIdleTimeout(2);
+	}
+	@EventHandler
+	public void on(ScatterEndEvent e){
+
+	}
+	@EventHandler
+	public void on(PVPEnableEvent e){
+		shrinkBorder();
+		getUHCWorld().setPVP(true);
+	}
+
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e){
 		Player target = e.getPlayer();
@@ -82,23 +133,23 @@ public class WorldManager implements Listener{
 			online.hidePlayer(target);
 			online.showPlayer(target);
 		}
-		
+
 	}
-	
+
 
 	@EventHandler
 	public void onPlayerLeave(PlayerQuitEvent e){
 		Player target = e.getPlayer();
 		e.setQuitMessage(ChatColor.RED + "\u2717" + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName());
 	}
-	
+
 	@EventHandler(priority = EventPriority.LOW)
 	public void on(FoodLevelChangeEvent e){
 		if(!(State.getState().equals(State.INGAME))){
 			e.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler(priority = EventPriority.HIGH)
 	public void on(EntityDamageEvent e){
 		if(!(State.getState().equals(State.INGAME))){
@@ -106,9 +157,9 @@ public class WorldManager implements Listener{
 				e.setCancelled(true);	
 			}
 		}
-		
+
 	}
-	
+
 	@EventHandler
 	public void on(PlayerLoginEvent e){
 		if(e.getResult().equals(PlayerLoginEvent.Result.KICK_OTHER) || e.getResult().equals(PlayerLoginEvent.Result.KICK_WHITELIST)|| e.getResult().equals(PlayerLoginEvent.Result.KICK_FULL)){
@@ -117,31 +168,30 @@ public class WorldManager implements Listener{
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void on(GameEndEvent e){
 		endGame(e.getWinners());
 	}
 	public void endGame(List<UUID> winners){
-		timer=0;
 		List<String> toBroadcast = new LinkedList<String>();
-		for(int i = 0; i<11; i++){
-			toBroadcast.add(ChatColor.AQUA + "------------");
-		}
+
+		toBroadcast.add(ChatColor.AQUA + "------------------------------");
+
 		toBroadcast.add("Game has ended, thanks for playing!");
-		
+
 		MessageSender.broadcast(toBroadcast);
 		new BukkitRunnable() {
-			
+
 			@Override
 			public void run() {
 				if(winners!=null){
 					List<String> toReturn = new ArrayList<String>();
 					toReturn.add("Winners are: ");
-					
-					fireworks(scatterM.getUHCWorld());
-					
-					
+
+					//fireworks(getUHCWorld());
+
+
 					for(UUID u : winners){
 						toReturn.add(teamM.getColorOfPlayer(u) + Bukkit.getServer().getOfflinePlayer(u).getName());
 						if(Bukkit.getOfflinePlayer(u).isOnline()){
@@ -149,39 +199,40 @@ public class WorldManager implements Listener{
 							target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 4));
 						}
 					}
-					
+
 					MessageSender.broadcast(toReturn);
 				}
-				
+
 			}
 		}.runTaskLater(plugin, 10L);
-		
+
 		new BukkitRunnable() {
-			
+
 			@Override
 			public void run() {
-				timer--;
 				if(timer>=60 && timer%60==0){
-					MessageSender.broadcast("Server closing in " + (timer/60) + "minute(s)");
+					MessageSender.broadcast(ChatColor.GOLD + "Server closing in " + ChatColor.GRAY + (timer/60) + ChatColor.GOLD + " minute(s)");
 				}
 				else if(timer<60 && timer>=15 && timer%15==0){
-					MessageSender.broadcast("Server closing in " + timer + "seconds");
+					MessageSender.broadcast(ChatColor.GOLD + "Server closing in " + ChatColor.GRAY + timer + ChatColor.GOLD + " seconds");
 				}
-				else if(timer <=5){
-					MessageSender.broadcast("Server closing in " + timer + "second(s)");
+				else if(timer <=5 && timer>0){
+					MessageSender.broadcast(ChatColor.GOLD + "Server closing in " + ChatColor.GRAY + timer + ChatColor.GOLD + " seconds");
 				}
-				
-				Bukkit.getServer().shutdown();
+				else if(timer==0){
+					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "stop");
+				}
+				--timer;
 			}
 		}.runTaskTimer(plugin, 0L, 20L);
-		
-		
+
+
 	}
-	
+
 	private void fireworks(World world){
-		
+
 		new BukkitRunnable() {
-			
+
 			@Override
 			public void run() {
 				for(Player online : Bukkit.getServer().getOnlinePlayers()){
@@ -189,34 +240,48 @@ public class WorldManager implements Listener{
 					int variation = random.nextInt(10);
 					Color color = Color.RED;
 					Location fireLoc = new Location(world, pLoc.getBlockX() + variation, pLoc.getBlockY(), pLoc.getBlockZ() + variation);
-					Firework fw = (Firework) world.spawn(fireLoc, Firework.class);
+					Firework fw = (Firework) world.spawnEntity(fireLoc, EntityType.FIREWORK);
 					FireworkMeta fwMeta = fw.getFireworkMeta();
-					fwMeta.addEffect(FireworkEffect.builder()
+					FireworkEffect effect = FireworkEffect.builder()
 							.flicker(false)
 							.trail(true)
-							.with(FireworkEffect.Type.BALL_LARGE)
+							.with(FireworkEffect.Type.STAR)
 							.withColor(color)
 							.withFade(Color.BLUE)
-							.build());
-					fwMeta.setPower(3);
+							.build();
+					fwMeta.addEffect(effect);
+					fwMeta.setPower(2);
 					fw.setFireworkMeta(fwMeta);
 					fw.detonate();
-					
+
 				}
-				
+
 			}
 		}.runTaskTimer(plugin, 0L, 30L);
-		
-	}
-	public void endGame(){
-		MessageSender.broadcast("Game has ended!");
-		MessageSender.broadcast("No one has won!");
-		
+
 	}
 	@EventHandler
 	public void on(PlayerChangedWorldEvent e){
 		if(e.getFrom().getPlayers().isEmpty()){
 			Bukkit.unloadWorld(e.getFrom(), false);
 		}
+	}
+
+	public World getLobby(){
+		return worldF.getLobby();
+	}
+	public void shrinkBorder(){
+		getUHCWorld().getWorldBorder().setSize(400, 15*60);
+		MessageSender.broadcast("The worldborder will now slowly shrink to a radius of 400.");
+	}
+	public void newUHCWorld(){
+		uhcWorld = worldF.create();
+	}
+	public World getUHCWorld(){
+		return this.uhcWorld;
+	}
+
+	public Location getCenter(){
+		return uhcWorld.getSpawnLocation();
 	}
 }

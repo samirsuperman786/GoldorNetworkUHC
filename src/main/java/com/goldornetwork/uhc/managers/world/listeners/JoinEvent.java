@@ -10,9 +10,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.potion.PotionEffect;
 
 import com.goldornetwork.uhc.UHC;
-import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.managers.world.WorldManager;
 import com.goldornetwork.uhc.utils.Medic;
 import com.goldornetwork.uhc.utils.MessageSender;
 
@@ -20,12 +20,12 @@ public class JoinEvent implements Listener{
 
 	//instances
 	private TeamManager teamM;
-	private ScatterManager scatterM;
+	private WorldManager worldM;
 
-	public JoinEvent(UHC plugin, TeamManager teamM, ScatterManager scatterM) {
+	public JoinEvent(UHC plugin, TeamManager teamM, WorldManager worldM) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.teamM=teamM;
-		this.scatterM=scatterM;
+		this.worldM=worldM;
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -59,7 +59,7 @@ public class JoinEvent implements Listener{
 			p.setLevel(0);
 			p.setExp(0L);
 			p.getInventory().setArmorContents(null);
-			p.teleport(scatterM.getLobby().getSpawnLocation());
+			p.teleport(worldM.getLobby().getSpawnLocation());
 			Medic.heal(p);
 		}
 		

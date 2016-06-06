@@ -84,15 +84,17 @@ public class UHC extends JavaPlugin {
 		
 		moveE= new MoveEvent(plugin, teamM);
 		
-		scatterM= new ScatterManager(plugin, teamM, moveE, chatM, worldF, chunkG);
+		worldM = new WorldManager(plugin, teamM, worldF, chunkG);
+		
+		scatterM= new ScatterManager(plugin, teamM, moveE, chatM, worldF, chunkG, worldM);
 		
 		voteM = new VoteManager(plugin, gameModeM, teamM);
 		
-		timerM = new TimerManager(plugin, scatterM, teamM, voteM, chatM);
+		timerM = new TimerManager(plugin, scatterM, teamM, voteM, chatM, worldM);
 		
-		spectM = new SpectatorRegionManager(plugin, teamM, scatterM);
+		spectM = new SpectatorRegionManager(plugin, teamM, worldM);
 		
-		worldM = new WorldManager(plugin, scatterM, teamM);
+		
 		
 		medic= new Medic(plugin, teamM);
 		
@@ -107,7 +109,7 @@ public class UHC extends JavaPlugin {
 		
 		new TeamInteraction(teamM);
 		new DeathEvent(plugin, teamM, scatterM, worldM);
-		new JoinEvent(plugin, teamM, scatterM);
+		new JoinEvent(plugin, teamM, worldM);
 		new LeaveEvent(plugin,teamM, scatterM);
 		new WeatherChange(plugin);
 		new AntiXray(plugin);
@@ -121,10 +123,10 @@ public class UHC extends JavaPlugin {
 		moveE.setup();
 		voteM.setup();
 		worldM.setup();
-		gameModeM.setupGamemodes(teamM, scatterM);
+		gameModeM.setupGamemodes(teamM, worldM);
 		scatterM.setup();
 		spectM.setup();
-		boardM.setup(teamM, scatterM);
+		boardM.setup(teamM, worldM);
 	}
 
 	private void createConfig() {

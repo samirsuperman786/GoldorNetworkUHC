@@ -13,6 +13,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.managers.world.WorldManager;
 import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
 import com.goldornetwork.uhc.managers.world.events.PVPEnableEvent;
 import com.goldornetwork.uhc.managers.world.listeners.team.ChatManager;
@@ -25,22 +26,24 @@ public class TimerManager implements Listener{
 	private TeamManager teamM;
 	private VoteManager voteM;
 	private ChatManager chatM;
+	private WorldManager worldM;
 
 	//storage
 	private int timeTillMatchStart;
 	private int timeTillPVPStart;
 	private int timeTillVote;
 	private boolean matchStart;
-	private boolean isPVPEnabled;
+	//private boolean isPVPEnabled;
 
 
-	public TimerManager(UHC plugin, ScatterManager scatterM, TeamManager teamM, VoteManager voteM, ChatManager chatM) {
+	public TimerManager(UHC plugin, ScatterManager scatterM, TeamManager teamM, VoteManager voteM, ChatManager chatM, WorldManager worldM) {
 		this.plugin=plugin;
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.scatterM=scatterM;
 		this.teamM=teamM;
 		this.voteM=voteM;
 		this.chatM=chatM;
+		this.worldM=worldM;
 	}
 
 	/**
@@ -51,7 +54,6 @@ public class TimerManager implements Listener{
 		config();
 		State.setState(State.NOT_RUNNING);
 		matchStart=false;
-		isPVPEnabled=false;
 	}
 
 	private void config(){
@@ -73,7 +75,6 @@ public class TimerManager implements Listener{
 	 */
 	public void startMatch(){
 		State.setState(State.OPEN);
-		isPVPEnabled= false;
 		matchStart = true;
 		chatM.mutePlayers();
 		countdownTimer();
@@ -152,12 +153,12 @@ public class TimerManager implements Listener{
 					MessageSender.broadcast("Match has started!");
 					State.setState(State.SCATTER);
 					if(teamM.isTeamsEnabled()){
-						scatterM.enableTeams();
+						scatterM.scatter();
 					}
 					for(Player all : Bukkit.getServer().getOnlinePlayers()){
 						if(teamM.isPlayerInGame(all.getUniqueId())==false){
 							teamM.addPlayerToObservers(all);
-							all.teleport(scatterM.getCenter());
+							all.teleport(worldM.getCenter());
 						}
 					}
 					//pvpTimer();
@@ -208,9 +209,6 @@ public class TimerManager implements Listener{
 				else if(timeTillPVPStart==0){
 					Bukkit.getPluginManager().callEvent(new PVPEnableEvent());
 					MessageSender.broadcast("PVP has been enabled!");
-					scatterM.shrinkBorder();
-					scatterM.getUHCWorld().setPVP(true);
-					isPVPEnabled = true;
 					cancel();
 				}
 
@@ -238,13 +236,6 @@ public class TimerManager implements Listener{
 		return matchStart;
 	}
 
-	/**
-	 * Used to check if PVP has been enabled yet
-	 * @return <code> True </code> if it has been enabled
-	 */
-	public boolean isPVPEnabled(){
-		return isPVPEnabled;
-	}
 
 
 }
