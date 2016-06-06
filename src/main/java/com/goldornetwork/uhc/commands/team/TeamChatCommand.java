@@ -30,8 +30,8 @@ public class TeamChatCommand extends UHCCommand{
 			return true;
 		}
 		else if(teamM.isTeamsEnabled()){
-			if(teamM.isPlayerInGame(p)){
-				if(teamM.isPlayerOnTeam(p)){
+			if(teamM.isPlayerInGame(p.getUniqueId())){
+				if(teamM.isPlayerOnTeam(p.getUniqueId())){
 					if(args.length==0){
 						return false;
 					}
@@ -41,7 +41,7 @@ public class TeamChatCommand extends UHCCommand{
 							str.append(args[i] + " ");
 						}
 						String msg = str.toString();
-						teamI.sendMsgTeamates(teamM.getTeamOfPlayer(p), p, msg);
+						teamI.sendMsgTeamates(teamM.getTeamOfPlayer(p.getUniqueId()), p, msg);
 						return true;
 					}
 					

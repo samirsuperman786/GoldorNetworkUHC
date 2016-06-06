@@ -155,7 +155,7 @@ public class TimerManager implements Listener{
 						scatterM.enableTeams();
 					}
 					for(Player all : Bukkit.getServer().getOnlinePlayers()){
-						if(teamM.isPlayerInGame(all)==false){
+						if(teamM.isPlayerInGame(all.getUniqueId())==false){
 							teamM.addPlayerToObservers(all);
 							all.teleport(scatterM.getCenter());
 						}

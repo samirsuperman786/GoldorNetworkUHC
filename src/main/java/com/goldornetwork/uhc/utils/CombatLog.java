@@ -63,7 +63,7 @@ public class CombatLog implements Listener{
 	public void on(PlayerQuitEvent e){
 		Player p = e.getPlayer();
 		if(State.getState().equals(State.INGAME)){
-			if(teamM.isPlayerInGame(p)){
+			if(teamM.isPlayerInGame(p.getUniqueId())){
 				spawnReplacement(p);
 			}
 		}
@@ -72,7 +72,7 @@ public class CombatLog implements Listener{
 	public void on(PlayerJoinEvent e){
 		Player p = e.getPlayer();
 		if(State.getState().equals(State.INGAME)){
-			if(teamM.isPlayerInGame(p)){
+			if(teamM.isPlayerInGame(p.getUniqueId())){
 				if(getDisconnected().containsKey(p.getUniqueId())){
 					removePlayer(p);
 					removeReplacement(p);

@@ -37,11 +37,11 @@ public class LookupCommand extends UHCCommand{
 				for(UUID u : teamM.getPlayersOnATeam(team)){
 					if(Bukkit.getOfflinePlayer(u).isOnline()){
 						Player target = Bukkit.getPlayer(u);
-						toReturn.add(PlayerUtils.getPrefix(target) + ChatColor.GREEN + "\u25CF" + teamM.getColorOfPlayer(target) + target.getName() + ChatColor.WHITE + ": " + ChatColor.RED + target.getHealth() + "\u2665");
+						toReturn.add(PlayerUtils.getPrefix(target) + ChatColor.GREEN + "\u25CF" + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName() + ChatColor.WHITE + ": " + ChatColor.RED + target.getHealth() + "\u2665");
 					}
 					else{
 						OfflinePlayer target = Bukkit.getOfflinePlayer(u);
-						toReturn.add(PlayerUtils.getPrefix(target) + ChatColor.RED + "\u25CF" + teamM.getColorOfPlayer(target) + target.getName());
+						toReturn.add(PlayerUtils.getPrefix(target) + ChatColor.RED + "\u25CF" + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName());
 					}
 				}
 				MessageSender.send(toReturn, sender);

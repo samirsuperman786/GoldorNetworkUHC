@@ -46,16 +46,16 @@ public class ChatManager implements Listener{
 		else{
 			for(Player all : Bukkit.getServer().getOnlinePlayers()){
 				if(teamM.isTeamsEnabled()){
-					if(teamM.isPlayerOnTeam(sender)){
-						if(teamM.getPlayersOnATeam(teamM.getTeamOfPlayer(sender)).contains(all.getUniqueId())){
-							all.sendMessage(teamM.getColorOfTeam(teamM.getTeamOfPlayer(sender)) + "[" + teamM.getTeamNameProper(teamM.getTeamOfPlayer(sender))+ "] " + PlayerUtils.getPrefix(sender) + ChatColor.GREEN + sender.getName() +  ChatColor.WHITE + ": " + e.getMessage());
+					if(teamM.isPlayerOnTeam(sender.getUniqueId())){
+						if(teamM.getPlayersOnATeam(teamM.getTeamOfPlayer(sender.getUniqueId())).contains(all.getUniqueId())){
+							all.sendMessage(teamM.getColorOfTeam(teamM.getTeamOfPlayer(sender.getUniqueId())) + "[" + teamM.getTeamNameProper(teamM.getTeamOfPlayer(sender.getUniqueId()))+ "] " + PlayerUtils.getPrefix(sender) + ChatColor.GREEN + sender.getName() +  ChatColor.WHITE + ": " + e.getMessage());
 						}
 						else{
-							all.sendMessage(teamM.getColorOfTeam(teamM.getTeamOfPlayer(sender)) + "[" + teamM.getTeamNameProper(teamM.getTeamOfPlayer(sender))+ "] " + PlayerUtils.getPrefix(sender) + ChatColor.RED + sender.getName() +  ChatColor.WHITE + ": " + e.getMessage());
+							all.sendMessage(teamM.getColorOfTeam(teamM.getTeamOfPlayer(sender.getUniqueId())) + "[" + teamM.getTeamNameProper(teamM.getTeamOfPlayer(sender.getUniqueId()))+ "] " + PlayerUtils.getPrefix(sender) + ChatColor.RED + sender.getName() +  ChatColor.WHITE + ": " + e.getMessage());
 						}
 					}
-					else if(teamM.isPlayerAnObserver(sender)){
-						all.sendMessage(teamM.getColorOfPlayer(sender) + "[Observer] " + PlayerUtils.getPrefix(sender)+ ChatColor.AQUA + sender.getName() +  ChatColor.WHITE + ": " + e.getMessage());
+					else if(teamM.isPlayerAnObserver(sender.getUniqueId())){
+						all.sendMessage(teamM.getColorOfPlayer(sender.getUniqueId()) + "[Observer] " + PlayerUtils.getPrefix(sender)+ ChatColor.AQUA + sender.getName() +  ChatColor.WHITE + ": " + e.getMessage());
 					}
 				}
 				

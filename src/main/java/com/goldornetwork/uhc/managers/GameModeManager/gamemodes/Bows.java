@@ -30,7 +30,7 @@ public class Bows extends Gamemode implements Listener{
 		}
 		Player pDamager = (Player) damager;
 		Player pTarget = (Player) target;
-		if(!(teamM.isPlayerInGame(pDamager)) || !(teamM.isPlayerInGame(pTarget))){
+		if(!(teamM.isPlayerInGame(pDamager.getUniqueId())) || !(teamM.isPlayerInGame(pTarget.getUniqueId()))){
 			return;
 		}
 		e.setCancelled(true);

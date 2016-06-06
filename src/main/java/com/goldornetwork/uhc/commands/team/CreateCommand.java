@@ -30,7 +30,7 @@ public class CreateCommand extends UHCCommand{
 			return true;
 		}
 
-		else if(teamM.isPlayerInGame(p)){
+		else if(teamM.isPlayerInGame(p.getUniqueId())){
 			MessageSender.send(ChatColor.RED, p, "You are already on a team!");
 			return true;
 		}

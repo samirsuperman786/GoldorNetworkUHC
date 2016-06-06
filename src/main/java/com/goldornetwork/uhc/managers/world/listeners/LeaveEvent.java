@@ -30,10 +30,10 @@ public class LeaveEvent implements Listener{
 	public void on(PlayerQuitEvent e){
 		Player p = e.getPlayer();
 		if(State.getState().equals(State.OPEN)){
-			if(teamM.isPlayerInGame(p)){
+			if(teamM.isPlayerInGame(p.getUniqueId())){
 				 if(teamM.isTeamsEnabled()){
-					if(teamM.isTeamInactive(teamM.getTeamOfPlayer(p))){
-						teamM.disbandTeam(teamM.getTeamOfPlayer(p));
+					if(teamM.isTeamInactive(teamM.getTeamOfPlayer(p.getUniqueId()))){
+						teamM.disbandTeam(teamM.getTeamOfPlayer(p.getUniqueId()));
 					}
 				}
 			}

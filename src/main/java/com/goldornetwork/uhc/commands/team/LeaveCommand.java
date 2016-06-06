@@ -28,7 +28,7 @@ public class LeaveCommand extends UHCCommand{
 			MessageSender.noConsole(sender);
 			return true;
 		}
-		else if(teamM.isPlayerInGame(p)==false){
+		else if(teamM.isPlayerInGame(p.getUniqueId())==false){
 			MessageSender.send(ChatColor.RED, sender, "You are not on a team");
 			return true;
 		}
@@ -41,14 +41,16 @@ public class LeaveCommand extends UHCCommand{
 				if(teamM.isTeamsEnabled()){
 					if(teamM.isPlayerOwner(p)){
 						teamM.removePlayerFromOwner(p);
+						teamM.disbandTeam(teamM.getTeamOfPlayer(p.getUniqueId()));
+						
 					}
 					else{
-						for(UUID u : teamM.getPlayersOnATeam(teamM.getTeamOfPlayer(p))){
+						for(UUID u : teamM.getPlayersOnATeam(teamM.getTeamOfPlayer(p.getUniqueId()))){
 							if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
-								MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.GOLD, teamM.getColorOfPlayer(p) + p.getName() + ChatColor.GOLD + " has left the team.");
+								MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.GOLD, teamM.getColorOfPlayer(p.getUniqueId()) + p.getName() + ChatColor.GOLD + " has left the team.");
 							}
 						}
-						teamM.removePlayerFromTeam(p);
+						teamM.removePlayerFromTeam(p.getUniqueId());
 					}
 					return true;
 				}

@@ -34,7 +34,7 @@ public class HelpopCommand extends UHCCommand{
 				str.append(args[i] + " ");
 			}
 			String msg = str.toString();
-			MessageSender.sendToOPS(teamM.getColorOfPlayer(target) + target.getName() + ChatColor.WHITE + ": " + msg);
+			MessageSender.sendToOPS(teamM.getColorOfPlayer(target.getUniqueId()) + target.getName() + ChatColor.WHITE + ": " + msg);
 			return true;
 		}
 	}

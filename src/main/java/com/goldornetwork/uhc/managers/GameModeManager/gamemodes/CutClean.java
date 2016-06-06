@@ -35,7 +35,7 @@ public class CutClean extends Gamemode implements Listener{
 			return;
 		}
 		Player target = e.getPlayer();
-		if(teamM.isPlayerInGame(target)==false){
+		if(teamM.isPlayerInGame(target.getUniqueId())==false){
 			return;
 		}
 		Block block = e.getBlock();

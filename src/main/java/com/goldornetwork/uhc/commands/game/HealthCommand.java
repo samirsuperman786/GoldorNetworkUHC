@@ -32,13 +32,13 @@ public class HealthCommand extends UHCCommand {
 				return true;
 			}
 			
-			else if(teamM.isPlayerInGame(Bukkit.getPlayer(args[0]))==false){
+			else if(teamM.isPlayerInGame(Bukkit.getPlayer(args[0]).getUniqueId())==false){
 				MessageSender.send(ChatColor.RED, sender, args[0] + " is not in game.");
 				return true;
 			}
 			else{
 				Player target = Bukkit.getPlayer(args[0]);
-				MessageSender.send(sender, teamM.getColorOfPlayer(target) + target.getName() + ChatColor.WHITE + ": " + ChatColor.RED + target.getHealth() + "\u2665");
+				MessageSender.send(sender, teamM.getColorOfPlayer(target.getUniqueId()) + target.getName() + ChatColor.WHITE + ": " + ChatColor.RED + target.getHealth() + "\u2665");
 				return true;
 			}
 		}

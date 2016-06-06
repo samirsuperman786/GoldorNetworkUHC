@@ -42,7 +42,7 @@ public class RewardingLongshots extends Gamemode implements Listener{
 					if(arrow.getShooter() instanceof Player){
 						Player target = (Player) e.getEntity();
 						Player shooter = (Player) arrow.getShooter();
-						if(teamM.isPlayerInGame(target) && teamM.isPlayerInGame(shooter)){
+						if(teamM.isPlayerInGame(target.getUniqueId()) && teamM.isPlayerInGame(shooter.getUniqueId())){
 							run(target, shooter);
 						}
 					}
@@ -71,7 +71,7 @@ public class RewardingLongshots extends Gamemode implements Listener{
 	}
 	
 	private void send(Player shooter, Player target, int distance){
-		MessageSender.send(ChatColor.GREEN, shooter, "You hit " + teamM.getColorOfPlayer(target) + target.getName() + ChatColor.GREEN +  " at a distance of " + ChatColor.GRAY + distance + ChatColor.GREEN + " blocks!");
+		MessageSender.send(ChatColor.GREEN, shooter, "You hit " + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName() + ChatColor.GREEN +  " at a distance of " + ChatColor.GRAY + distance + ChatColor.GREEN + " blocks!");
 		MessageSender.send(ChatColor.RED, target, "You got shot from a distance of " + ChatColor.GRAY + distance + ChatColor.RED + " blocks!");
 	}
 

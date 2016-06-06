@@ -29,9 +29,9 @@ public class PMCoordsCommand extends UHCCommand {
 			return true;
 		}
 		else if(teamM.isTeamsEnabled()){
-			if(teamM.isPlayerInGame(p)){
-				if(teamM.isPlayerOnTeam(p)){
-					teamI.sendCoords(teamM.getTeamOfPlayer(p), p);
+			if(teamM.isPlayerInGame(p.getUniqueId())){
+				if(teamM.isPlayerOnTeam(p.getUniqueId())){
+					teamI.sendCoords(teamM.getTeamOfPlayer(p.getUniqueId()), p);
 				}
 				else{
 					MessageSender.send(ChatColor.RED, p, "You are not on a team!");

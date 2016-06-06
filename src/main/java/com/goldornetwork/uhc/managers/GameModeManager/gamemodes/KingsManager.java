@@ -61,7 +61,7 @@ public class KingsManager extends Gamemode implements Listener{
 	public void on(PlayerJoinEvent e){
 		Player p = e.getPlayer();
 		if(State.getState().equals(State.INGAME)){
-			if(teamM.isPlayerInGame(p)){
+			if(teamM.isPlayerInGame(p.getUniqueId())){
 				if(teamM.isTeamsEnabled()){
 					if(lateKings.contains(p.getUniqueId())){
 						giveAPlayerKingItems(p);
@@ -81,13 +81,13 @@ public class KingsManager extends Gamemode implements Listener{
 	@EventHandler(priority =EventPriority.MONITOR)
 	public void on(PlayerDeathEvent e){
 		if(listOfKings.containsValue(e.getEntity().getUniqueId())){
-			debuffTeamMates(teamM.getTeamOfPlayer(e.getEntity()));
+			debuffTeamMates(teamM.getTeamOfPlayer(e.getEntity().getUniqueId()));
 		}
 	}
 	@EventHandler
 	public void on(PlayerItemConsumeEvent e){
 		if(State.getState().equals(State.INGAME)){
-			if(teamM.isPlayerInGame(e.getPlayer())){
+			if(teamM.isPlayerInGame(e.getPlayer().getUniqueId())){
 				if(teamM.isTeamsEnabled()){
 					if(currentlyDebuffed.contains(e.getPlayer().getUniqueId())){
 						if(e.getItem().getType().equals(Material.MILK_BUCKET)){

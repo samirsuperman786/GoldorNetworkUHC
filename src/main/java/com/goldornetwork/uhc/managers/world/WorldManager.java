@@ -76,7 +76,7 @@ public class WorldManager implements Listener{
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e){
 		Player target = e.getPlayer();
-		e.setJoinMessage(ChatColor.GREEN + "\u2713" + teamM.getColorOfPlayer(target) +  target.getName());
+		e.setJoinMessage(ChatColor.GREEN + "\u2713" + teamM.getColorOfPlayer(target.getUniqueId()) +  target.getName());
 		target.setHealth(target.getHealth());
 		for(Player online : Bukkit.getOnlinePlayers()){
 			online.hidePlayer(target);
@@ -89,7 +89,7 @@ public class WorldManager implements Listener{
 	@EventHandler
 	public void onPlayerLeave(PlayerQuitEvent e){
 		Player target = e.getPlayer();
-		e.setQuitMessage(ChatColor.RED + "\u2717" + teamM.getColorOfPlayer(target) + target.getName());
+		e.setQuitMessage(ChatColor.RED + "\u2717" + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName());
 	}
 	
 	@EventHandler(priority = EventPriority.LOW)
@@ -143,7 +143,7 @@ public class WorldManager implements Listener{
 					
 					
 					for(UUID u : winners){
-						toReturn.add(teamM.getColorOfPlayer(Bukkit.getOfflinePlayer(u)) + Bukkit.getServer().getOfflinePlayer(u).getName());
+						toReturn.add(teamM.getColorOfPlayer(u) + Bukkit.getServer().getOfflinePlayer(u).getName());
 						if(Bukkit.getOfflinePlayer(u).isOnline()){
 							Player target = Bukkit.getServer().getPlayer(u);
 							target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 4));

@@ -401,17 +401,17 @@ public class ScatterManager implements Listener{
 	public void on(PlayerJoinEvent e){
 		Player target = e.getPlayer();
 		if(State.getState().equals(State.INGAME)|| State.getState().equals(State.SCATTER)){
-			if(teamM.isPlayerInGame(e.getPlayer())){
+			if(teamM.isPlayerInGame(e.getPlayer().getUniqueId())){
 				if(getLateScatters().contains(target.getUniqueId()) && !(lateScatterReadyToScatter.contains(target.getUniqueId()))){
 					handleLateScatter(target);
 				}
 
 			}
-			else if(teamM.isPlayerInGame(e.getPlayer())==false){
+			else if(teamM.isPlayerInGame(e.getPlayer().getUniqueId())==false){
 				if(target.getWorld().equals(getUHCWorld())==false){
 					target.teleport(getUHCWorld().getSpawnLocation());
 				}
-				if(teamM.isPlayerAnObserver(target)==false){
+				if(teamM.isPlayerAnObserver(target.getUniqueId())==false){
 					teamM.addPlayerToObservers(target);
 				}
 				else{
@@ -428,13 +428,13 @@ public class ScatterManager implements Listener{
 		if(lateScatterReadyToScatter.isEmpty()){
 			return;
 		}
-		else if(!(teamM.isPlayerOnTeam(Bukkit.getOfflinePlayer(lateScatterReadyToScatter.peek())))){
+		else if(!(teamM.isPlayerOnTeam(lateScatterReadyToScatter.peek()))){
 			lateScatterReadyToScatter.poll();
 			Bukkit.getPluginManager().callEvent(new LateScatterEvent());
 		}
 		else{
 			UUID u = lateScatterReadyToScatter.poll();
-			Location location = locationsOfTeamSpawn.get(teamM.getTeamOfPlayer(Bukkit.getOfflinePlayer(u)));
+			Location location = locationsOfTeamSpawn.get(teamM.getTeamOfPlayer(u));
 			location.getChunk().load(true);
 
 			((CraftWorld)location.getWorld()).getHandle().chunkProviderServer.getChunkAt(location.getBlockX(), location.getBlockZ(), new Runnable() {
@@ -448,7 +448,7 @@ public class ScatterManager implements Listener{
 
 
 							OfflinePlayer p = Bukkit.getOfflinePlayer(u);
-							if(teamM.isPlayerOnTeam(p)){
+							if(teamM.isPlayerOnTeam(u)){
 								if(p.isOnline()==false){
 									lateScatters.add(u);
 									Bukkit.getPluginManager().callEvent(new LateScatterEvent());

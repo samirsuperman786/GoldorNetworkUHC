@@ -56,7 +56,7 @@ public class GoneFishing extends Gamemode implements Listener {
 	public void on(PlayerJoinEvent e){
 		Player p = e.getPlayer();
 		if(State.getState().equals(State.INGAME)){
-			if(teamM.isPlayerInGame(p)){
+			if(teamM.isPlayerInGame(p.getUniqueId())){
 				if(lateGoneFishing.contains(p.getUniqueId())){
 					giveAPlayerGoneFishingItems(p);
 					removeAPlayerFromLateGoneFishing(p);

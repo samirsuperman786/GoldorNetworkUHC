@@ -36,7 +36,7 @@ public class InvitePlayerCommand extends UHCCommand{
 			MessageSender.send(ChatColor.RED, p, "Match has already started!");
 			return true;
 		}
-		else if(teamM.isPlayerInGame(p)==false){
+		else if(teamM.isPlayerInGame(p.getUniqueId())==false){
 			MessageSender.send(ChatColor.RED, p, "You are not on a team!");
 			return true;
 		}
@@ -54,13 +54,13 @@ public class InvitePlayerCommand extends UHCCommand{
 			MessageSender.send(ChatColor.RED, p, "Player " + args[0].toLowerCase() + " is not online!");
 			return true;
 		}
-		else if(teamM.isPlayerOnTeam(Bukkit.getPlayer(args[0]))){
+		else if(teamM.isPlayerOnTeam(Bukkit.getPlayer(args[0]).getUniqueId())){
 			MessageSender.send(ChatColor.RED, p, "Player " + args[0] + " is already on a team!");
 			return true;
 		}
 		else {
-			teamM.invitePlayer(teamM.getTeamOfPlayer(p), Bukkit.getServer().getPlayer(args[0]));
-			MessageSender.alertMessage(Bukkit.getServer().getPlayer(args[0]), ChatColor.GREEN, "You have been invited to team " + teamM.getColorOfPlayer(p) + teamM.getTeamNameProper(teamM.getTeamOfPlayer(p)) + ChatColor.GREEN + " by " + teamM.getColorOfPlayer(p) + p.getName());
+			teamM.invitePlayer(teamM.getTeamOfPlayer(p.getUniqueId()), Bukkit.getServer().getPlayer(args[0]).getUniqueId());
+			MessageSender.alertMessage(Bukkit.getServer().getPlayer(args[0]), ChatColor.GREEN, "You have been invited to team " + teamM.getColorOfPlayer(p.getUniqueId()) + teamM.getTeamNameProper(teamM.getTeamOfPlayer(p.getUniqueId())) + ChatColor.GREEN + " by " + teamM.getColorOfPlayer(p.getUniqueId()) + p.getName());
 			MessageSender.alertMessage(p, ChatColor.GREEN, "You have invited player " + Bukkit.getServer().getPlayer(args[0]).getName());
 			return true;
 		}

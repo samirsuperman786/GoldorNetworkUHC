@@ -34,7 +34,7 @@ public class BedBombs extends Gamemode implements Listener {
 		Block block = e.getClickedBlock();
 		Player p = e.getPlayer();
 		
-		if(teamM.isPlayerInGame(p)==false){
+		if(teamM.isPlayerInGame(p.getUniqueId())==false){
 			return;
 		}
 		
