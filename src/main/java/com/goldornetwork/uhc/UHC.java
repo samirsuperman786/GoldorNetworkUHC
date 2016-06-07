@@ -14,13 +14,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.commands.CommandHandler;
-import com.goldornetwork.uhc.managers.BoardManager;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.SpectatorRegionManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.VoteManager;
 import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
+import com.goldornetwork.uhc.managers.board.BoardManager;
 import com.goldornetwork.uhc.managers.world.ChunkGenerator;
 import com.goldornetwork.uhc.managers.world.UHCBan;
 import com.goldornetwork.uhc.managers.world.WorldFactory;
@@ -126,7 +126,7 @@ public class UHC extends JavaPlugin {
 		gameModeM.setupGamemodes(teamM, worldM);
 		scatterM.setup();
 		spectM.setup();
-		boardM.setup(teamM, worldM);
+		boardM.setup(teamM, worldM, timerM);
 	}
 
 	private void createConfig() {

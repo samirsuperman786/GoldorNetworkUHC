@@ -103,7 +103,7 @@ public class WorldManager implements Listener{
 			all.teleport(worldF.getLobby().getSpawnLocation());
 
 		}
-		plugin.getServer().setIdleTimeout(plugin.getConfig().getInt("TIME-TILL-PVP-START") * 2);
+		plugin.getServer().setIdleTimeout(60);
 		plugin.getServer().setWhitelist(true);
 
 	}
@@ -112,7 +112,15 @@ public class WorldManager implements Listener{
 		getUHCWorld().setGameRuleValue("doMobSpawning", "true");
 		getUHCWorld().setGameRuleValue("dodaylightcycle", "true");
 		getUHCWorld().setTime(60);
-		plugin.getServer().setIdleTimeout(2);
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				plugin.getServer().setIdleTimeout(4);
+				
+			}
+		}.runTaskLater(plugin, 1200L);
+		
 	}
 	@EventHandler
 	public void on(ScatterEndEvent e){

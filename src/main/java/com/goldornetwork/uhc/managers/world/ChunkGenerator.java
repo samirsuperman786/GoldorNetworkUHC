@@ -127,7 +127,7 @@ public class ChunkGenerator {
 				}
 				
 			}
-		}.runTaskTimer(plugin, 200L, 30L);
+		}.runTaskTimer(plugin, 200L, 20L);
 	}
 
 

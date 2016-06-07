@@ -42,7 +42,6 @@ public class LeaveCommand extends UHCCommand{
 					if(teamM.isPlayerOwner(p)){
 						teamM.removePlayerFromOwner(p);
 						teamM.disbandTeam(teamM.getTeamOfPlayer(p.getUniqueId()));
-						
 					}
 					else{
 						for(UUID u : teamM.getPlayersOnATeam(teamM.getTeamOfPlayer(p.getUniqueId()))){
@@ -52,6 +51,7 @@ public class LeaveCommand extends UHCCommand{
 						}
 						teamM.removePlayerFromTeam(p.getUniqueId());
 					}
+					
 					return true;
 				}
 				else{

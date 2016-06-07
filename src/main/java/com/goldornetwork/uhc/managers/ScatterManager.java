@@ -242,22 +242,30 @@ public class ScatterManager implements Listener{
 					MinecraftServer.getServer().processQueue.add(new Runnable() {
 						@Override
 						public void run() {
+							
+							new BukkitRunnable() {
+								
+								@Override
+								public void run() {
+									Location safeLocation = new Location(location.getWorld(), location.getBlockX(), location.getWorld().getHighestBlockYAt(location), location.getBlockZ());
 
-							Location safeLocation = new Location(location.getWorld(), location.getBlockX(), location.getWorld().getHighestBlockYAt(location), location.getBlockZ());
+									for(UUID u : teamToScatter.get(team)){
+										OfflinePlayer p = Bukkit.getOfflinePlayer(u);
+										if(p.isOnline()==false){
+											lateScatters.add(u);
+										}
+										else if(p.isOnline()==true){
+											isTeamOnline.put(team, true);
+											Player target = (Player) p;
+											initializePlayer(target);
+											teleported = target.teleport(safeLocation);
+										}
 
-							for(UUID u : teamToScatter.get(team)){
-								OfflinePlayer p = Bukkit.getOfflinePlayer(u);
-								if(p.isOnline()==false){
-									lateScatters.add(u);
+									}
+									
 								}
-								else if(p.isOnline()==true){
-									isTeamOnline.put(team, true);
-									Player target = (Player) p;
-									initializePlayer(target);
-									teleported = target.teleport(safeLocation);
-								}
-
-							}
+							}.runTaskLater(plugin, 10L);
+							
 
 							new BukkitRunnable() {
 

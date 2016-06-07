@@ -11,7 +11,6 @@ E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\staff\StartCommand.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\UHCBan.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\game\InfoCommand.java
-E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\BoardManager.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\UHC.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\CommandException.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\CoordXZ.java
@@ -26,6 +25,7 @@ E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\gamemodes\Bows.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\listeners\team\TeamInteraction.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\WorldFactory.java
+E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\board\BoardManager.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\events\GameEndEvent.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\team\CreateCommand.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\events\PVPEnableEvent.java
@@ -65,4 +65,5 @@ E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\listeners\WeatherChange.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\Gamemode.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\gamemodes\KingsManager.java
+E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\events\GameOpenEvent.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\staff\CancelCommand.java

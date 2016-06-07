@@ -14,6 +14,7 @@ import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.managers.world.WorldManager;
+import com.goldornetwork.uhc.managers.world.events.GameOpenEvent;
 import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
 import com.goldornetwork.uhc.managers.world.events.PVPEnableEvent;
 import com.goldornetwork.uhc.managers.world.listeners.team.ChatManager;
@@ -61,10 +62,9 @@ public class TimerManager implements Listener{
 		plugin.getConfig().addDefault("TIME-TILL-PVP-START", 40);
 		plugin.getConfig().addDefault("TIME-TILL-VOTE-END", 5);
 		plugin.saveConfig();
-		//TODO multiply by 60
-		this.timeTillMatchStart = (plugin.getConfig().getInt("TIME-TILL-MATCH-START")*30);
+		this.timeTillMatchStart = (plugin.getConfig().getInt("TIME-TILL-MATCH-START")*60);
 		this.timeTillPVPStart = (plugin.getConfig().getInt("TIME-TILL-PVP-START")*60);
-		this.timeTillVote = (plugin.getConfig().getInt("TIME-TILL-VOTE-END")*30);
+		this.timeTillVote = (plugin.getConfig().getInt("TIME-TILL-VOTE-END")*60);
 	}
 
 	/**
@@ -75,6 +75,7 @@ public class TimerManager implements Listener{
 	 */
 	public void startMatch(){
 		State.setState(State.OPEN);
+		Bukkit.getServer().getPluginManager().callEvent(new GameOpenEvent());
 		matchStart = true;
 		chatM.mutePlayers();
 		countdownTimer();
@@ -235,7 +236,14 @@ public class TimerManager implements Listener{
 	public boolean hasMatchStarted(){
 		return matchStart;
 	}
-
+	
+	public int getTimeTillMatchStart(){
+		return timeTillMatchStart;
+	}
+	
+	public int getTimeTillPVP(){
+		return timeTillPVPStart;
+	}
 
 
 }

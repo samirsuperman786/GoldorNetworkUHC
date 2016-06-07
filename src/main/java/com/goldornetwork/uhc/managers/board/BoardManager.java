@@ -1,4 +1,4 @@
-package com.goldornetwork.uhc.managers;
+package com.goldornetwork.uhc.managers.board;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -25,7 +26,10 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import com.goldornetwork.uhc.UHC;
+import com.goldornetwork.uhc.managers.TeamManager;
+import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.world.WorldManager;
+import com.goldornetwork.uhc.managers.world.events.GameOpenEvent;
 import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
 
 public class BoardManager implements Listener{
@@ -35,22 +39,26 @@ public class BoardManager implements Listener{
 	private Scoreboard mainBoard;
 	private Team observerTeam;
 	private WorldManager worldM;
+	private TimerManager timerM;
 
 	private List<Team> activeTeams = new ArrayList<Team>(); 
 	private Map<String, Team> teamScoreBoards = new HashMap<String, Team>();
+	private Map<String, Objective> teamHeaders = new HashMap<String, Objective>();
 	private Map<UUID, String> teamOfPlayer = new HashMap<UUID, String>();
-	private Map<String, BukkitTask> scoreboardUpdaters = new HashMap<String, BukkitTask>();
+
+	//scoreboard
+	private Objective header;
 
 	public BoardManager(UHC plugin) {
 		this.plugin=plugin;
-
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
 
-	public void setup(TeamManager teamM, WorldManager worldM){
+	public void setup(TeamManager teamM, WorldManager worldM, TimerManager timerM){
 		this.teamM=teamM;
 		this.worldM=worldM;
+		this.timerM=timerM;
 		mainBoard=Bukkit.getServer().getScoreboardManager().getNewScoreboard();
 		initializeObserverBoard();
 		for(Player all : Bukkit.getServer().getOnlinePlayers()){
@@ -60,32 +68,63 @@ public class BoardManager implements Listener{
 
 	}
 
-	private void initializeObserverBoard() {
-		Objective header = mainBoard.registerNewObjective("header", "dummy");
-		header.setDisplayName(ChatColor.GOLD + ""+ ChatColor.BOLD + "GoldorNetwork");
-		header.setDisplaySlot(DisplaySlot.SIDEBAR);
+	private void initializeInfo(Objective header){
 		
+		Score teamsize = header.getScore(ChatColor.AQUA + "Max Team Size: ");
+		teamsize.setScore(teamM.getTeamSize());
+		updater(teamsize, 20L, new Callable<Integer>() {
+			public Integer call(){
+				return teamM.getTeamSize();
+			}
+		});
+		
+		Score playersInGame = header.getScore(ChatColor.GOLD + "Players: ");
+		updater(playersInGame, 40L, new Callable<Integer>(){
+			public Integer call(){
+				return teamM.getPlayersInGame().size();
+			}
+		});
+		
+		Score teamsLeft = header.getScore(ChatColor.GOLD + "Teams Left: ");
+		updater(teamsLeft, 40L, new Callable<Integer>(){
+			public Integer call(){
+				return teamM.getActiveTeams().size();
+			}
+		});
+		
+		
+
+		Score currentBorder = header.getScore(ChatColor.AQUA + "Border Radius: ");
+		currentBorder.setScore((int) worldM.getUHCWorld().getWorldBorder().getSize());
+		updater(currentBorder, 100L, new Callable<Integer>() {
+			public Integer call(){
+				return (int) (10*(Math.round((worldM.getUHCWorld().getWorldBorder().getSize())/2)/10));
+
+			}
+		});
+		
+		
+		
+	}
+	private void initializeObserverBoard() {
+		header = mainBoard.registerNewObjective("header", "dummy");
+		header.setDisplayName(ChatColor.GOLD + "" + ChatColor.BOLD + "GoldorNetwork");
+		header.setDisplaySlot(DisplaySlot.SIDEBAR);
+
 		Objective objective = mainBoard.registerNewObjective("showhealth", "health");
 		objective.setDisplaySlot(DisplaySlot.BELOW_NAME);
 		objective.setDisplayName(ChatColor.RED + "\u2665");
-		
-		List<Score> toAdd = new LinkedList<Score>();
-		toAdd.add(header.getScore(ChatColor.AQUA + "Radius: " + ChatColor.WHITE + plugin.getConfig().getInt("radius")));
-		toAdd.add(header.getScore(" "));
-		toAdd.add(header.getScore(ChatColor.AQUA + "Team Size: " + ChatColor.WHITE + "0"));
-		toAdd.add(header.getScore(ChatColor.AQUA + "Current Border: " + ChatColor.WHITE + (int) worldM.getUHCWorld().getWorldBorder().getSize()));
 
-		for(Score score : toAdd){
-			score.setScore(0);
-		}
+
+		initializeInfo(header);
+
 
 		observerTeam = mainBoard.registerNewTeam("observers");
 		observerTeam.setPrefix(ChatColor.AQUA + "[Observer] ");
 	}
 
-	private Scoreboard getObserverBoard(){
-		return mainBoard;
-	}
+
+
 	private Scoreboard initializeTeamBoard(String team){
 		Scoreboard teamBoard = Bukkit.getScoreboardManager().getNewScoreboard();
 		String teamToAdd = teamM.getTeamNameProper(team);
@@ -101,19 +140,21 @@ public class BoardManager implements Listener{
 		Objective header = teamBoard.registerNewObjective("header", "dummy");
 		header.setDisplaySlot(DisplaySlot.SIDEBAR);
 		header.setDisplayName(teamM.getColorOfTeam(team) + ChatColor.BOLD + teamToAdd);
+
+		Objective health = teamBoard.registerNewObjective("healthDisplayer", "health");
+		health.setDisplaySlot(DisplaySlot.BELOW_NAME);
+		health.setDisplayName(ChatColor.RED + "\u2665");
 		
-		Objective objective = teamBoard.registerNewObjective("showhealth", "health");
-		objective.setDisplaySlot(DisplaySlot.BELOW_NAME);
-		objective.setDisplayName(ChatColor.RED + "\u2665");
 		
+		initializeInfo(header);
+		Score timeTillMatch = header.getScore(ChatColor.AQUA + "Match starts in: ");
+		updater(timeTillMatch, 20L, 0L, new Callable<Integer>() {
+			public Integer call(){
+				return timerM.getTimeTillMatchStart();
+			}
+		});
 		
-		List<Score> toAdd = new LinkedList<Score>();
-		toAdd.add(header.getScore(ChatColor.AQUA + "Team Size: " + ChatColor.WHITE + "0"));
-		
-		for(Score score : toAdd){
-			score.setScore(0);
-		}
-		
+		teamHeaders.put(team, header);
 		teamScoreBoards.put(team, newTeam);
 		activeTeams.add(newTeam);
 		return teamBoard;
@@ -128,6 +169,13 @@ public class BoardManager implements Listener{
 			target.setScoreboard(mainBoard);
 		}
 	}
+	public void removePlayerFromObservers(OfflinePlayer p){
+		observerTeam.removePlayer(p);
+		if(p.isOnline()){
+			Player target = (Player) p;
+			target.setPlayerListName(target.getName());
+		}
+	}
 
 	public void createTeam(String team){
 		initializeTeamBoard(team);
@@ -137,7 +185,6 @@ public class BoardManager implements Listener{
 		activeTeams.remove(teamScoreBoards.get(team));
 		teamScoreBoards.get(team).unregister();
 		teamScoreBoards.remove(team);
-		//cancelUpdater(team);
 	}
 
 	public void addPlayerToTeam(String team, Player p){
@@ -149,31 +196,13 @@ public class BoardManager implements Listener{
 	public void removePlayerFromTeam(String team, OfflinePlayer p){
 		teamScoreBoards.get(team).removePlayer(p);
 		teamOfPlayer.remove(p.getUniqueId());
-
+		if(p.isOnline()){
+			Player target = (Player) p;
+			target.setScoreboard(mainBoard);
+		}
 	}
 	public Scoreboard getScoreboardOfPlayer(Player p){
 		return teamScoreBoards.get(teamOfPlayer.get(p.getUniqueId())).getScoreboard();
-	}
-
-	private void updater(String team, Scoreboard sc){
-		BukkitTask run = new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				for(OfflinePlayer teamates : teamScoreBoards.get(team).getPlayers()){
-					if(teamates.isOnline()){
-						Player p = teamates.getPlayer();
-						p.setScoreboard(sc);
-					}
-				}
-
-			}
-		}.runTaskTimer(plugin, 0L, 20L);
-		scoreboardUpdaters.put(team, run);
-	}
-
-	private void cancelUpdater(String team){
-		scoreboardUpdaters.get(team).cancel();
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -216,6 +245,113 @@ public class BoardManager implements Listener{
 
 	}
 
+	private void gameStartInit(Objective header){
+		Score timeTillPVP = header.getScore(ChatColor.AQUA + "Time Till Meetup: ");
+		updater(timeTillPVP, 20L, 0L, new Callable<Integer>() {
+			public Integer call(){
+				return timerM.getTimeTillPVP();
+			}
+		});
+		
+		Score spectators = header.getScore(ChatColor.AQUA + "Observers: ");
+		spectators.setScore(teamM.getObservers().size());
+		updater(spectators, 60L, new Callable<Integer>() {
+			public Integer call(){
+				return teamM.getObservers().size();
+			}
+		});
+	}
+	
+	//updaters
+
+
+
+	private void updater(Score score, long frequency, Callable<Integer> func){
+		new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				int val = 0;
+				try {
+					val = func.call();
+				} catch (Exception e) {
+
+					e.printStackTrace();
+				}
+				score.setScore(val);
+
+
+			}
+		}.runTaskTimer(plugin, 0L, frequency);
+	}
+	private void updater(Score score, long frequency, long delay, Callable<Integer> expiration){
+
+		try {
+			new BukkitRunnable() {
+				
+				int i =expiration.call();
+				String toBlink = score.getEntry();
+				
+				@Override
+				public void run() {
+					
+					if(i>60){
+						
+						double k = i;
+						int toSet = (int) Math.ceil(k/60);
+						score.setScore(toSet);
+					}
+					else if(i<=60 && i>10){
+						score.setScore(i);
+					}
+					else if(i<=10 && i>0){
+						score.getScoreboard().resetScores(toBlink);
+						if(i%2==0){
+							toBlink = ChatColor.RED + ChatColor.stripColor(score.getEntry());
+						}
+						else{
+							toBlink = score.getEntry();
+						}
+						Score toChange = score.getObjective().getScore(toBlink);
+						toChange.setScore(i);
+					}
+					else if(i==0){
+						score.getScoreboard().resetScores(toBlink);
+						cancel();
+						
+					}
+					i--;
+
+
+				}
+			}.runTaskTimer(plugin, delay, frequency);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@EventHandler
+	public void onUpdate(GameStartEvent e){
+		gameStartInit(this.header);
+		
+		for(String team : teamM.getActiveTeams()){
+			Objective header = teamHeaders.get(team);
+			gameStartInit(header);
+			
+		}
+
+	}
+
+	@EventHandler
+	public void onUpdate(GameOpenEvent e){
+		Score timeTillMatch = header.getScore(ChatColor.AQUA + "Match Starts In: ");
+		updater(timeTillMatch, 20L, 0L, new Callable<Integer>() {
+			public Integer call(){
+				return timerM.getTimeTillMatchStart();
+			}
+		});
+		
+	}
 
 
 

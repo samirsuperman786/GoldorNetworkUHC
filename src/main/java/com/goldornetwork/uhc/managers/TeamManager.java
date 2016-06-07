@@ -18,6 +18,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.managers.board.BoardManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 
@@ -57,6 +58,7 @@ public class TeamManager {
 	 */
 	public void setup(){
 		config();
+		this.playersPerTeam=0;
 		isTeamsEnabled=false;
 		playersInGame.clear();
 		observers.clear();
@@ -291,7 +293,6 @@ public class TeamManager {
 				MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.GREEN, p.getName() + " has joined your team.");
 			}
 		}
-		//
 		boardM.addPlayerToTeam(team, p);
 		playersInGame.add(p.getUniqueId());
 		teamOfPlayer.put(p.getUniqueId(), team);
@@ -378,6 +379,14 @@ public class TeamManager {
 		MessageSender.send(ChatColor.AQUA, p, "You are now spectating.");
 		boardM.addPlayerToObserver(p);
 	}
+	public void removePlayerFromObservers(Player p){
+		observers.remove(p.getUniqueId());
+		for(PotionEffect effect : p.getActivePotionEffects()){
+			p.removePotionEffect(effect.getType());
+		}
+		boardM.removePlayerFromObservers(p);
+	}
+	
 	public String getColorOfPlayer(UUID target){
 		if(isPlayerAnObserver(target)){
 			return ChatColor.AQUA.toString();
