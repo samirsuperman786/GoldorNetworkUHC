@@ -89,4 +89,20 @@ public class MessageSender {
 		}
 	}
 	
+	public static void broadcastTitle(String title, String subtitle){
+		for(Player online: Bukkit.getOnlinePlayers()){
+			online.sendTitle(title, subtitle);
+		}
+	}
+	public static void broadcastBigTitle(String title){
+		for(Player online: Bukkit.getOnlinePlayers()){
+			online.sendTitle(title, "");
+		}
+	}
+	public static void broadcastSmallTitle(String subtitle){
+		for(Player online: Bukkit.getOnlinePlayers()){
+			online.sendTitle("", subtitle);
+		}
+	}
+	
 }

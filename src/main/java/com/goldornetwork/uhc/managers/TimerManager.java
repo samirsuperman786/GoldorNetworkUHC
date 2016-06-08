@@ -1,8 +1,5 @@
 package com.goldornetwork.uhc.managers;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -11,7 +8,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
-import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.managers.world.WorldManager;
 import com.goldornetwork.uhc.managers.world.events.GameOpenEvent;
@@ -128,6 +124,7 @@ public class TimerManager implements Listener{
 				else if(timeTillMatchStart == 0){
 
 					MessageSender.broadcast("Match has started!");
+					MessageSender.broadcastTitle(ChatColor.GOLD + "Match has started!", ChatColor.GOLD + "Scattering...");
 					State.setState(State.SCATTER);
 					if(teamM.isTeamsEnabled()){
 						scatterM.scatter();
@@ -153,6 +150,7 @@ public class TimerManager implements Listener{
 	@EventHandler
 	public void on(GameStartEvent e){
 		pvpTimer();
+		MessageSender.broadcastBigTitle(ChatColor.GOLD + "Go!");
 	}
 	/**
 	 * When called, this will begin the count down till PVP is enabled
@@ -186,6 +184,7 @@ public class TimerManager implements Listener{
 				else if(timeTillPVPStart==0){
 					Bukkit.getPluginManager().callEvent(new PVPEnableEvent());
 					MessageSender.broadcast("PVP has been enabled!");
+					MessageSender.broadcastTitle(ChatColor.GOLD + "Meetup is now!", ChatColor.RED + "Get moving to (0, 0)");
 					cancel();
 				}
 

@@ -146,10 +146,25 @@ public class VoteManager implements Listener{
 	public void enableOption(int choice){
 		voteActive=false;
 		List<String> toBroadcast = new LinkedList<String>();
+		StringBuilder str = new StringBuilder();
+		int comma=0;
 		for(Gamemode game : options.get(choice)){
 			game.enable(plugin);
 			toBroadcast.add(ChatColor.AQUA + game.getName() + " has been enabled");
+			comma++;
+			String message = ChatColor.AQUA + game.getProperName();
+			String properMessage;
+			if(comma<getOptions().get(choice).size()){
+				properMessage = message + ", ";
+			}
+			else{
+				properMessage=message;
+			}
+			str.append(properMessage);
+
 		}
+		String msg = str.toString();
+		MessageSender.broadcastSmallTitle(msg + " have been enabled.");
 		MessageSender.broadcast(toBroadcast);
 	}
 

@@ -181,7 +181,6 @@ public class WorldManager implements Listener{
 		toBroadcast.add(ChatColor.AQUA + "------------------------------");
 
 		toBroadcast.add("Game has ended, thanks for playing!");
-
 		MessageSender.broadcast(toBroadcast);
 		new BukkitRunnable() {
 
@@ -189,20 +188,33 @@ public class WorldManager implements Listener{
 			public void run() {
 				if(winners!=null){
 					List<String> toReturn = new ArrayList<String>();
-					toReturn.add("Winners are: ");
-
+					//toReturn.add("Winners are: ");
+					
 					//fireworks(getUHCWorld());
+					int comma = 0;
 
+					StringBuilder str = new StringBuilder();
 
 					for(UUID u : winners){
-						toReturn.add(teamM.getColorOfPlayer(u) + Bukkit.getServer().getOfflinePlayer(u).getName());
+						comma++;
+						String message = teamM.getColorOfPlayer(u) + Bukkit.getOfflinePlayer(u).getName();
+						String properMessage;
+						if(comma<winners.size()){
+							properMessage = message + ", ";
+						}
+						else{
+							properMessage=message;
+						}
+						str.append(properMessage);
+						
 						if(Bukkit.getOfflinePlayer(u).isOnline()){
 							Player target = Bukkit.getServer().getPlayer(u);
 							target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 4));
 						}
 					}
-
+					String msg = ChatColor.GOLD + "Winners: " + str.toString();
 					MessageSender.broadcast(toReturn);
+					MessageSender.broadcastTitle(ChatColor.GOLD + "Game Over!", msg);
 				}
 
 			}

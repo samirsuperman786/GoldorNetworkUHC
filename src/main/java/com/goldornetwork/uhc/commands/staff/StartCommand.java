@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import com.goldornetwork.uhc.commands.UHCCommand;
 import com.goldornetwork.uhc.managers.TeamManager;
@@ -35,11 +36,8 @@ public class StartCommand extends UHCCommand{
 		else if(args.length==1){
 			if(Parser.isInt(args[0])){
 				int teamSize = Integer.valueOf(args[0]);
-
+				Player p = (Player) sender;
 				teamM.setupTeams(teamSize);
-				MessageSender.broadcast("Teams have been enabled with a size of " + ChatColor.GRAY + teamSize + ChatColor.GOLD + " players per team!");
-
-
 				timerM.startMatch();
 				return true;
 			}
