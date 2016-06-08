@@ -106,7 +106,7 @@ public class UHC extends JavaPlugin {
 		
 		uhcWarn= new UHCWarn();
 		
-		uhcB = new UHCBan();
+		uhcB = new UHCBan(teamM);
 		//cmds
 		cmd = new CommandHandler(plugin);
 		

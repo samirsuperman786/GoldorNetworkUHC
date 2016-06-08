@@ -1,5 +1,7 @@
 package com.goldornetwork.uhc.managers.world;
 
+import org.bukkit.BanList;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,7 +31,10 @@ public class UHCServer implements Listener{
 	@EventHandler
 	public void on(PlayerLoginEvent e){
 		Player target = e.getPlayer();
-		if(target.hasPermission("uhc.whitelist.bypass")){
+		if(target.isBanned()){
+			e.disallow(PlayerLoginEvent.Result.KICK_BANNED, ChatColor.GOLD + Bukkit.getServer().getBanList(BanList.Type.NAME).getBanEntry(target.getName()).getReason());
+		}
+		else if(target.hasPermission("uhc.whitelist.bypass")){
 			e.allow();
 		}
 		else if(plugin.getServer().getOnlinePlayers().size()<FAKE_PLAYER_SLOTS){
