@@ -73,10 +73,9 @@ public class VoteManager implements Listener{
 
 	private List<String> getMessage(){
 		List<String> toBroadcast = new LinkedList<String>();
-		toBroadcast.add("[Options]");
+		toBroadcast.add("[Options] Please use /vote [option], also /info [gamemode]");
 		
 		for(int i = 0; i<getNumberOfOptions(); i++){
-			//toBroadcast.add("Option " + (i + 1));	
 			int comma = 0;
 
 			StringBuilder str = new StringBuilder();
@@ -98,7 +97,6 @@ public class VoteManager implements Listener{
 			toBroadcast.add("Option " + (i + 1) + ": " + msg);
 
 		}
-		toBroadcast.add(ChatColor.LIGHT_PURPLE + "Please use /vote [option], also /info [gamemode]");
 		return toBroadcast;
 	}
 
