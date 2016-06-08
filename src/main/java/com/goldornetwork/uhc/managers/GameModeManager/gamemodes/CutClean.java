@@ -25,7 +25,7 @@ public class CutClean extends Gamemode implements Listener{
 	private Random random = new Random();
 	
 	public CutClean(TeamManager teamM) {
-		super("CutClean", "Pretty much any drop is smelted.");
+		super("Cut Clean", "CutClean", "Pretty much any drop is smelted.");
 		this.teamM=teamM;
 	}
 	

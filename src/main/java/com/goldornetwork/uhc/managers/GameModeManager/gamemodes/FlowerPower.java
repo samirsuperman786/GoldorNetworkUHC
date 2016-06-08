@@ -24,7 +24,7 @@ public class FlowerPower extends Gamemode implements Listener{
 	
 	
 	public FlowerPower(TeamManager teamM) {
-		super("FlowerPower", "When you break a flower, a random amount of a random item drops!");
+		super("Flower Power", "FlowerPower", "When you break a flower, a random amount of a random item drops!");
 		this.teamM= teamM;
 	}
 	private static final Set<Material> INVALID_BLOCKS = ImmutableSet.of(

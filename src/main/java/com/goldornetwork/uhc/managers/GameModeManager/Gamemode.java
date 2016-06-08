@@ -12,14 +12,19 @@ public abstract class Gamemode{
 	
 	private String description;
 	private String name;
+	private String properName;
 	
-	protected Gamemode(String name, String description){
+	protected Gamemode(String properName, String name, String description){
 		this.description=description;
 		this.name=name;
+		this.properName=properName;
 	}
 	
 	public String getName(){
 		return name;
+	}
+	public String getProperName(){
+		return properName;
 	}
 	public String getDescription() {
 		return description;

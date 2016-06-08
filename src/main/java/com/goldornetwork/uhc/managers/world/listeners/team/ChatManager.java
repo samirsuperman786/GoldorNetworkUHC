@@ -40,7 +40,7 @@ public class ChatManager implements Listener{
 	public void on(AsyncPlayerChatEvent e){
 		Player sender = e.getPlayer();
 		e.setCancelled(true);
-		if(mutePlayers && e.getPlayer().hasPermission("uhc.chat.mutebypass")==false){
+		if(mutePlayers && sender.hasPermission("uhc.chat.mutebypass")==false){
 			return;
 		}
 		else{
@@ -57,10 +57,13 @@ public class ChatManager implements Listener{
 					else if(teamM.isPlayerAnObserver(sender.getUniqueId())){
 						all.sendMessage(teamM.getColorOfPlayer(sender.getUniqueId()) + "[Observer] " + PlayerUtils.getPrefix(sender)+ ChatColor.AQUA + sender.getName() +  ChatColor.WHITE + ": " + e.getMessage());
 					}
+					else{
+						all.sendMessage(PlayerUtils.getPrefix(sender) + teamM.getColorOfPlayer(sender.getUniqueId()) + sender.getName() + ChatColor.WHITE + ": " + e.getMessage());
+					}
 				}
 				
 				else{
-					all.sendMessage(PlayerUtils.getPrefix(sender) + ChatColor.WHITE + sender.getName() + ": " + e.getMessage());
+					all.sendMessage(PlayerUtils.getPrefix(sender) + teamM.getColorOfPlayer(sender.getUniqueId()) + sender.getName() + ": " + e.getMessage());
 				}
 			}
 		}

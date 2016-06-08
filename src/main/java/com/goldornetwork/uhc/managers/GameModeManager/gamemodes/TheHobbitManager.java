@@ -34,7 +34,7 @@ public class TheHobbitManager extends Gamemode implements Listener{
 	private List<UUID> lateHobbits = new ArrayList<UUID>();
 	
 	public TheHobbitManager(TeamManager teamM) {
-		super("TheHobbit", "Players receive one golden nugget and when clicked, the player receives invisibility for 30 seconds!");
+		super("The Hobbit", "TheHobbit", "Players receive one golden nugget and when clicked, the player receives invisibility for 30 seconds!");
 		this.teamM=teamM;
 	}
 	@Override

@@ -34,7 +34,7 @@ public class PotionSwap extends Gamemode implements Listener{
 	private List<UUID> latePotionPlayers = new ArrayList<UUID>();
 	
 	public PotionSwap(UHC plugin, TeamManager teamM) {
-		super("PotionSwap", "Every 5 minutes, players will receive a new potion effect!");
+		super("Potion Swap","PotionSwap", "Every 5 minutes, players will receive a new potion effect!");
 		this.plugin=plugin;
 		this.teamM=teamM;
 	}

@@ -23,7 +23,7 @@ public class BlockRush extends Gamemode implements Listener{
 	//storage
 	private List<Material> firstBlocksMined = new ArrayList<Material>();
 	public BlockRush(WorldManager worldM) {
-		super("BlockRush", "First one to mine a unique block gets a diamond!");
+		super("Block Rush", "BlockRush", "First one to mine a unique block gets a diamond!");
 		this.worldM=worldM;
 	}
 	@Override

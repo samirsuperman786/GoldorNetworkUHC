@@ -19,7 +19,7 @@ public class Switcheroo extends Gamemode implements Listener{
 	private TeamManager teamM;
 
 	public Switcheroo(TeamManager teamM) {
-		super("Switcheroo", "When a player shoots another player, they switch places");
+		super("Switcheroo", "Switcheroo", "When a player shoots another player, they switch places");
 		this.teamM=teamM;
 	}
 	@Override

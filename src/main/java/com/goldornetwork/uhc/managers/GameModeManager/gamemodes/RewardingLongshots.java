@@ -22,7 +22,7 @@ public class RewardingLongshots extends Gamemode implements Listener{
 	private TeamManager teamM;
 	
 	public RewardingLongshots(TeamManager teamM) {
-		super("RewardingLongshots", "Players get higher rewards for longer shots!");
+		super("Rewarding Longshots", "RewardingLongshots", "Players get higher rewards for longer shots!");
 		this.teamM=teamM;
 	}
 	

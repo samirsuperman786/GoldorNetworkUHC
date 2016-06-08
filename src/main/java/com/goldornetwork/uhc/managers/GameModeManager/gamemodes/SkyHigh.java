@@ -36,7 +36,7 @@ public class SkyHigh extends Gamemode implements Listener{
 	UHC plugin;
 	
 	public SkyHigh(UHC plugin, TeamManager teamM) {
-		super("SkyHigh", "After PVP, players who are not above y=100 will take a heart of damage every 30 seconds!");
+		super("Sky High", "SkyHigh", "After PVP, players who are not above y=100 will take a heart of damage every 30 seconds!");
 		this.plugin=plugin;
 		this.teamM=teamM;
 	}

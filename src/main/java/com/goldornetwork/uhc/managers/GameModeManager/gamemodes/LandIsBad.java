@@ -26,7 +26,7 @@ public class LandIsBad extends Gamemode implements Listener{
 	private Map<UUID, BukkitTask> playersToDamage= new HashMap<UUID, BukkitTask>();
 
 	public LandIsBad(UHC plugin, TeamManager teamM) {
-		super("LandIsBad", "After PVP is enabled, players who are not underwater will take a heart of damage every ten seconds!");
+		super("Land is Bad", "LandIsBad", "After PVP is enabled, players who are not underwater will take a heart of damage every ten seconds!");
 		this.plugin=plugin;
 		this.teamM=teamM;
 	}

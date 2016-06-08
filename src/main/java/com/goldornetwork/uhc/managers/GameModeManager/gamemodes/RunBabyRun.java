@@ -28,7 +28,7 @@ public class RunBabyRun extends Gamemode implements Listener{
 	private PotionEffect speedBuff = new PotionEffect(PotionEffectType.SPEED,Integer.MAX_VALUE, 2, true, true);
 	
 	public RunBabyRun(UHC plugin,TeamManager teamM) {
-		super("RunBabyRun", "If you are at or below " + HEALTH_THRESHOLD + " hearts, you gain speed 3!");
+		super("Run Baby Run", "RunBabyRun", "If you are at or below " + HEALTH_THRESHOLD + " hearts, you gain speed 3!");
 		this.plugin=plugin;
 		this.teamM=teamM;
 	}

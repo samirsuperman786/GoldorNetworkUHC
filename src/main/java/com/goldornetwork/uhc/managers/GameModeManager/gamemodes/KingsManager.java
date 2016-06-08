@@ -41,7 +41,7 @@ public class KingsManager extends Gamemode implements Listener{
 	private List<UUID> currentlyDebuffed = new ArrayList<UUID>();
 	
 	public KingsManager(TeamManager teamM) {
-		super("Kings", "A random player on a team will receive special powers, and when that player dies, all his teamates shall suffer!");
+		super("Kings", "Kings", "A random player on a team will receive special powers, and when that player dies, all his teamates shall suffer!");
 		this.teamM=teamM;
 	}
 	@Override
