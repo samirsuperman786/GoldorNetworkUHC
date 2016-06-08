@@ -14,8 +14,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
+import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
 
 public class RunBabyRun extends Gamemode implements Listener{
 
@@ -28,7 +28,7 @@ public class RunBabyRun extends Gamemode implements Listener{
 	private PotionEffect speedBuff = new PotionEffect(PotionEffectType.SPEED,Integer.MAX_VALUE, 2, true, true);
 	
 	public RunBabyRun(UHC plugin,TeamManager teamM) {
-		super("RunBabyRun", "If you are at or below " + HEALTH_THRESHOLD + " hearts, you gain speed 3!");
+		super("Run Baby Run", "RunBabyRun", "If you are at or below " + HEALTH_THRESHOLD + " hearts, you gain speed 3!");
 		this.plugin=plugin;
 		this.teamM=teamM;
 	}
@@ -46,7 +46,7 @@ public class RunBabyRun extends Gamemode implements Listener{
 				for(UUID u : teamM.getPlayersInGame()){
 					if(Bukkit.getOfflinePlayer(u).isOnline()){
 						Player target = Bukkit.getPlayer(u);
-						if(target.getHealth()<=HEALTH_THRESHOLD){
+						if(target.getHealth()<=(HEALTH_THRESHOLD*2)){
 							if(!(lowHealth.contains(u))){
 								lowHealth.add(u);
 								addBuffs(target);

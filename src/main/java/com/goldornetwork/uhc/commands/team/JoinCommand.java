@@ -1,5 +1,6 @@
 package com.goldornetwork.uhc.commands.team;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -36,36 +37,22 @@ public class JoinCommand extends UHCCommand {
 			MessageSender.send(ChatColor.RED, p, "You may not join a team.");
 			return true;
 		}
-		else if(teamM.isPlayerInGame(p)){
+		else if(teamM.isPlayerInGame(p.getUniqueId())){
 			MessageSender.send(ChatColor.RED, sender, "You are already on a team");
 			return true;
 		}
 
-		else if(args.length == 0){
-			if(teamM.isFFAEnabled()){
-				if(teamM.isFFARoomToJoin()){
-					teamM.addPlayerToFFA(p);
-					MessageSender.alertMessage(p, ChatColor.GREEN, "You have joined the FFA");
-					return true;
-				}
-				else{
-					MessageSender.alertMessage(p, ChatColor.RED, "No room to join sorry!");
-					return true;
-				}
-
-			}
-			else{
-				return false;
-			}
-		}
 		else if(args.length==1){
 			if(teamM.isTeamsEnabled()){
 				if(teamM.isValidTeam(args[0])){
 					if(teamM.isPlayerInvitedToTeam(p,args[0].toLowerCase())){
 						if(teamM.isTeamRoomToJoin(args[0].toLowerCase())){
-							MessageSender.alertMessage(p, ChatColor.GREEN, "You have joined team " + teamM.getColorOfTeam(args[0].toLowerCase()) + args[0]);
+							if(teamM.isPlayerAnObserver(p.getUniqueId())){
+								teamM.removePlayerFromObservers(p);
+							}
+							MessageSender.alertMessage(p, ChatColor.GREEN, "You have joined team " + teamM.getColorOfTeam(args[0].toLowerCase()) + teamM.getTeamNameProper(args[0]));
 							teamM.addPlayerToTeam(p, args[0].toLowerCase());
-							teamM.unInvitePlayer(args[0], p);
+							teamM.unInvitePlayer(args[0], p.getUniqueId());
 							return true;
 						}
 						else{
@@ -97,8 +84,13 @@ public class JoinCommand extends UHCCommand {
 	}
 	@Override
 	public List<String> tabComplete(CommandSender sender, String[] args) {
+		List<String> toReturn = new ArrayList<String>();
 		if(args.length==1){
-			return teamM.getActiveTeams();
+			for(String teams : teamM.getActiveTeams()){
+				String toAdd = teamM.getTeamNameProper(teams);
+				toReturn.add(toAdd);
+			}
+			return toReturn;
 		}
 		return null;
 	}

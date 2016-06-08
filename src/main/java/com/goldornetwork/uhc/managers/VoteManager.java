@@ -7,20 +7,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
-import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.KingsManager;
 import com.goldornetwork.uhc.utils.MessageSender;
-import com.google.common.collect.ImmutableSet;
 
-public class VoteManager {
+public class VoteManager implements Listener{
 
 	private GameModeManager gamemodeM;
 	private TeamManager teamM;
@@ -32,13 +34,14 @@ public class VoteManager {
 	private Map<Integer, Integer> mostPopularVote = new HashMap<Integer, Integer>();
 	private List<UUID> haveVoted = new ArrayList<UUID>();
 	private boolean voteActive;
-	
+
 	public VoteManager(UHC plugin, GameModeManager gamemodeM, TeamManager teamM) {
 		this.plugin=plugin;
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.gamemodeM = gamemodeM;
 		this.teamM=teamM;
 	}
-	
+
 	public void setup(){
 		mostPopularVote.clear();
 		haveVoted.clear();
@@ -54,6 +57,49 @@ public class VoteManager {
 		}
 		return false;
 	}
+
+	public void broadcastOptions(){
+
+		new BukkitRunnable() {
+
+			@Override
+			public void run() {
+
+				MessageSender.broadcast(getMessage());				
+
+			}
+		}.runTaskLater(plugin, 100L);
+	}
+
+	private List<String> getMessage(){
+		List<String> toBroadcast = new LinkedList<String>();
+		toBroadcast.add("[Options] Please use /vote [option], also /info [gamemode]");
+		
+		for(int i = 0; i<getNumberOfOptions(); i++){
+			int comma = 0;
+
+			StringBuilder str = new StringBuilder();
+
+			for(Gamemode game : getOptions().get(i)){
+				comma++;
+				String message = ChatColor.AQUA + game.getProperName();
+				String properMessage;
+				if(comma<getOptions().get(i).size()){
+					properMessage = message + ", ";
+				}
+				else{
+					properMessage=message;
+				}
+				str.append(properMessage);
+
+			}
+			String msg = str.toString();
+			toBroadcast.add("Option " + (i + 1) + ": " + msg);
+
+		}
+		return toBroadcast;
+	}
+
 	public void generateOptions(){
 		voteActive=true;
 		for(int k = 0; k<NUMBEROFOPTIONS; k++){
@@ -87,32 +133,39 @@ public class VoteManager {
 	}
 	private boolean isValid(Gamemode game){
 		boolean valid = true;
-		if(teamM.isFFAEnabled()){
-			for(Class<?> gameClass : INCOMPATABLE_WITH_FFA){
-				if(game.equals(gamemodeM.getGameMode(gameClass))){
-					valid=false;
-					break;
-				}
-			}
-		}
 		return valid;
 	}
-	private static final Set<Class<?>> INCOMPATABLE_WITH_FFA = ImmutableSet.of(
-			KingsManager.class
-			);
-	
+
+
 	public List<List<Gamemode>> getOptions(){
 		return options;
 	}
-	
+
 	public void enableOption(int choice){
 		voteActive=false;
+		List<String> toBroadcast = new LinkedList<String>();
+		StringBuilder str = new StringBuilder();
+		int comma=0;
 		for(Gamemode game : options.get(choice)){
 			game.enable(plugin);
-			MessageSender.broadcast(ChatColor.AQUA + game.getName() + " has been enabled");
+			toBroadcast.add(ChatColor.AQUA + game.getName() + " has been enabled");
+			comma++;
+			String message = ChatColor.AQUA + game.getProperName();
+			String properMessage;
+			if(comma<getOptions().get(choice).size()){
+				properMessage = message + ", ";
+			}
+			else{
+				properMessage=message;
+			}
+			str.append(properMessage);
+
 		}
+		String msg = str.toString();
+		MessageSender.broadcastSmallTitle(msg + " have been enabled.");
+		MessageSender.broadcast(toBroadcast);
 	}
-	
+
 	public boolean hasVoted(Player p){
 		if(haveVoted.contains(p.getUniqueId())){
 			return true;
@@ -125,7 +178,7 @@ public class VoteManager {
 		haveVoted.add(p.getUniqueId());
 		mostPopularVote.replace(choice-1, (mostPopularVote.get(choice-1) + 1));
 	}
-	
+
 	public int getWinner(){
 		int maxVal = (Collections.max(mostPopularVote.values()));
 		int currentWinner=0;
@@ -136,14 +189,32 @@ public class VoteManager {
 		}
 		return currentWinner;
 	}
-	
+
 	public int getWinnerVotes(){
 		return (Collections.max(mostPopularVote.values()));
 	}
-	
+
 	public boolean isActive(){
 		return voteActive;
 	}
-	
-	
+
+	@EventHandler
+	public void on(PlayerJoinEvent e){
+		Player target =e.getPlayer();
+		if(isActive()){
+			new BukkitRunnable() {
+
+				@Override
+				public void run() {
+					if(target.isOnline()){
+						MessageSender.send(getMessage(), target);
+					}					
+				}
+			}.runTaskLater(plugin, 10L);
+
+		}
+
+	}
+
+
 }

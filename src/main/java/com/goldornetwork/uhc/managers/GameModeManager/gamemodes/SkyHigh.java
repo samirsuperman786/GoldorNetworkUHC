@@ -19,10 +19,10 @@ import org.bukkit.scheduler.BukkitTask;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
-import com.goldornetwork.uhc.managers.GameModeManager.PVPEnableEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
+import com.goldornetwork.uhc.managers.world.events.PVPEnableEvent;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class SkyHigh extends Gamemode implements Listener{
@@ -36,7 +36,7 @@ public class SkyHigh extends Gamemode implements Listener{
 	UHC plugin;
 	
 	public SkyHigh(UHC plugin, TeamManager teamM) {
-		super("SkyHigh", "After PVP, players who are not above y=100 will take a heart of damage every 30 seconds!");
+		super("Sky High", "SkyHigh", "After PVP, players who are not above y=100 will take a heart of damage every 30 seconds!");
 		this.plugin=plugin;
 		this.teamM=teamM;
 	}
@@ -98,7 +98,7 @@ public class SkyHigh extends Gamemode implements Listener{
 							public void run() {
 								if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
 									Bukkit.getServer().getPlayer(u).damage(2);
-									MessageSender.send(ChatColor.RED, Bukkit.getServer().getPlayer(u), "You are below y = 101!");
+									MessageSender.send(ChatColor.RED, Bukkit.getServer().getPlayer(u), "You are below Y: 101");
 								}
 								
 							}
@@ -109,7 +109,7 @@ public class SkyHigh extends Gamemode implements Listener{
 				}
 				else if(Bukkit.getServer().getPlayer(u).getLocation().getBlockY()>=101){
 					if(playersToDamage.containsKey(u)){
-						MessageSender.send(ChatColor.GREEN, Bukkit.getServer().getPlayer(u), "You are now above y =100!");
+						MessageSender.send(ChatColor.GREEN, Bukkit.getServer().getPlayer(u), "You are now above Y: 100");
 						playersToDamage.get(u).cancel();
 						playersToDamage.remove(u);
 					}

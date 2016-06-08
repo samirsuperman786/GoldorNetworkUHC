@@ -23,10 +23,11 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
 import com.goldornetwork.uhc.utils.MessageSender;
+import com.goldornetwork.uhc.utils.PlayerUtils;
 
 public class KingsManager extends Gamemode implements Listener{
 
@@ -40,7 +41,7 @@ public class KingsManager extends Gamemode implements Listener{
 	private List<UUID> currentlyDebuffed = new ArrayList<UUID>();
 	
 	public KingsManager(TeamManager teamM) {
-		super("Kings", "A random player on a team will receive special powers, and when that player dies, all his teamates shall suffer!");
+		super("Kings", "Kings", "A random player on a team will receive special powers, and when that player dies, all his teamates shall suffer!");
 		this.teamM=teamM;
 	}
 	@Override
@@ -60,7 +61,7 @@ public class KingsManager extends Gamemode implements Listener{
 	public void on(PlayerJoinEvent e){
 		Player p = e.getPlayer();
 		if(State.getState().equals(State.INGAME)){
-			if(teamM.isPlayerInGame(p)){
+			if(teamM.isPlayerInGame(p.getUniqueId())){
 				if(teamM.isTeamsEnabled()){
 					if(lateKings.contains(p.getUniqueId())){
 						giveAPlayerKingItems(p);
@@ -80,13 +81,13 @@ public class KingsManager extends Gamemode implements Listener{
 	@EventHandler(priority =EventPriority.MONITOR)
 	public void on(PlayerDeathEvent e){
 		if(listOfKings.containsValue(e.getEntity().getUniqueId())){
-			debuffTeamMates(teamM.getTeamOfPlayer(e.getEntity()));
+			debuffTeamMates(teamM.getTeamOfPlayer(e.getEntity().getUniqueId()));
 		}
 	}
 	@EventHandler
 	public void on(PlayerItemConsumeEvent e){
 		if(State.getState().equals(State.INGAME)){
-			if(teamM.isPlayerInGame(e.getPlayer())){
+			if(teamM.isPlayerInGame(e.getPlayer().getUniqueId())){
 				if(teamM.isTeamsEnabled()){
 					if(currentlyDebuffed.contains(e.getPlayer().getUniqueId())){
 						if(e.getItem().getType().equals(Material.MILK_BUCKET)){
@@ -134,7 +135,7 @@ public class KingsManager extends Gamemode implements Listener{
 			listOfKings.put(team, king.getUniqueId());
 			for(UUID u : teamM.getPlayersOnATeam(team)){
 				if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
-					MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.GOLD, "Your king is " + teamM.getColorOfTeam(team) + king.getName());
+					MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.GOLD, "Your king is " + PlayerUtils.getPrefix(king) + ChatColor.GREEN + king.getName());
 				}
 			}
 			if(king.isOnline()){

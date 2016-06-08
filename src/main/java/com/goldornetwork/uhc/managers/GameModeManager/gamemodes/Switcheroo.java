@@ -19,7 +19,7 @@ public class Switcheroo extends Gamemode implements Listener{
 	private TeamManager teamM;
 
 	public Switcheroo(TeamManager teamM) {
-		super("Switcheroo", "When a player shoots another player, they switch places");
+		super("Switcheroo", "Switcheroo", "When a player shoots another player, they switch places");
 		this.teamM=teamM;
 	}
 	@Override
@@ -37,7 +37,7 @@ public class Switcheroo extends Gamemode implements Listener{
 					if(arrow.getShooter() instanceof Player){
 						Player target = (Player) e.getEntity();
 						Player shooter = (Player) arrow.getShooter();
-						if(teamM.isPlayerInGame(target) && teamM.isPlayerInGame(shooter)){
+						if(teamM.isPlayerInGame(target.getUniqueId()) && teamM.isPlayerInGame(shooter.getUniqueId())){
 							run(target, shooter);
 						}
 					}
@@ -53,8 +53,8 @@ public class Switcheroo extends Gamemode implements Listener{
 		Location shooterLocation = shooter.getLocation();
 		target.teleport(shooterLocation);
 		shooter.teleport(targetLocation);
-		MessageSender.send(ChatColor.RED, target, "You have switched places with " + teamM.getColorOfPlayer(shooter )+ shooter.getName());
-		MessageSender.send(ChatColor.RED, shooter, "You have switched places with " + teamM.getColorOfPlayer(target) + target.getName());
+		MessageSender.send(ChatColor.RED, target, "You have switched places with " + teamM.getColorOfPlayer(shooter.getUniqueId())+ shooter.getName());
+		MessageSender.send(ChatColor.RED, shooter, "You have switched places with " + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName());
 	}
 
 

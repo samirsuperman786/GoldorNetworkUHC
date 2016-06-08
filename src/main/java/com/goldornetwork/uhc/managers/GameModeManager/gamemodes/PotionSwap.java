@@ -18,9 +18,9 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
 import com.google.common.collect.ImmutableSet;
 
 public class PotionSwap extends Gamemode implements Listener{
@@ -34,7 +34,7 @@ public class PotionSwap extends Gamemode implements Listener{
 	private List<UUID> latePotionPlayers = new ArrayList<UUID>();
 	
 	public PotionSwap(UHC plugin, TeamManager teamM) {
-		super("PotionSwap", "Every 5 minutes, players will receive a new potion effect!");
+		super("Potion Swap","PotionSwap", "Every 5 minutes, players will receive a new potion effect!");
 		this.plugin=plugin;
 		this.teamM=teamM;
 	}

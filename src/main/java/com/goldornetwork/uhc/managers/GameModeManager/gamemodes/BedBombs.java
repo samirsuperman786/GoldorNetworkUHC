@@ -21,7 +21,7 @@ public class BedBombs extends Gamemode implements Listener {
 	private TeamManager teamM;
 	
 	public BedBombs(TeamManager teamM) {
-		super("BedBombs", "Beds explode when clicked on!");
+		super("Bed Bombs", "BedBombs", "Beds explode when clicked on!");
 		this.teamM=teamM;
 	}
 	
@@ -34,7 +34,7 @@ public class BedBombs extends Gamemode implements Listener {
 		Block block = e.getClickedBlock();
 		Player p = e.getPlayer();
 		
-		if(teamM.isPlayerInGame(p)==false){
+		if(teamM.isPlayerInGame(p.getUniqueId())==false){
 			return;
 		}
 		

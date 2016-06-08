@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Random;
 
 import com.goldornetwork.uhc.UHC;
-import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.BedBombs;
 import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.BlockRush;
@@ -21,6 +20,7 @@ import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.RunBabyRun;
 import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.SkyHigh;
 import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.Switcheroo;
 import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.TheHobbitManager;
+import com.goldornetwork.uhc.managers.world.WorldManager;
 import com.google.common.collect.ImmutableList;
 
 public class GameModeManager {
@@ -44,15 +44,14 @@ public class GameModeManager {
 	 * @param teamM - the TeamManager
 	 * @param scatterM - the ScatterManager
 	 */
-	public void setupGamemodes(TeamManager teamM, ScatterManager scatterM){
+	public void setupGamemodes(TeamManager teamM, WorldManager worldM){
 		
 		for(Gamemode game : getEnabledGamemodes()){
 			game.disable();
 		}
 		
-		defaultGamemodes(teamM);
-		
-		gamemodes.add(new BlockRush(scatterM));
+		gamemodes.add(new CutClean(teamM));
+		gamemodes.add(new BlockRush(worldM));
 		gamemodes.add(new FlowerPower(teamM));
 		gamemodes.add(new KillSwitch());
 		gamemodes.add(new KingsManager(teamM));
@@ -65,14 +64,6 @@ public class GameModeManager {
 		gamemodes.add(new BedBombs(teamM));
 		gamemodes.add(new Bows(teamM));
 		gamemodes.add(new RunBabyRun(plugin, teamM));
-	}
-	private void defaultGamemodes(TeamManager teamM){
-		List<Gamemode> toEnable = new ArrayList<Gamemode>();
-		toEnable.add(new CutClean(teamM));
-		
-		for(Gamemode game : toEnable){
-			game.enable(plugin);
-		}
 	}
 
 	@SuppressWarnings("unchecked")

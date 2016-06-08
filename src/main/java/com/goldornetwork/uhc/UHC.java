@@ -14,24 +14,26 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.commands.CommandHandler;
-import com.goldornetwork.uhc.listeners.BackGround;
-import com.goldornetwork.uhc.listeners.DeathEvent;
-import com.goldornetwork.uhc.listeners.JoinEvent;
-import com.goldornetwork.uhc.listeners.LeaveEvent;
-import com.goldornetwork.uhc.listeners.MoveEvent;
-import com.goldornetwork.uhc.listeners.WeatherChange;
-import com.goldornetwork.uhc.listeners.team.ChatManager;
-import com.goldornetwork.uhc.listeners.team.TeamInteraction;
-import com.goldornetwork.uhc.managers.BoardManager;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.SpectatorRegionManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.VoteManager;
 import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
+import com.goldornetwork.uhc.managers.board.BoardManager;
 import com.goldornetwork.uhc.managers.world.ChunkGenerator;
+import com.goldornetwork.uhc.managers.world.UHCBan;
+import com.goldornetwork.uhc.managers.world.UHCServer;
+import com.goldornetwork.uhc.managers.world.UHCWarn;
 import com.goldornetwork.uhc.managers.world.WorldFactory;
 import com.goldornetwork.uhc.managers.world.WorldManager;
+import com.goldornetwork.uhc.managers.world.listeners.DeathEvent;
+import com.goldornetwork.uhc.managers.world.listeners.JoinEvent;
+import com.goldornetwork.uhc.managers.world.listeners.LeaveEvent;
+import com.goldornetwork.uhc.managers.world.listeners.MoveEvent;
+import com.goldornetwork.uhc.managers.world.listeners.WeatherChange;
+import com.goldornetwork.uhc.managers.world.listeners.team.ChatManager;
+import com.goldornetwork.uhc.managers.world.listeners.team.TeamInteraction;
 import com.goldornetwork.uhc.utils.AntiXray;
 import com.goldornetwork.uhc.utils.Medic;
 
@@ -48,6 +50,7 @@ public class UHC extends JavaPlugin {
 	private GameModeManager gameModeM;
 	private TeamManager teamM;
 	private TimerManager timerM;
+	private TeamInteraction teamI;
 	private BoardManager boardM;
 	private ChunkGenerator chunkG;
 	private ScatterManager scatterM;
@@ -58,6 +61,9 @@ public class UHC extends JavaPlugin {
 	private WorldManager worldM;
 	private ChatManager chatM;
 	private WorldFactory worldF;
+	private UHCBan uhcB;
+	private UHCWarn uhcWarn;
+	private UHCServer uhcServer;
 	private SpectatorRegionManager spectM;
 	private Runtime rt = Runtime.getRuntime();
 	private OperatingSystemMXBean compHandler = ManagementFactory.getOperatingSystemMXBean();
@@ -82,47 +88,52 @@ public class UHC extends JavaPlugin {
 		
 		moveE= new MoveEvent(plugin, teamM);
 		
-		scatterM= new ScatterManager(plugin, teamM, moveE, chatM, worldF, chunkG);
+		worldM = new WorldManager(plugin, teamM, worldF, chunkG);
+		
+		scatterM= new ScatterManager(plugin, teamM, moveE, chatM, worldF, chunkG, worldM);
 		
 		voteM = new VoteManager(plugin, gameModeM, teamM);
 		
-		timerM = new TimerManager(plugin, scatterM, teamM, voteM, chatM);
+		timerM = new TimerManager(plugin, scatterM, teamM, voteM, chatM, worldM);
 		
-		spectM = new SpectatorRegionManager(plugin, teamM, scatterM);
+		spectM = new SpectatorRegionManager(plugin, teamM, worldM);
 		
-		worldM = new WorldManager(plugin, scatterM);
+		uhcServer=new UHCServer(plugin);
 		
 		medic= new Medic(plugin, teamM);
 		
+		teamI = new TeamInteraction(teamM);
+		
+		uhcWarn= new UHCWarn();
+		
+		uhcB = new UHCBan();
 		//cmds
 		cmd = new CommandHandler(plugin);
 		
-		cmd.registerCommands(teamM, timerM, gameModeM, chunkG, voteM);
+		cmd.registerCommands(teamM, timerM, gameModeM, chunkG, voteM, teamI, uhcB, uhcWarn);
 		
 		//listeners
 		
 		new TeamInteraction(teamM);
-		new BackGround(plugin);
 		new DeathEvent(plugin, teamM, scatterM, worldM);
-		new JoinEvent(plugin, teamM, scatterM);
+		new JoinEvent(plugin, teamM, worldM);
 		new LeaveEvent(plugin,teamM, scatterM);
 		new WeatherChange(plugin);
 		new AntiXray(plugin);
-		//new CombatLog(plugin, scatterM, teamM);
 		
 	}
 
 	private void setup(){
-		worldF.setup();
 		teamM.setup();
 		timerM.setup();
 		moveE.setup();
 		voteM.setup();
 		worldM.setup();
-		gameModeM.setupGamemodes(teamM, scatterM);
+		gameModeM.setupGamemodes(teamM, worldM);
 		scatterM.setup();
 		spectM.setup();
-		boardM.setup(teamM, scatterM);
+		boardM.setup(teamM, worldM, timerM);
+		uhcServer.setup();
 	}
 
 	private void createConfig() {
@@ -170,15 +181,15 @@ public class UHC extends JavaPlugin {
 		plugin = this;
 		createConfig();
 		instances();
+		worldF.setup();
+		
 		new BukkitRunnable() {
 			
 			@Override
 			public void run() {
 				
 				setup();
-				for(World world: Bukkit.getWorlds()){
-					world.setAutoSave(false);
-				}
+				
 			}
 		}.runTaskLater(plugin, 20L);
 		
@@ -200,6 +211,7 @@ public class UHC extends JavaPlugin {
 			world.setAutoSave(false);
 			Bukkit.unloadWorld(world, false);
 		}
+		Bukkit.getServer().getScheduler().cancelAllTasks();
 		plugin=null;
 	}
 

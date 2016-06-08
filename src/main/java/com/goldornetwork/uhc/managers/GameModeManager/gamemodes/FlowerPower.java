@@ -24,7 +24,7 @@ public class FlowerPower extends Gamemode implements Listener{
 	
 	
 	public FlowerPower(TeamManager teamM) {
-		super("FlowerPower", "When you break a flower, a random amount of a random item drops!");
+		super("Flower Power", "FlowerPower", "When you break a flower, a random amount of a random item drops!");
 		this.teamM= teamM;
 	}
 	private static final Set<Material> INVALID_BLOCKS = ImmutableSet.of(
@@ -35,7 +35,13 @@ public class FlowerPower extends Gamemode implements Listener{
 			Material.REDSTONE_COMPARATOR_ON, Material.REDSTONE_LAMP_ON, Material.REDSTONE_LAMP_OFF, Material.SUGAR_CANE_BLOCK, Material.PUMPKIN_STEM, Material.MELON_STEM,
 			Material.NETHER_WARTS, Material.BREWING_STAND, Material.CAULDRON, Material.TRIPWIRE, Material.FLOWER_POT, Material.CROPS, Material.POTATO, Material.CARROT, 
 			Material.SKULL, Material.BARRIER, Material.COMMAND, Material.STANDING_BANNER, Material.WALL_BANNER, Material.DAYLIGHT_DETECTOR_INVERTED, Material.ENDER_PORTAL,
-			Material.ENDER_PORTAL_FRAME, Material.MOB_SPAWNER, Material.MONSTER_EGG, Material.MONSTER_EGGS
+			Material.ENDER_PORTAL_FRAME, Material.MOB_SPAWNER, Material.MONSTER_EGG, Material.MONSTER_EGGS, Material.DIODE_BLOCK_OFF, Material.DIODE_BLOCK_ON, Material.DIODE,
+			Material.IRON_DOOR_BLOCK, Material.TRIPWIRE_HOOK, Material.DOUBLE_STONE_SLAB2, Material.STONE_SLAB2, Material.FIREWORK_CHARGE, Material.FIRE, Material.FIREBALL,
+			Material.BURNING_FURNACE, Material.CAKE, Material.CAKE_BLOCK, Material.COMMAND_MINECART, Material.DEAD_BUSH, Material.DOUBLE_PLANT, Material.DOUBLE_STEP,
+			Material.WOOD_DOUBLE_STEP, Material.STEP, Material.ENCHANTED_BOOK, Material.EXPLOSIVE_MINECART, Material.EYE_OF_ENDER, Material.HAY_BLOCK, Material.HUGE_MUSHROOM_1,
+			Material.HUGE_MUSHROOM_2, Material.LADDER, Material.LEAVES, Material.LEAVES_2, Material.LOG_2, Material.LOG, Material.LONG_GRASS, Material.MELON_BLOCK,
+			Material.MAP, Material.MYCEL, Material.NETHER_STALK, Material.PORTAL, Material.PRISMARINE, Material.PRISMARINE_CRYSTALS, Material.PRISMARINE_SHARD,
+			Material.SOIL, Material.VINE, Material.WRITTEN_BOOK, Material.EXPLOSIVE_MINECART
 			);
 	
 	@Override
@@ -49,7 +55,7 @@ public class FlowerPower extends Gamemode implements Listener{
 	public void on(BlockBreakEvent e){
 		if(State.getState().equals(State.INGAME)){
 				Player p = e.getPlayer();
-				if(teamM.isPlayerInGame(p)){
+				if(teamM.isPlayerInGame(p.getUniqueId())){
 					if(e.getBlock().getType().equals(Material.YELLOW_FLOWER) || e.getBlock().getType().equals(Material.RED_ROSE)){
 						run(p, e);
 					}

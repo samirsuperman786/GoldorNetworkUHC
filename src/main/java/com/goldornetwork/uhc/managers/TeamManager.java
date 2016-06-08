@@ -18,6 +18,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.managers.board.BoardManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 
@@ -34,9 +35,7 @@ public class TeamManager {
 	private Random random = new Random();
 	//storage
 	private int playersPerTeam;
-	private int MaxFFASize;
 	private int MaxTeams;
-	private boolean isFFAEnabled;
 	private boolean isTeamsEnabled;
 
 	private List<UUID> playersInGame = new ArrayList<UUID>();
@@ -48,7 +47,7 @@ public class TeamManager {
 	private Map<String, Integer> playersOnCurrentTeam = new HashMap<String, Integer>();
 	private Map<String, UUID> ownerOfTeam = new HashMap<String, UUID>();
 	private Map<String, List<UUID>> invitedPlayers = new HashMap<String, List<UUID>>();
-	
+
 	public TeamManager(UHC plugin, BoardManager boardM) {
 		this.plugin=plugin;
 		this.boardM=boardM;
@@ -59,7 +58,7 @@ public class TeamManager {
 	 */
 	public void setup(){
 		config();
-		isFFAEnabled=false;
+		this.playersPerTeam=0;
 		isTeamsEnabled=false;
 		playersInGame.clear();
 		observers.clear();
@@ -76,12 +75,10 @@ public class TeamManager {
 		for(TEAMS team : TEAMS.values()){
 			toADD.add(team.toString());
 		}
-		plugin.getConfig().addDefault("MAX-FFA-SIZE", 100);
 		plugin.getConfig().addDefault("MAX-TEAMS", 24);
 		plugin.getTeamConfig().addDefault("TEAM-NAMES", toADD);
 		plugin.saveTeamConfig();
 		plugin.saveConfig();
-		this.MaxFFASize=plugin.getConfig().getInt("MAX-FFA-SIZE");
 		this.MaxTeams=plugin.getConfig().getInt("MAX-TEAMS");
 	}
 
@@ -91,7 +88,7 @@ public class TeamManager {
 	}
 
 	public enum BASECOLORS{
-		BLUE, DARK_AQUA, DARK_BLUE, DARK_GRAY, DARK_PURPLE, DARK_RED, GRAY, LIGHT_PURPLE
+		BLUE, DARK_AQUA, DARK_BLUE, DARK_GRAY, DARK_PURPLE, DARK_RED, LIGHT_PURPLE, YELLOW
 	}
 
 	/**
@@ -114,12 +111,6 @@ public class TeamManager {
 
 
 
-	/**
-	 * Sets up FFA
-	 */
-	public void setupFFA(){
-		isFFAEnabled = true;
-	}
 
 	/**
 	 * Sets up teams with a give team size
@@ -129,15 +120,11 @@ public class TeamManager {
 		isTeamsEnabled = true;
 		this.playersPerTeam = teamSize;
 		initializeT();
-		
+
 	}
 
-	/**
-	 * Checks if FFA is enabled
-	 * @return <code> True </code> if FFA is enabled
-	 */
-	public boolean isFFAEnabled(){
-		return isFFAEnabled;
+	public int getTeamSize(){
+		return this.playersPerTeam;
 	}
 
 	/**
@@ -146,20 +133,6 @@ public class TeamManager {
 	 */
 	public boolean isTeamsEnabled(){
 		return isTeamsEnabled;
-	}
-
-
-	/**
-	 * Checks if there is room in the FFA to join
-	 * @return <code> True </code> if there is room to join
-	 */
-	public boolean isFFARoomToJoin(){
-		if((MaxFFASize-playersInGame.size())>0){
-			return true;
-		}
-		else{
-			return false;
-		}
 	}
 
 	/**
@@ -177,48 +150,21 @@ public class TeamManager {
 	}
 
 	/**
-	 * Adds a given player to the FFA
-	 * @param p the player to add to FFA
-	 */
-	public void addPlayerToFFA(Player p){
-		playersInGame.add(p.getUniqueId());
-		displayName(p, "FFA");
-	}
-	/**
 	 * Checks if a given player is in game
 	 * @param p the player to check 
 	 * @return <code> True </code> if the player is in game
 	 */
-	public boolean isPlayerInGame(Player p){
-		if(playersInGame.contains(p.getUniqueId())){
-			return true;
-		}
-		else{
-			return false;
-		}
+	public boolean isPlayerInGame(UUID target){
+		return playersInGame.contains(target);
 
 	}
 
-	/**
-	 * Removes a player from the FFA
-	 * @param p the player to remove
-	 */
-	public void removePlayerFromFFA(Player p){
-		playersInGame.remove(p.getUniqueId());
-		p.setDisplayName(p.getName());
-	}
 
 	/**
-	 * Removes a player from the status of owner and cancels invitations
+	 * Removes a player from the status of owner
 	 * @param p the player to remove from owner
 	 */
 	public void removePlayerFromOwner(Player p){
-		if(State.getState().equals(State.OPEN)){
-			disbandTeam(getTeamOfPlayer(p));
-		}
-		else{
-			removePlayerFromTeam(p);
-		}
 		ownerOfTeam.remove(p.getUniqueId());
 	}
 
@@ -226,14 +172,16 @@ public class TeamManager {
 	 * Removes a given player from a any team that player is on
 	 * @param p the player to remove from a team
 	 */
-	public void removePlayerFromTeam(OfflinePlayer p){
-		boardM.removePlayerFromTeam(getTeamOfPlayer(p), p);
-		decreaseTeamSize(getTeamOfPlayer(p), 1);
-		playersInGame.remove(p.getUniqueId());
-		teamOfPlayer.remove(p.getUniqueId());
-		if(p.isOnline()){
-			Player target = (Player) p;
-			target.setDisplayName(target.getName());
+	public void removePlayerFromTeam(UUID target){
+		OfflinePlayer offTarget = Bukkit.getOfflinePlayer(target);
+		boardM.removePlayerFromTeam(getTeamOfPlayer(target), offTarget);
+		decreaseTeamSize(getTeamOfPlayer(target), 1);
+		playersInGame.remove(target);
+		teamOfPlayer.remove(target);
+		
+		if(offTarget.isOnline()){
+			Player p = (Player) offTarget;
+			p.setDisplayName(p.getName());
 		}
 	}
 
@@ -245,13 +193,9 @@ public class TeamManager {
 	 * @param p the player to check
 	 * @return <code> True </code> if the give player is observing
 	 */
-	public boolean isPlayerAnObserver(Player p){
-		if(observers.contains(p.getUniqueId())){
-			return true;
-		}
-		else{
-			return false;
-		}
+	public boolean isPlayerAnObserver(UUID u){
+		return observers.contains(u);
+		
 
 	}
 
@@ -277,8 +221,8 @@ public class TeamManager {
 	 * @param p - the player to get the team of
 	 * @return <code> String </code> of the given players team
 	 */
-	public String getTeamOfPlayer(OfflinePlayer p){
-		return teamOfPlayer.get(p.getUniqueId()).toLowerCase();
+	public String getTeamOfPlayer(UUID target){
+		return teamOfPlayer.get(target).toLowerCase();
 	}
 
 
@@ -323,12 +267,7 @@ public class TeamManager {
 			}
 
 		}
-		if(foundTeam==true){
-			return true;
-		}
-		else{
-			return false;
-		}
+		return foundTeam;
 
 	}
 
@@ -338,13 +277,7 @@ public class TeamManager {
 	 * @return <code> True </code> if there is room to join
 	 */
 	public boolean isTeamRoomToJoin(String team){
-		if((playersPerTeam - playersOnCurrentTeam.get(team.toLowerCase()))>0){
-			return true;
-		}
-		else{
-			return false;
-		}
-
+		return (playersPerTeam - playersOnCurrentTeam.get(team.toLowerCase())>0);
 
 	}
 
@@ -360,7 +293,6 @@ public class TeamManager {
 				MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.GREEN, p.getName() + " has joined your team.");
 			}
 		}
-		//
 		boardM.addPlayerToTeam(team, p);
 		playersInGame.add(p.getUniqueId());
 		teamOfPlayer.put(p.getUniqueId(), team);
@@ -368,11 +300,9 @@ public class TeamManager {
 		displayName(p, team);
 	}
 
-	public boolean isPlayerOnTeam(OfflinePlayer p){
-		if(teamOfPlayer.containsKey(p.getUniqueId())){
-			return true;
-		}
-		return false;
+	public boolean isPlayerOnTeam(UUID target){
+		return teamOfPlayer.containsKey(target);
+		
 	}
 
 	/**
@@ -380,13 +310,13 @@ public class TeamManager {
 	 * @param inviter - the person who is inviting
 	 * @param target - the person to invite
 	 */
-	public void invitePlayer(String team, OfflinePlayer target){
+	public void invitePlayer(String team, UUID target){
 		if(invitedPlayers.containsKey(team)){
-			invitedPlayers.get(team).add(target.getUniqueId());
+			invitedPlayers.get(team).add(target);
 		}
 		else{
 			List<UUID> toAdd = new ArrayList<UUID>();
-			toAdd.add(target.getUniqueId());
+			toAdd.add(target);
 			invitedPlayers.put(team, toAdd);
 		}
 	}
@@ -396,10 +326,13 @@ public class TeamManager {
 	 * @param inviter - the person who is un-inviting
 	 * @param target - the person to un-invite
 	 */
-	public void unInvitePlayer(String team, OfflinePlayer target){
-		if(invitedPlayers.get(team).contains(target.getUniqueId())){
-			invitedPlayers.get(team).remove(target.getUniqueId());
+	public void unInvitePlayer(String team, UUID target){
+		if(invitedPlayers.containsKey(team)){
+			if(invitedPlayers.get(team).contains(target)){
+				invitedPlayers.get(team).remove(target);
+			}
 		}
+
 	}
 
 
@@ -427,12 +360,7 @@ public class TeamManager {
 	 * @return <code> True </code> if the player is the owner
 	 */
 	public boolean isPlayerOwner(Player p){
-		if(ownerOfTeam.containsValue(p.getUniqueId())){
-			return true;
-		}
-		else{
-			return false;
-		}
+		return ownerOfTeam.containsValue(p.getUniqueId());
 	}
 
 	/**
@@ -451,15 +379,20 @@ public class TeamManager {
 		MessageSender.send(ChatColor.AQUA, p, "You are now spectating.");
 		boardM.addPlayerToObserver(p);
 	}
-	public String getColorOfPlayer(Player p){
-		if(isFFAEnabled){
-			return isPlayerInGame(p) ? ChatColor.YELLOW.toString() : ChatColor.AQUA.toString();
+	public void removePlayerFromObservers(Player p){
+		observers.remove(p.getUniqueId());
+		for(PotionEffect effect : p.getActivePotionEffects()){
+			p.removePotionEffect(effect.getType());
+		}
+		boardM.removePlayerFromObservers(p);
+	}
+	
+	public String getColorOfPlayer(UUID target){
+		if(isPlayerAnObserver(target)){
+			return ChatColor.AQUA.toString();
 		}
 		else if(isTeamsEnabled){
-			return isPlayerOnTeam(p) ? colorOfTeam.get(getTeamOfPlayer(p).toLowerCase()) : ChatColor.AQUA.toString();
-		}
-		else if(isPlayerAnObserver(p)){
-			return ChatColor.AQUA.toString();
+			return isPlayerOnTeam(target) ? getColorOfTeam(getTeamOfPlayer(target)) : ChatColor.WHITE.toString();
 		}
 		else{
 			return ChatColor.GRAY.toString();
@@ -498,7 +431,10 @@ public class TeamManager {
 	public List<String> getActiveTeams(){
 		return listOfActiveTeams;
 	}
-	
+	public boolean isActiveTeam(String team){
+		return listOfActiveTeams.contains(team.toLowerCase());
+	}
+
 	public boolean isTeamInactive(String team){
 		boolean allOffline=true;
 		while(allOffline){
@@ -508,37 +444,38 @@ public class TeamManager {
 					break;
 				}
 			}
-			break;
+			if(allOffline==false){
+				break;
+			}
 		}
 		return allOffline;
 	}
 	public void disbandTeam(String team){
 		listOfActiveTeams.remove(team);
-		UUID owner = getOwnerOfTeam(team);
 		if(invitedPlayers.containsKey(team)){
 			for(UUID u: invitedPlayers.get(team)){
 				if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
-					MessageSender.alertMessage(Bukkit.getServer().getPlayer(u),ChatColor.RED, "Your invitation to team " + getColorOfTeam(team) + " has been revoked!");
+					MessageSender.alertMessage(Bukkit.getServer().getPlayer(u),ChatColor.RED, "Your invitation to team " + getColorOfTeam(team) + getTeamNameProper(team) + " has been revoked!");
 				}
 			}
 			invitedPlayers.remove(team);
 		}
-		
+
 		for(UUID u : getPlayersOnATeam(team)){
 			if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
 				MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.RED, "Your team has been disbanded.");
 			}
-			removePlayerFromTeam(Bukkit.getServer().getOfflinePlayer(u));
+			removePlayerFromTeam(u);
 		}
-		ownerOfTeam.remove(owner);
 		boardM.removeTeam(team);
 	}
-	
+
+
 	public String getTeamNameProper(String team){
 		String output = team.substring(0, 1).toUpperCase() + team.toLowerCase().substring(1);
 		return output;
 	}
-	
+
 	/**
 	 * used to increase the number of players currently on a team
 	 * @param team - the team to increase
@@ -557,14 +494,14 @@ public class TeamManager {
 		playersOnCurrentTeam.replace(team.toLowerCase(), playersOnCurrentTeam.get(team.toLowerCase()) - numberToDecrease);
 	}
 
-	
+
 	/**
 	 * Used to edit the display name of a player
 	 * @param p - the player to change the display name of
 	 * @param team - the text to display in front of a players name
 	 */
 	public void displayName(Player p, String team){
-		p.setDisplayName(getColorOfPlayer(p) + "["  + getTeamNameProper(team) + "] " + ChatColor.RED + p.getName() + ChatColor.WHITE);
+		p.setDisplayName(getColorOfPlayer(p.getUniqueId()) + "["  + getTeamNameProper(team) + "] " + ChatColor.RED + p.getName() + ChatColor.WHITE);
 	}
 
 

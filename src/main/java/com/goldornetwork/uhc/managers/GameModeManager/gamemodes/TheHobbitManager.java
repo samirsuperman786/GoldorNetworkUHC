@@ -19,9 +19,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class TheHobbitManager extends Gamemode implements Listener{
@@ -34,7 +34,7 @@ public class TheHobbitManager extends Gamemode implements Listener{
 	private List<UUID> lateHobbits = new ArrayList<UUID>();
 	
 	public TheHobbitManager(TeamManager teamM) {
-		super("TheHobbit", "Players receive one golden nugget and when clicked, the player receives invisibility for 30 seconds!");
+		super("The Hobbit", "TheHobbit", "Players receive one golden nugget and when clicked, the player receives invisibility for 30 seconds!");
 		this.teamM=teamM;
 	}
 	@Override
@@ -87,7 +87,7 @@ public class TheHobbitManager extends Gamemode implements Listener{
 	public void on(PlayerInteractEvent e){
 		Player p = e.getPlayer();
 			if(State.getState().equals(State.INGAME)){
-				if(teamM.isPlayerInGame(p)){
+				if(teamM.isPlayerInGame(p.getUniqueId())){
 					if(e.getMaterial().equals(Material.GOLD_NUGGET)){
 						if(e.getItem().getItemMeta().getDisplayName().equals(ChatColor.AQUA + "The Magic Ring of Invisibility")){
 									p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 30*20, 0, false, false));

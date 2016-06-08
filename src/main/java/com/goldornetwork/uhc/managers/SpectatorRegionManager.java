@@ -11,7 +11,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
 
 import com.goldornetwork.uhc.UHC;
-import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
+import com.goldornetwork.uhc.managers.world.WorldManager;
+import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
 
 public class SpectatorRegionManager implements Listener {
 
@@ -19,21 +20,21 @@ public class SpectatorRegionManager implements Listener {
 	//instances
 	private UHC plugin;
 	private TeamManager teamM;
-	private ScatterManager scatterM;
+	private WorldManager worldM;
 
 	//storage
 	final int BUFFERBLOCKS= 15;
 	Location center;
 
-	public SpectatorRegionManager(UHC plugin, TeamManager teamM,ScatterManager scatterM) {
+	public SpectatorRegionManager(UHC plugin, TeamManager teamM, WorldManager worldM) {
 		this.plugin=plugin;
 		this.teamM=teamM;
-		this.scatterM=scatterM;
+		this.worldM=worldM;
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 	
 	public void setup(){
-		center= scatterM.getCenter();
+		center= worldM.getCenter();
 	}
 	@EventHandler
 	public void on(GameStartEvent e){
@@ -50,16 +51,22 @@ public class SpectatorRegionManager implements Listener {
 	 * Checks the region of spectators and teleports them if they are not inside of the world border
 	 */
 	public void runTask() {
-			int radius = (int) ((scatterM.getUHCWorld().getWorldBorder().getSize())/2);
-			Vector minRegion = new Location(scatterM.getUHCWorld(), center.getBlockX() - radius - BUFFERBLOCKS, 0, center.getBlockZ() - radius - BUFFERBLOCKS).toVector();
-			Vector maxRegion = new Location(scatterM.getUHCWorld(), center.getBlockX() + radius + BUFFERBLOCKS, scatterM.getUHCWorld().getMaxHeight(), center.getBlockZ() + radius + BUFFERBLOCKS).toVector();
+		
+			int radius = (int) ((worldM.getUHCWorld().getWorldBorder().getSize())/2);
+			Vector minRegion = new Location(worldM.getUHCWorld(), center.getBlockX() - radius - BUFFERBLOCKS, 0, center.getBlockZ() - radius - BUFFERBLOCKS).toVector();
+			Vector maxRegion = new Location(worldM.getUHCWorld(), center.getBlockX() + radius + BUFFERBLOCKS, worldM.getUHCWorld().getMaxHeight(), center.getBlockZ() + radius + BUFFERBLOCKS).toVector();
 			for(UUID u : teamM.getObservers()){
 				OfflinePlayer p = (OfflinePlayer) Bukkit.getServer().getOfflinePlayer(u);
-				if(p.isOnline()){
+				if(p.isOnline()){		
 					Player target = (Player) p;
-					Vector pLoc = target.getLocation().toVector();
-					if(pLoc.isInAABB(minRegion, maxRegion)==false){
-						target.teleport(scatterM.getCenter());
+					if(target.getWorld().equals(worldM.getUHCWorld())){
+						Vector pLoc = target.getLocation().toVector();
+						if(pLoc.isInAABB(minRegion, maxRegion)==false){
+							target.teleport(worldM.getCenter());
+						}
+					}
+					else{
+						target.teleport(worldM.getCenter());
 					}
 				}
 			}

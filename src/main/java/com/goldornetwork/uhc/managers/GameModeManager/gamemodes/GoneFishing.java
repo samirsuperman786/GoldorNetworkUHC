@@ -17,9 +17,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.GameModeManager.GameStartEvent;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
 
 public class GoneFishing extends Gamemode implements Listener {
 
@@ -28,7 +28,7 @@ public class GoneFishing extends Gamemode implements Listener {
 	private List <UUID> lateGoneFishing = new ArrayList<UUID>();
 	
 	public GoneFishing(TeamManager teamM) {
-		super("GoneFishing", "Players spawn with infinite levels, 20 anvils, a fishing rod with: Luck of the Sea 250, Lure 250, and Unbreaking 150. Caution: Enchantment tables are disabled!");
+		super("Gone Fishing", "GoneFishing", "Players spawn with infinite levels, 20 anvils, a fishing rod with: Luck of the Sea 250, Lure 250, and Unbreaking 150. Caution: Enchantment tables are disabled!");
 		this.teamM=teamM;
 	}
 	
@@ -56,7 +56,7 @@ public class GoneFishing extends Gamemode implements Listener {
 	public void on(PlayerJoinEvent e){
 		Player p = e.getPlayer();
 		if(State.getState().equals(State.INGAME)){
-			if(teamM.isPlayerInGame(p)){
+			if(teamM.isPlayerInGame(p.getUniqueId())){
 				if(lateGoneFishing.contains(p.getUniqueId())){
 					giveAPlayerGoneFishingItems(p);
 					removeAPlayerFromLateGoneFishing(p);

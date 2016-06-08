@@ -1,4 +1,4 @@
-package com.goldornetwork.uhc.listeners;
+package com.goldornetwork.uhc.managers.world.listeners;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,6 +11,7 @@ import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.managers.world.WorldManager;
+import com.goldornetwork.uhc.managers.world.events.GameEndEvent;
 
 public class DeathEvent implements Listener {
 
@@ -19,7 +20,7 @@ public class DeathEvent implements Listener {
 	private TeamManager teamM;
 	private ScatterManager scatterM;
 	private WorldManager worldM;
-	
+
 	public DeathEvent(UHC plugin, TeamManager teamM, ScatterManager scatterM, WorldManager worldM) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.plugin=plugin;
@@ -33,18 +34,24 @@ public class DeathEvent implements Listener {
 	 * @param p - player who has just died
 	 */
 	public void playerDied(Player p){
+		String team = teamM.getTeamOfPlayer(p.getUniqueId());
 		if(teamM.isTeamsEnabled()){
-			if(teamM.getOwnerOfTeam(teamM.getTeamOfPlayer(p)).equals(p.getUniqueId())){
+			if(teamM.getOwnerOfTeam(team).equals(p.getUniqueId())){
 				teamM.removePlayerFromOwner(p);
 			}
-			else{
-				teamM.removePlayerFromTeam(p);
+			teamM.removePlayerFromTeam(p.getUniqueId());
+			
+			if(teamM.getPlayersOnATeam(team).isEmpty()){
+				teamM.disbandTeam(team);
+				if(teamM.getActiveTeams().size()==1){
+					String winner = teamM.getActiveTeams().get(0);
+					plugin.getServer().getPluginManager().callEvent(new GameEndEvent(teamM.getPlayersOnATeam(winner)));
+				}
 			}
+
 		}
-		else if(teamM.isFFAEnabled()){
-			teamM.removePlayerFromFFA(p);
-		}
-		
+
+
 	}
 
 	@EventHandler
@@ -52,19 +59,18 @@ public class DeathEvent implements Listener {
 		Player p = e.getEntity();
 		p.setHealth(p.getMaxHealth());
 		teamM.addPlayerToObservers(p);
-		if(teamM.isPlayerInGame(p)){
+		if(teamM.isPlayerInGame(p.getUniqueId())){
 			if(State.getState().equals(State.INGAME) || State.getState().equals(State.SCATTER)){
 				p.getWorld().strikeLightningEffect(p.getLocation());
-				
 				//So no race conditions happen
 				new BukkitRunnable() {
-					
+
 					@Override
 					public void run() {
 						playerDied(p);
 					}
 				}.runTaskLater(plugin, 5L);
-				
+
 			}
 			else{
 				e.setDeathMessage(null);
