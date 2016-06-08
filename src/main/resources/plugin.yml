@@ -56,3 +56,6 @@ commands:
       description: Use this to talk to the moderators and admins!
       usage: /<command> [player] [reason]
       aliases: [pban, pb]
+   warn:
+      description: Use this to warn a player. 
+      usage: /<command> [player] [reason]

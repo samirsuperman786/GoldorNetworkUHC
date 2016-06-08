@@ -9,18 +9,16 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.goldornetwork.uhc.commands.UHCCommand;
-import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.world.UHCBan;
+import com.goldornetwork.uhc.managers.world.UHCWarn;
 import com.goldornetwork.uhc.utils.MessageSender;
 
-public class UHCBanCommand extends UHCCommand{
+public class UHCWarnCommand extends UHCCommand{
 
-	private TeamManager teamM;
-	private UHCBan uhcB;
-	public UHCBanCommand(TeamManager teamM, UHCBan uhcB) {
-		super("playerban", "[player] [reason]");
-		this.teamM=teamM;
-		this.uhcB=uhcB;
+	private UHCWarn uhcWarn;
+	
+	public UHCWarnCommand(UHCWarn uhcWarn) {
+		super("warn", "player");
+		this.uhcWarn=uhcWarn;
 	}
 
 	@Override
@@ -35,8 +33,7 @@ public class UHCBanCommand extends UHCCommand{
 			return true;
 		}
 
-		else if(teamM.isPlayerOnline(args[0])==false){
-			//TODO add offline player ban capabilities
+		else if(Bukkit.getOfflinePlayer(args[0]).isOnline()==false){
 			MessageSender.send(ChatColor.RED, banner, "Player " + args[0].toLowerCase() + " is not online!");
 			return true;
 		}
@@ -50,10 +47,9 @@ public class UHCBanCommand extends UHCCommand{
 				str.append(args[i] + " ");
 			}
 			String msg = str.toString();
-			uhcB.banPlayer(banner, target, msg);
+			uhcWarn.warnPlayer(target, msg);
 			return true;
 		}
-		
 	}
 
 	@Override

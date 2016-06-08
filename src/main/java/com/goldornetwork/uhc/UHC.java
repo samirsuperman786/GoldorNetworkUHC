@@ -24,6 +24,7 @@ import com.goldornetwork.uhc.managers.board.BoardManager;
 import com.goldornetwork.uhc.managers.world.ChunkGenerator;
 import com.goldornetwork.uhc.managers.world.UHCBan;
 import com.goldornetwork.uhc.managers.world.UHCServer;
+import com.goldornetwork.uhc.managers.world.UHCWarn;
 import com.goldornetwork.uhc.managers.world.WorldFactory;
 import com.goldornetwork.uhc.managers.world.WorldManager;
 import com.goldornetwork.uhc.managers.world.listeners.DeathEvent;
@@ -61,6 +62,7 @@ public class UHC extends JavaPlugin {
 	private ChatManager chatM;
 	private WorldFactory worldF;
 	private UHCBan uhcB;
+	private UHCWarn uhcWarn;
 	private UHCServer uhcServer;
 	private SpectatorRegionManager spectM;
 	private Runtime rt = Runtime.getRuntime();
@@ -101,11 +103,14 @@ public class UHC extends JavaPlugin {
 		medic= new Medic(plugin, teamM);
 		
 		teamI = new TeamInteraction(teamM);
+		
+		uhcWarn= new UHCWarn();
+		
 		uhcB = new UHCBan();
 		//cmds
 		cmd = new CommandHandler(plugin);
 		
-		cmd.registerCommands(teamM, timerM, gameModeM, chunkG, voteM, teamI, uhcB);
+		cmd.registerCommands(teamM, timerM, gameModeM, chunkG, voteM, teamI, uhcB, uhcWarn);
 		
 		//listeners
 		
@@ -115,7 +120,6 @@ public class UHC extends JavaPlugin {
 		new LeaveEvent(plugin,teamM, scatterM);
 		new WeatherChange(plugin);
 		new AntiXray(plugin);
-		//new CombatLog(plugin, scatterM, teamM);
 		
 	}
 

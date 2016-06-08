@@ -30,7 +30,7 @@ public class HelpCommand extends UHCCommand{
 		}
 		else if(args.length==1){
 			if(args[0].equalsIgnoreCase("team")){
-				toReturn.add(ChatColor.GOLD + "" + ChatColor.UNDERLINE + "Team Commands");
+				toReturn.add(ChatColor.GOLD + "Team Commands: ");
 				toReturn.add(formatCommand("/create", "Use this to create a team."));
 				toReturn.add(formatCommand("/invite [player]", "Use this to invite a player to your team."));
 				toReturn.add(formatCommand("/uninvite [player]", "Use this to un-invite a player from your team."));
@@ -42,7 +42,7 @@ public class HelpCommand extends UHCCommand{
 				return true;
 			}
 			else if(args[0].equalsIgnoreCase("game")){
-				toReturn.add(ChatColor.GOLD + "" + ChatColor.UNDERLINE + "Game Commands");
+				toReturn.add(ChatColor.GOLD + "Game Commands: ");
 				toReturn.add(formatCommand("/helpop [message]", "Use this to message staff."));
 				toReturn.add(formatCommand("/info", "Use this to learn the gamemodes."));
 				toReturn.add(formatCommand("/vote [option]", "Use this to vote when a poll is active."));
@@ -52,9 +52,10 @@ public class HelpCommand extends UHCCommand{
 				return true;
 			}
 			else if(args[0].equalsIgnoreCase("staff")){
-				toReturn.add(ChatColor.GOLD + "" + ChatColor.UNDERLINE + "Staff Commands");
-				toReturn.add(formatCommand("/playerban [player]", "Use this to permanently ban a player."));
+				toReturn.add(ChatColor.GOLD + "Staff Commands: ");
 				toReturn.add(formatCommand("/start [teamsize]", "Use this to start a match."));
+				toReturn.add(formatCommand("/playerban [player] [reason]", "Use this to permanently ban a player."));
+				toReturn.add(formatCommand("/warn [player] [reason]", "Use to warn a player."));
 				MessageSender.send(toReturn, sender);
 				return true;
 			}
