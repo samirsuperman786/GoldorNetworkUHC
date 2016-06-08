@@ -32,9 +32,12 @@ public class UHCServer implements Listener{
 		if(target.hasPermission("uhc.whitelist.bypass")){
 			e.allow();
 		}
+		else if(plugin.getServer().getOnlinePlayers().size()<FAKE_PLAYER_SLOTS){
+			e.allow();
+		}
 		else if(plugin.getServer().getOnlinePlayers().size()>= FAKE_PLAYER_SLOTS){
 			if(target.isWhitelisted()==false){
-				e.disallow(PlayerLoginEvent.Result.KICK_FULL, ChatColor.AQUA + "Server is full!");
+				e.disallow(PlayerLoginEvent.Result.KICK_FULL, ChatColor.RED + "Server is full!");
 			}
 			else if(plugin.getServer().getOnlinePlayers().size()<(FAKE_PLAYER_SLOTS + BUFFER_PLAYER_SLOTS)){
 				e.allow();
