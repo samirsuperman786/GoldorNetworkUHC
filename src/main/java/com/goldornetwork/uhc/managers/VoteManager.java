@@ -7,20 +7,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
-import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.KingsManager;
+import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.utils.MessageSender;
-import com.google.common.collect.ImmutableSet;
 
-public class VoteManager {
+public class VoteManager implements Listener{
 
 	private GameModeManager gamemodeM;
 	private TeamManager teamM;
@@ -35,6 +37,7 @@ public class VoteManager {
 	
 	public VoteManager(UHC plugin, GameModeManager gamemodeM, TeamManager teamM) {
 		this.plugin=plugin;
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.gamemodeM = gamemodeM;
 		this.teamM=teamM;
 	}
@@ -54,6 +57,50 @@ public class VoteManager {
 		}
 		return false;
 	}
+	
+	public void broadcastOptions(){
+
+		new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				List<String> toBroadcast = new LinkedList<String>();
+				toBroadcast.add("[Options]");
+				
+				for(int i = 0; i<getNumberOfOptions(); i++){
+					toBroadcast.add("Option " + (i + 1));
+					for(Gamemode game : getOptions().get(i)){
+						toBroadcast.add(ChatColor.AQUA + game.getName());
+
+					}
+					toBroadcast.add("---------------");
+
+				}
+				toBroadcast.add(ChatColor.LIGHT_PURPLE + "Please use /vote [option], also /info [gamemode]");
+				
+				MessageSender.broadcast(toBroadcast);				
+
+			}
+		}.runTaskLater(plugin, 100L);
+	}
+	
+	private List<String> getMessage(){
+		List<String> toBroadcast = new LinkedList<String>();
+		toBroadcast.add("[Options]");
+		
+		for(int i = 0; i<getNumberOfOptions(); i++){
+			toBroadcast.add("Option " + (i + 1));
+			for(Gamemode game : getOptions().get(i)){
+				toBroadcast.add(ChatColor.AQUA + game.getName());
+
+			}
+			toBroadcast.add("---------------");
+
+		}
+		toBroadcast.add(ChatColor.LIGHT_PURPLE + "Please use /vote [option], also /info [gamemode]");
+		return toBroadcast;
+	}
+	
 	public void generateOptions(){
 		voteActive=true;
 		for(int k = 0; k<NUMBEROFOPTIONS; k++){
@@ -135,6 +182,15 @@ public class VoteManager {
 	
 	public boolean isActive(){
 		return voteActive;
+	}
+	
+	@EventHandler
+	public void on(PlayerJoinEvent e){
+		Player target =e.getPlayer();
+		if(isActive()){
+			MessageSender.send(getMessage(), target);
+		}
+		
 	}
 	
 	

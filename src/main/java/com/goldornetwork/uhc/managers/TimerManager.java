@@ -84,32 +84,8 @@ public class TimerManager implements Listener{
 
 	private void voteTimer(){
 
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				voteM.generateOptions();
-				List<String> toBroadcast = new LinkedList<String>();
-				toBroadcast.add("[Options]");
-				
-				for(int i = 0; i<voteM.getNumberOfOptions(); i++){
-					toBroadcast.add("Option " + (i + 1));
-					for(Gamemode game : voteM.getOptions().get(i)){
-						toBroadcast.add(ChatColor.AQUA + game.getName());
-
-					}
-					toBroadcast.add("---------------");
-
-				}
-				toBroadcast.add(ChatColor.LIGHT_PURPLE + "Please use /vote [option], also /info [gamemode]");
-				
-				MessageSender.broadcast(toBroadcast);
-				
-				
-
-			}
-		}.runTaskLater(plugin, 100L);
-
+		voteM.broadcastOptions();
+		voteM.generateOptions();
 
 		new BukkitRunnable() {
 
