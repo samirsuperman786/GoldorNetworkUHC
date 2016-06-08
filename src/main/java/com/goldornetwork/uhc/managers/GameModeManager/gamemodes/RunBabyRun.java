@@ -46,7 +46,7 @@ public class RunBabyRun extends Gamemode implements Listener{
 				for(UUID u : teamM.getPlayersInGame()){
 					if(Bukkit.getOfflinePlayer(u).isOnline()){
 						Player target = Bukkit.getPlayer(u);
-						if(target.getHealth()<=HEALTH_THRESHOLD){
+						if(target.getHealth()<=(HEALTH_THRESHOLD*2)){
 							if(!(lowHealth.contains(u))){
 								lowHealth.add(u);
 								addBuffs(target);
