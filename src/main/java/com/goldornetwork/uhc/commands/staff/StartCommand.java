@@ -36,7 +36,6 @@ public class StartCommand extends UHCCommand{
 		else if(args.length==1){
 			if(Parser.isInt(args[0])){
 				int teamSize = Integer.valueOf(args[0]);
-				Player p = (Player) sender;
 				teamM.setupTeams(teamSize);
 				timerM.startMatch();
 				return true;
