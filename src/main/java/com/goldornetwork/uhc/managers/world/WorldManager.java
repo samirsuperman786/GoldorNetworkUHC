@@ -13,6 +13,7 @@ import org.bukkit.Difficulty;
 import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.entity.Entity;
@@ -26,7 +27,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
@@ -34,14 +34,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
-import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.managers.world.events.GameEndEvent;
 import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
 import com.goldornetwork.uhc.managers.world.events.PVPEnableEvent;
 import com.goldornetwork.uhc.managers.world.events.ScatterEndEvent;
-import com.goldornetwork.uhc.managers.world.events.ScatterStartEvent;
 import com.goldornetwork.uhc.utils.Medic;
 import com.goldornetwork.uhc.utils.MessageSender;
 
@@ -104,11 +102,15 @@ public class WorldManager implements Listener{
 
 		}
 		plugin.getServer().setIdleTimeout(60);
+		plugin.getServer().getWhitelistedPlayers().clear();
 		plugin.getServer().setWhitelist(true);
-
 	}
 	@EventHandler
 	public void on(GameStartEvent e){
+		for(UUID u : teamM.getPlayersInGame()){
+			OfflinePlayer target = Bukkit.getOfflinePlayer(u);
+			target.setWhitelisted(true);
+		}
 		getUHCWorld().setGameRuleValue("doMobSpawning", "true");
 		getUHCWorld().setGameRuleValue("dodaylightcycle", "true");
 		getUHCWorld().setTime(60);
@@ -168,14 +170,6 @@ public class WorldManager implements Listener{
 
 	}
 
-	@EventHandler
-	public void on(PlayerLoginEvent e){
-		if(e.getResult().equals(PlayerLoginEvent.Result.KICK_OTHER) || e.getResult().equals(PlayerLoginEvent.Result.KICK_WHITELIST)|| e.getResult().equals(PlayerLoginEvent.Result.KICK_FULL)){
-			if(e.getPlayer().hasPermission("uhc.whitelist.bypass")){
-				e.allow();
-			}
-		}
-	}
 
 	@EventHandler
 	public void on(GameEndEvent e){

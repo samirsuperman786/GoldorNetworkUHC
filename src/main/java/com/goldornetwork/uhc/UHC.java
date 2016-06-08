@@ -23,6 +23,7 @@ import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
 import com.goldornetwork.uhc.managers.board.BoardManager;
 import com.goldornetwork.uhc.managers.world.ChunkGenerator;
 import com.goldornetwork.uhc.managers.world.UHCBan;
+import com.goldornetwork.uhc.managers.world.UHCServer;
 import com.goldornetwork.uhc.managers.world.WorldFactory;
 import com.goldornetwork.uhc.managers.world.WorldManager;
 import com.goldornetwork.uhc.managers.world.listeners.DeathEvent;
@@ -60,6 +61,7 @@ public class UHC extends JavaPlugin {
 	private ChatManager chatM;
 	private WorldFactory worldF;
 	private UHCBan uhcB;
+	private UHCServer uhcServer;
 	private SpectatorRegionManager spectM;
 	private Runtime rt = Runtime.getRuntime();
 	private OperatingSystemMXBean compHandler = ManagementFactory.getOperatingSystemMXBean();
@@ -94,7 +96,7 @@ public class UHC extends JavaPlugin {
 		
 		spectM = new SpectatorRegionManager(plugin, teamM, worldM);
 		
-		
+		uhcServer=new UHCServer(plugin);
 		
 		medic= new Medic(plugin, teamM);
 		
@@ -127,6 +129,7 @@ public class UHC extends JavaPlugin {
 		scatterM.setup();
 		spectM.setup();
 		boardM.setup(teamM, worldM, timerM);
+		uhcServer.setup();
 	}
 
 	private void createConfig() {
@@ -175,6 +178,7 @@ public class UHC extends JavaPlugin {
 		createConfig();
 		instances();
 		worldF.setup();
+		
 		new BukkitRunnable() {
 			
 			@Override

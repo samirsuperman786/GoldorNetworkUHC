@@ -51,15 +51,21 @@ public class SpectatorRegionManager implements Listener {
 	 * Checks the region of spectators and teleports them if they are not inside of the world border
 	 */
 	public void runTask() {
+		
 			int radius = (int) ((worldM.getUHCWorld().getWorldBorder().getSize())/2);
 			Vector minRegion = new Location(worldM.getUHCWorld(), center.getBlockX() - radius - BUFFERBLOCKS, 0, center.getBlockZ() - radius - BUFFERBLOCKS).toVector();
 			Vector maxRegion = new Location(worldM.getUHCWorld(), center.getBlockX() + radius + BUFFERBLOCKS, worldM.getUHCWorld().getMaxHeight(), center.getBlockZ() + radius + BUFFERBLOCKS).toVector();
 			for(UUID u : teamM.getObservers()){
 				OfflinePlayer p = (OfflinePlayer) Bukkit.getServer().getOfflinePlayer(u);
-				if(p.isOnline()){
+				if(p.isOnline()){		
 					Player target = (Player) p;
-					Vector pLoc = target.getLocation().toVector();
-					if(pLoc.isInAABB(minRegion, maxRegion)==false){
+					if(target.getWorld().equals(worldM.getUHCWorld())){
+						Vector pLoc = target.getLocation().toVector();
+						if(pLoc.isInAABB(minRegion, maxRegion)==false){
+							target.teleport(worldM.getCenter());
+						}
+					}
+					else{
 						target.teleport(worldM.getCenter());
 					}
 				}
