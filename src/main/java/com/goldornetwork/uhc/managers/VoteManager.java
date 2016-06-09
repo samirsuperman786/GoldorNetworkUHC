@@ -148,7 +148,7 @@ public class VoteManager implements Listener{
 		int comma=0;
 		for(Gamemode game : options.get(choice)){
 			game.enable(plugin);
-			toBroadcast.add(ChatColor.AQUA + game.getName() + " has been enabled");
+			toBroadcast.add(ChatColor.AQUA + game.getProperName() + " has been enabled");
 			comma++;
 			String message = ChatColor.AQUA + game.getProperName();
 			String properMessage;

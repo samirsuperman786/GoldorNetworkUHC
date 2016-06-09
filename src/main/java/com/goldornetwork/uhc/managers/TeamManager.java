@@ -437,17 +437,13 @@ public class TeamManager {
 
 	public boolean isTeamInactive(String team){
 		boolean allOffline=true;
-		while(allOffline){
 			for(UUID u : getPlayersOnATeam(team)){
 				if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
 					allOffline=false;
 					break;
 				}
 			}
-			if(allOffline==false){
-				break;
-			}
-		}
+		
 		return allOffline;
 	}
 	public void disbandTeam(String team){

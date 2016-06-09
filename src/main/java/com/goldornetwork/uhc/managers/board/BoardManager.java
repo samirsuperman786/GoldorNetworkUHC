@@ -307,10 +307,10 @@ public class BoardManager implements Listener{
 					else if(i<=10 && i>0){
 						score.getScoreboard().resetScores(toBlink);
 						if(i%2==0){
-							toBlink = ChatColor.RED + ChatColor.stripColor(score.getEntry());
+							toBlink = score.getEntry();
 						}
 						else{
-							toBlink = score.getEntry();
+							toBlink = ChatColor.RED + ChatColor.stripColor(score.getEntry());
 						}
 						Score toChange = score.getObjective().getScore(toBlink);
 						toChange.setScore(i);

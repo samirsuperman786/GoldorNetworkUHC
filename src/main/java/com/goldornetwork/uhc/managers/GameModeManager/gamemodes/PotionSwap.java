@@ -8,10 +8,12 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -115,6 +117,19 @@ public class PotionSwap extends Gamemode implements Listener{
 		return toReturn.get(index);
 	}
 	
+	@EventHandler
+	public void on(PlayerItemConsumeEvent e){
+		if(!(State.getState().equals(State.INGAME))){
+			return;
+		}
+		if(e.getItem().getType().equals(Material.MILK_BUCKET)){
+			if(teamM.isPlayerInGame(e.getPlayer().getUniqueId())){
+				e.setCancelled(true);
+			}
+			
+		}
+		
+	}
 	
 
 	

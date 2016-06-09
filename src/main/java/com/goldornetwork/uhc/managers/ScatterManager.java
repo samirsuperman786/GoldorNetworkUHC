@@ -172,6 +172,7 @@ public class ScatterManager implements Listener{
 									Location toCheck = new Location(UHCWorld, toLoad.x, UHCWorld.getHighestBlockYAt(toLoad.x, toLoad.z), toLoad.z);
 									if(validate(toCheck)){
 										validatedLocs.add(toCheck);
+										chunksToKeepLoaded.add(toCheck.getChunk());
 										++timer;
 									}
 									else{
@@ -233,7 +234,6 @@ public class ScatterManager implements Listener{
 
 					worldM.getUHCWorld().getChunkAt(x, z).load(true);
 					worldM.getUHCWorld().getChunkAt(popX, popZ).load(false);
-					chunksToKeepLoaded.add(worldM.getUHCWorld().getChunkAt(loc.get(timer)));
 					++timer;
 				}
 
@@ -275,7 +275,7 @@ public class ScatterManager implements Listener{
 
 								@Override
 								public void run() {
-									Location safeLocation = new Location(location.getWorld(), location.getBlockX(), location.getWorld().getHighestBlockYAt(location), location.getBlockZ());
+									//Location safeLocation = new Location(location.getWorld(), location.getBlockX(), location.getWorld().getHighestBlockYAt(location), location.getBlockZ());
 
 									for(UUID u : teamToScatter.get(team)){
 										OfflinePlayer p = Bukkit.getOfflinePlayer(u);
@@ -286,7 +286,7 @@ public class ScatterManager implements Listener{
 											isTeamOnline.put(team, true);
 											Player target = (Player) p;
 											initializePlayer(target);
-											teleported = target.teleport(safeLocation);
+											teleported = target.teleport(location);
 										}
 
 									}
@@ -364,31 +364,33 @@ public class ScatterManager implements Listener{
 		Block landBlock = loc.clone().add(0, -1, 0).getBlock();
 		Block oneAboveLand = loc.clone().getBlock();
 		Block twoAboveLand = loc.clone().add(0, 1, 0).getBlock();
+		Block threeAboveLand = loc.clone().add(0, 2, 0).getBlock();
 		
-		if(loc.getBlockY()<60){
-			valid =false;
-		}
 		
-		else{
+			checkLoop:
 			for(BlockFace face : faces){
 			
-				if(INVALID_SPAWN_BLOCKS.contains(landBlock.getRelative(face).getType())){
+				if(VALID_SPAWN_BLOCKS.contains(landBlock.getRelative(face).getType())==false){
 					valid=false;
-					break;
+					break checkLoop;
 				}
 
-				else if(oneAboveLand.getRelative(face).getType().isSolid() || INVALID_AIR_BLOCKS.contains(oneAboveLand.getRelative(face).getType())){
+				else if(oneAboveLand.getRelative(face).getType().equals(Material.AIR)==false){
 					valid=false;
-					break;
+					break checkLoop;
 				}
 				
-				else if(twoAboveLand.getRelative(face).getType().isSolid() || INVALID_AIR_BLOCKS.contains(twoAboveLand.getRelative(face).getType())){
+				else if(twoAboveLand.getRelative(face).getType().equals(Material.AIR)==false){
 					valid = false;
-					break;
+					break checkLoop;
 				}
+				/*else if(threeAboveLand.getRelative(face).getType().equals(Material.AIR)==false){
+					valid = false;
+					break checkLoop;
+				}*/
+				
 			}
 
-		}
 
 		return valid;
 	}
@@ -531,19 +533,9 @@ public class ScatterManager implements Listener{
 	 * @see findValidLocation()
 	 * @see validate()
 	 */
-	private static final Set<Material> INVALID_SPAWN_BLOCKS = ImmutableSet.of(
-			Material.STATIONARY_LAVA,
-			Material.LAVA, 
-			Material.WATER, 
-			Material.STATIONARY_WATER, 
-			Material.CACTUS,
-			Material.LEAVES,
-			Material.LEAVES_2,
-			Material.AIR
-			);
-	private static final Set<Material> INVALID_AIR_BLOCKS = ImmutableSet.of(
-			Material.LEAVES,
-			Material.LEAVES_2
+	private static final Set<Material> VALID_SPAWN_BLOCKS = ImmutableSet.of(
+			Material.GRASS,
+            Material.SAND
 			);
 
 	@EventHandler

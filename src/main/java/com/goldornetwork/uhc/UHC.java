@@ -98,7 +98,7 @@ public class UHC extends JavaPlugin {
 		
 		spectM = new SpectatorRegionManager(plugin, teamM, worldM);
 		
-		uhcServer=new UHCServer(plugin);
+		uhcServer=new UHCServer(plugin, teamM);
 		
 		medic= new Medic(plugin, teamM);
 		
