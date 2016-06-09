@@ -1,7 +1,10 @@
 package com.goldornetwork.uhc.managers.world.listeners;
 
+import java.util.Random;
+
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -21,7 +24,8 @@ public class JoinEvent implements Listener{
 	//instances
 	private TeamManager teamM;
 	private WorldManager worldM;
-
+	private Random random = new Random();
+	
 	public JoinEvent(UHC plugin, TeamManager teamM, WorldManager worldM) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.teamM=teamM;
@@ -59,7 +63,10 @@ public class JoinEvent implements Listener{
 			p.setLevel(0);
 			p.setExp(0L);
 			p.getInventory().setArmorContents(null);
-			p.teleport(worldM.getLobby().getSpawnLocation());
+			Location lobby = worldM.getLobby().getSpawnLocation();
+			Location toTeleport = lobby.add(lobby.getBlockX() + random.nextInt(1), lobby.getBlockY(), lobby.getBlockZ() + random.nextInt(1));
+			toTeleport.setYaw(90);
+			p.teleport(toTeleport);
 			Medic.heal(p);
 		}
 		

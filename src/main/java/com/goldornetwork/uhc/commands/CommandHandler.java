@@ -20,9 +20,9 @@ import com.goldornetwork.uhc.commands.game.HelpopCommand;
 import com.goldornetwork.uhc.commands.game.InfoCommand;
 import com.goldornetwork.uhc.commands.game.LookupCommand;
 import com.goldornetwork.uhc.commands.game.VoteCommand;
-import com.goldornetwork.uhc.commands.staff.CancelCommand;
 import com.goldornetwork.uhc.commands.staff.StartCommand;
 import com.goldornetwork.uhc.commands.staff.UHCBanCommand;
+import com.goldornetwork.uhc.commands.staff.UHCMuteCommand;
 import com.goldornetwork.uhc.commands.staff.UHCWarnCommand;
 import com.goldornetwork.uhc.commands.team.CreateCommand;
 import com.goldornetwork.uhc.commands.team.InvitePlayerCommand;
@@ -38,6 +38,7 @@ import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
 import com.goldornetwork.uhc.managers.world.ChunkGenerator;
 import com.goldornetwork.uhc.managers.world.UHCBan;
 import com.goldornetwork.uhc.managers.world.UHCWarn;
+import com.goldornetwork.uhc.managers.world.listeners.team.ChatManager;
 import com.goldornetwork.uhc.managers.world.listeners.team.TeamInteraction;
 import com.goldornetwork.uhc.utils.MessageSender;
 
@@ -153,11 +154,12 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 	 * @param timerM TimerManager
 	 * @param chunkG ChunkGenerator
 	 */
-	public void registerCommands(TeamManager teamM, TimerManager timerM, GameModeManager gamemodeM, ChunkGenerator chunkG, VoteManager voteM, TeamInteraction teamI, UHCBan uhcB, UHCWarn uhcWarn){
+	public void registerCommands(TeamManager teamM, TimerManager timerM, GameModeManager gamemodeM, ChunkGenerator chunkG, VoteManager voteM, TeamInteraction teamI, UHCBan uhcB, UHCWarn uhcWarn, ChatManager chatM){
 		//staff
 		cmds.add(new StartCommand(timerM, teamM));
 		cmds.add(new UHCBanCommand(teamM, uhcB));
 		cmds.add(new UHCWarnCommand(uhcWarn));
+		cmds.add(new UHCMuteCommand(chatM));
 		
 		//team
 		cmds.add(new CreateCommand(teamM));
