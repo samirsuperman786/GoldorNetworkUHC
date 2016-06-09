@@ -285,8 +285,34 @@ public class WorldManager implements Listener{
 		return worldF.getLobby();
 	}
 	public void shrinkBorder(){
-		getUHCWorld().getWorldBorder().setSize(400, 15*60);
-		MessageSender.broadcast("The worldborder will now slowly shrink to a radius of 400.");
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				getUHCWorld().getWorldBorder().setSize(500, 15*60);
+				MessageSender.broadcast("The worldborder will now slowly shrink to a radius of 250.");
+				new BukkitRunnable() {
+					
+					@Override
+					public void run() {
+						getUHCWorld().getWorldBorder().setSize(300, 10*60);
+						MessageSender.broadcast("The worldborder will now slowly shrink to a radius of 150.");
+						
+						new BukkitRunnable() {
+							
+							@Override
+							public void run() {
+								getUHCWorld().getWorldBorder().setSize(100, 5*60);
+								MessageSender.broadcast("The worldborder will now slowly shrink to a radius of 50.");
+								
+							}
+						}.runTaskLater(plugin, 36000L);
+					}
+				}.runTaskLater(plugin, 36000L);
+				
+			}
+		}.runTaskLater(plugin, 100L);
+		
 	}
 	public void newUHCWorld(){
 		uhcWorld = worldF.create();
