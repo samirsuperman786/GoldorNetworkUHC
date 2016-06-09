@@ -32,6 +32,7 @@ import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.managers.world.ChunkGenerator;
 import com.goldornetwork.uhc.managers.world.WorldFactory;
 import com.goldornetwork.uhc.managers.world.WorldManager;
+import com.goldornetwork.uhc.managers.world.events.FindLocationEvent;
 import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
 import com.goldornetwork.uhc.managers.world.events.LateScatterEvent;
 import com.goldornetwork.uhc.managers.world.events.ScatterEndEvent;
@@ -138,38 +139,68 @@ public class ScatterManager implements Listener{
 		findLocations(nameOfTeams.size());
 	}
 
+	@EventHandler
+	public void on(FindLocationEvent e){
+		if(timer >=e.getNumberOfLocations()){
+
+				int j = 0;
+				for(String team : teamM.getActiveTeams()){
+					locationsOfTeamSpawn.put(team, validatedLocs.get(j));
+					j++;
+				}
+			generate(validatedLocs);
+		}
+		
+		else{
+			
+			
+			Location toCheck = randomLocation(worldM.getUHCWorld(), radius);
+			toCheck.getChunk().load(true);
+			
+			((CraftWorld)toCheck.getWorld()).getHandle().chunkProviderServer.getChunkAt(toCheck.getBlockX(), toCheck.getBlockZ(), new Runnable() {
+				@Override
+				public void run() {
+					MinecraftServer.getServer().processQueue.add(new Runnable() {
+						@Override
+						public void run() {
+							new BukkitRunnable() {
+								
+								@Override
+								public void run() {
+									if(validate(toCheck)){
+										validatedLocs.add(toCheck);
+										++timer;
+									}
+									new BukkitRunnable() {
+										
+										@Override
+										public void run() {
+											plugin.getServer().getPluginManager().callEvent(new FindLocationEvent(e.getNumberOfLocations()));
+											
+										}
+									}.runTaskLater(plugin, 5L);
+									
+								}
+							}.runTaskLater(plugin, 5L);
+							
+							
+
+
+						}
+					});
+				}
+			});
+			
+			
+			
+			
+		}
+	}
 	private void findLocations(int numberOfLocationsToFind){
 		chunkG.cancelGeneration();
 		timer=0;
 		MessageSender.broadcast("Finding locations...");
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				
-				if(timer >=numberOfLocationsToFind){
-
-					if(teamM.isTeamsEnabled()){
-						int j = 0;
-						for(String team : teamM.getActiveTeams()){
-							locationsOfTeamSpawn.put(team, validatedLocs.get(j));
-							j++;
-						}
-					}
-					generate(validatedLocs);
-					cancel();
-				}
-				else{
-					for(int i = 0; i<LOADS_PER_SECOND; i++){
-						Location vLoc = findValidLocation(worldM.getUHCWorld(), radius);
-						validatedLocs.add(vLoc);
-						++timer;
-					}
-				}
-
-
-			}
-		}.runTaskTimer(plugin, 0L, 20L);
+		plugin.getServer().getPluginManager().callEvent(new FindLocationEvent(numberOfLocationsToFind));
 	}
 	private void generate(List<Location> loc){
 		timer=0;
@@ -271,7 +302,7 @@ public class ScatterManager implements Listener{
 												Bukkit.getPluginManager().callEvent(new TeleportTeamEvent());
 
 											}
-										}.runTaskLater(plugin, 120L);
+										}.runTaskLater(plugin, 130L);
 										cancel();
 									}
 
@@ -305,6 +336,17 @@ public class ScatterManager implements Listener{
 	 */
 	public int getRadius(){
 		return radius;
+	}
+	
+	private Location randomLocation(World world, int radius){
+		Location location = null;
+		Random random = new Random();
+		int x = random.nextInt(radius * 2) - radius;
+		int z = random.nextInt(radius * 2) - radius;
+		x= x+ worldM.getCenter().getBlockX();
+		z= z+ worldM.getCenter().getBlockZ();
+		location = new Location(world, x, world.getHighestBlockYAt(x, z), z);
+		return location;
 	}
 	/**
 	 * Used to get a safe teleportable location 

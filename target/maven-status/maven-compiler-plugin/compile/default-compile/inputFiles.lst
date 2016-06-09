@@ -57,6 +57,7 @@ E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\UHCServer.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\gamemodes\PotionSwap.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\SpectatorRegionManager.java
+E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\events\FindLocationEvent.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\TeamManager.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\gamemodes\GoneFishing.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\team\UnInvitePlayerCommand.java
