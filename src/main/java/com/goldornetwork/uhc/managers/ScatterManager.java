@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.entity.Player;
@@ -30,6 +31,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.managers.world.ChunkGenerator;
+import com.goldornetwork.uhc.managers.world.CoordXZ;
 import com.goldornetwork.uhc.managers.world.WorldFactory;
 import com.goldornetwork.uhc.managers.world.WorldManager;
 import com.goldornetwork.uhc.managers.world.events.FindLocationEvent;
@@ -143,57 +145,61 @@ public class ScatterManager implements Listener{
 	public void on(FindLocationEvent e){
 		if(timer >=e.getNumberOfLocations()){
 
-				int j = 0;
-				for(String team : teamM.getActiveTeams()){
-					locationsOfTeamSpawn.put(team, validatedLocs.get(j));
-					j++;
-				}
+			int j = 0;
+			for(String team : teamM.getActiveTeams()){
+				locationsOfTeamSpawn.put(team, validatedLocs.get(j));
+				j++;
+			}
 			generate(validatedLocs);
 		}
-		
+
 		else{
-			
-			
-			Location toCheck = randomLocation(worldM.getUHCWorld(), radius);
-			toCheck.getChunk().load(true);
-			
-			((CraftWorld)toCheck.getWorld()).getHandle().chunkProviderServer.getChunkAt(toCheck.getBlockX(), toCheck.getBlockZ(), new Runnable() {
+
+			World UHCWorld= worldM.getUHCWorld();
+			CoordXZ toLoad= randomLocation(UHCWorld, radius);
+			UHCWorld.getChunkAt(toLoad.x, toLoad.z).load(true);
+
+			((CraftWorld)UHCWorld).getHandle().chunkProviderServer.getChunkAt(toLoad.x, toLoad.z, new Runnable() {
 				@Override
 				public void run() {
 					MinecraftServer.getServer().processQueue.add(new Runnable() {
 						@Override
 						public void run() {
 							new BukkitRunnable() {
-								
+
 								@Override
 								public void run() {
+									Location toCheck = new Location(UHCWorld, toLoad.x, UHCWorld.getHighestBlockYAt(toLoad.x, toLoad.z), toLoad.z);
 									if(validate(toCheck)){
 										validatedLocs.add(toCheck);
 										++timer;
 									}
+									else{
+										UHCWorld.unloadChunkRequest(toLoad.x, toLoad.z);
+									}
 									new BukkitRunnable() {
-										
+
 										@Override
 										public void run() {
 											plugin.getServer().getPluginManager().callEvent(new FindLocationEvent(e.getNumberOfLocations()));
-											
+
 										}
 									}.runTaskLater(plugin, 5L);
-									
+
 								}
 							}.runTaskLater(plugin, 5L);
-							
-							
+
+
 
 
 						}
 					});
 				}
 			});
-			
-			
-			
-			
+
+
+
+
 		}
 	}
 	private void findLocations(int numberOfLocationsToFind){
@@ -264,9 +270,9 @@ public class ScatterManager implements Listener{
 					MinecraftServer.getServer().processQueue.add(new Runnable() {
 						@Override
 						public void run() {
-							
+
 							new BukkitRunnable() {
-								
+
 								@Override
 								public void run() {
 									Location safeLocation = new Location(location.getWorld(), location.getBlockX(), location.getWorld().getHighestBlockYAt(location), location.getBlockZ());
@@ -284,10 +290,10 @@ public class ScatterManager implements Listener{
 										}
 
 									}
-									
+
 								}
 							}.runTaskLater(plugin, 10L);
-							
+
 
 							new BukkitRunnable() {
 
@@ -337,45 +343,14 @@ public class ScatterManager implements Listener{
 	public int getRadius(){
 		return radius;
 	}
-	
-	private Location randomLocation(World world, int radius){
-		Location location = null;
+
+	private CoordXZ randomLocation(World world, int radius){
 		Random random = new Random();
 		int x = random.nextInt(radius * 2) - radius;
 		int z = random.nextInt(radius * 2) - radius;
 		x= x+ worldM.getCenter().getBlockX();
 		z= z+ worldM.getCenter().getBlockZ();
-		location = new Location(world, x, world.getHighestBlockYAt(x, z), z);
-		return location;
-	}
-	/**
-	 * Used to get a safe teleportable location 
-	 * @param world - the world the location should be found in
-	 * @param radius - the radius of the world that the locations should be found within
-	 * @return <code> Location </code> location of safe spawn
-	 * @see validate()
-	 */
-	private Location findValidLocation(World world, int radius){
-		//TODO use nms
-		boolean valid = false;
-		Location location = null;
-		while(valid ==false){
-			Random random = new Random();
-			int x = random.nextInt(radius * 2) - radius;
-			int z = random.nextInt(radius * 2) - radius;
-			x= x+ worldM.getCenter().getBlockX();
-			z= z+ worldM.getCenter().getBlockZ();
-			world.loadChunk(x, z, true);
-			location = new Location(world, x, world.getHighestBlockYAt(x, z), z);
-			if(validate(location.clone())){
-				valid=true;
-				break;
-			}
-			else{
-				world.unloadChunkRequest(x, z);
-			}
-		}
-		return location;
+		return new CoordXZ(x, z);
 	}
 
 	/**
@@ -386,36 +361,34 @@ public class ScatterManager implements Listener{
 	 */
 	private boolean validate(Location loc){
 		boolean valid = true;
+		Block landBlock = loc.clone().add(0, -1, 0).getBlock();
+		Block oneAboveLand = loc.clone().getBlock();
+		Block twoAboveLand = loc.clone().add(0, 1, 0).getBlock();
+		
 		if(loc.getBlockY()<60){
 			valid =false;
 		}
-
+		
 		else{
 			for(BlockFace face : faces){
-				//getting the block at land
-				if(INVALID_SPAWN_BLOCKS.contains(loc.clone().add(0, -1, 0).getBlock().getRelative(face).getType())){
+			
+				if(INVALID_SPAWN_BLOCKS.contains(landBlock.getRelative(face).getType())){
 					valid=false;
 					break;
 				}
 
-				//getting the block above land
-				else if(loc.clone().add(0, 0, 0).getBlock().getRelative(face).getType().isSolid()){
+				else if(oneAboveLand.getRelative(face).getType().isSolid() || INVALID_AIR_BLOCKS.contains(oneAboveLand.getRelative(face).getType())){
 					valid=false;
 					break;
 				}
-
-				//getting the block 2 above land
-				else if(loc.clone().add(0, 1, 0).getBlock().getRelative(face).getType().isSolid()){
+				
+				else if(twoAboveLand.getRelative(face).getType().isSolid() || INVALID_AIR_BLOCKS.contains(twoAboveLand.getRelative(face).getType())){
 					valid = false;
 					break;
 				}
 			}
 
 		}
-
-
-
-
 
 		return valid;
 	}
@@ -443,6 +416,7 @@ public class ScatterManager implements Listener{
 
 			}
 		}
+
 	}
 
 	@EventHandler
@@ -548,9 +522,9 @@ public class ScatterManager implements Listener{
 		return this.lateScatters;
 	}
 
-	
 
-	
+
+
 
 	/**
 	 * A list of blocks that we do not want players to spawn on
@@ -567,8 +541,11 @@ public class ScatterManager implements Listener{
 			Material.LEAVES_2,
 			Material.AIR
 			);
+	private static final Set<Material> INVALID_AIR_BLOCKS = ImmutableSet.of(
+			Material.LEAVES,
+			Material.LEAVES_2
+			);
 
-	
 	@EventHandler
 	public void on(ScatterEndEvent e){
 		setupStartingOptions();
@@ -595,7 +572,7 @@ public class ScatterManager implements Listener{
 	public void prePVPSetup(){
 		worldM.getUHCWorld().setTime(0);
 		worldM.getUHCWorld().setGameRuleValue("dodaylightcycle", "false");
-		
+
 	}
 
 }
