@@ -27,6 +27,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
@@ -53,7 +54,7 @@ public class WorldManager implements Listener{
 	private int timer;
 	private int radius;
 	private World uhcWorld;
-
+	
 	public WorldManager(UHC plugin, TeamManager teamM, WorldFactory worldF, ChunkGenerator chunkG) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.plugin=plugin;
@@ -278,6 +279,17 @@ public class WorldManager implements Listener{
 	public void on(PlayerChangedWorldEvent e){
 		if(e.getFrom().getPlayers().isEmpty()){
 			Bukkit.unloadWorld(e.getFrom(), false);
+		}
+	}
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void on(PlayerMoveEvent e){
+		if(e.getPlayer().getWorld().equals(getLobby())){
+			Location pLoc = e.getTo();
+			if(pLoc.getBlockY()<=0){
+				Location lobby = getLobby().getSpawnLocation();
+				Location toTeleport = lobby.add(lobby.getBlockX() + random.nextInt(1), lobby.getBlockY(), lobby.getBlockZ() + random.nextInt(1));
+				e.getPlayer().teleport(toTeleport);
+			}
 		}
 	}
 

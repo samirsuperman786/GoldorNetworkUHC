@@ -146,12 +146,8 @@ public class ScatterManager implements Listener{
 
 			@Override
 			public void run() {
-				int availMem = plugin.AvailableMemory();
-				if(availMem<200){
-					return;
-				}
-
-				else if(timer >=numberOfLocationsToFind){
+				
+				if(timer >=numberOfLocationsToFind){
 
 					if(teamM.isTeamsEnabled()){
 						int j = 0;
@@ -166,7 +162,6 @@ public class ScatterManager implements Listener{
 				else{
 					for(int i = 0; i<LOADS_PER_SECOND; i++){
 						Location vLoc = findValidLocation(worldM.getUHCWorld(), radius);
-						vLoc.add(0, 0, 0);
 						validatedLocs.add(vLoc);
 						++timer;
 					}
@@ -183,10 +178,6 @@ public class ScatterManager implements Listener{
 
 			@Override
 			public void run() {
-				int availMem = plugin.AvailableMemory();
-				if(availMem<200){
-					return;
-				}
 				if(timer>=loc.size()){
 
 					if(teamM.isTeamsEnabled()){
@@ -405,7 +396,6 @@ public class ScatterManager implements Listener{
 					teamM.addPlayerToObservers(target);
 				}
 				else{
-
 					MessageSender.send(ChatColor.AQUA, target, "You are now spectating the game");
 				}
 
@@ -563,6 +553,7 @@ public class ScatterManager implements Listener{
 	public void prePVPSetup(){
 		worldM.getUHCWorld().setTime(0);
 		worldM.getUHCWorld().setGameRuleValue("dodaylightcycle", "false");
+		
 	}
 
 }

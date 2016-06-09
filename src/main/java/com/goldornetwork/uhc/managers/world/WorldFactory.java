@@ -12,6 +12,7 @@ import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldInitEvent;
@@ -78,6 +79,14 @@ public class WorldFactory implements Listener{
 		if(!(plugin.getServer().getWorlds().contains(Lobby))){
 			Lobby = plugin.getServer().createWorld(new WorldCreator("Lobby"));
 			Lobby.setSpawnLocation(0, Lobby.getHighestBlockYAt(0, 0), 0);
+			Lobby.setGameRuleValue("doMobSpawning", "false");
+			Lobby.setGameRuleValue("doDaylightCycle", "false");
+			Lobby.setTime(60);
+			for(Entity entity : Lobby.getEntities()){
+				if(!(entity instanceof Player)){
+					entity.remove();
+				}
+			}
 		}
 		return Lobby;
 	}
