@@ -287,7 +287,7 @@ public class WorldManager implements Listener{
 			Location pLoc = e.getTo();
 			if(pLoc.getBlockY()<=0){
 				Location lobby = getLobby().getSpawnLocation();
-				Location toTeleport = lobby.add(lobby.getBlockX() + random.nextInt(1), lobby.getBlockY(), lobby.getBlockZ() + random.nextInt(1));
+				Location toTeleport = lobby.clone().add(random.nextInt(1), 0, random.nextInt(1));
 				toTeleport.setYaw(90);
 				e.getPlayer().teleport(toTeleport);
 			}

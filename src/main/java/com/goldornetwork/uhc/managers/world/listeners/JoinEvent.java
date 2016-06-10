@@ -64,7 +64,7 @@ public class JoinEvent implements Listener{
 			p.setExp(0L);
 			p.getInventory().setArmorContents(null);
 			Location lobby = worldM.getLobby().getSpawnLocation();
-			Location toTeleport = lobby.add(lobby.getBlockX() + random.nextInt(1), lobby.getBlockY(), lobby.getBlockZ() + random.nextInt(1));
+			Location toTeleport = lobby.clone().add(random.nextInt(1), 0, random.nextInt(1));
 			toTeleport.setYaw(90);
 			p.teleport(toTeleport);
 			Medic.heal(p);

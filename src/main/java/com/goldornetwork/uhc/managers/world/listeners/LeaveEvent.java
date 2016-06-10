@@ -13,12 +13,9 @@ import com.goldornetwork.uhc.managers.GameModeManager.State;
 
 public class LeaveEvent implements Listener{
 
-	//TODO if match has started and player leaves, spawn a chicken with their name, if afk for more than 5 mins then kill them and remove from team/game
-
 	//instances
 	private TeamManager teamM;
 	private ScatterManager scatterM;
-	//private ScatterManager scatterM = ScatterManager.getInstance();
 
 	public LeaveEvent(UHC plugin, TeamManager teamM, ScatterManager scatterM) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -33,7 +30,7 @@ public class LeaveEvent implements Listener{
 			if(teamM.isPlayerInGame(p.getUniqueId())){
 				 if(teamM.isTeamsEnabled()){
 					if(teamM.isTeamInactive(teamM.getTeamOfPlayer(p.getUniqueId()))){
-						teamM.disbandTeam(teamM.getTeamOfPlayer(p.getUniqueId()));
+						//teamM.disbandTeam(teamM.getTeamOfPlayer(p.getUniqueId()));
 					}
 				}
 			}

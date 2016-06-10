@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
+import com.goldornetwork.uhc.managers.GameModeManager.State;
 
 public class UHCServer implements Listener{
 
@@ -45,7 +46,18 @@ public class UHCServer implements Listener{
 		}
 		else if(plugin.getServer().getOnlinePlayers().size()<FAKE_PLAYER_SLOTS){
 			if(plugin.getServer().hasWhitelist()){
-				e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "Server not open yet.");
+				if(State.getState().equals(State.OPEN)){
+					e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "Server has already been re-whitelisted.");
+				}
+				else if(State.getState().equals(State.NOT_RUNNING)){
+					e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "Server not open yet.");
+				}
+				else if(State.getState().equals(State.INGAME) || State.getState().equals(State.SCATTER)){
+					e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "Match in progress.");
+				}
+				else{
+					e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "Server closed.");
+				}
 			}
 			else{
 				e.allow();
