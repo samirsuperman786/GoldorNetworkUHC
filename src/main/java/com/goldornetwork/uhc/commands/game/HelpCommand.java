@@ -48,6 +48,9 @@ public class HelpCommand extends UHCCommand{
 				toReturn.add(formatCommand("/vote [option]", "Use this to vote when a poll is active."));
 				toReturn.add(formatCommand("/health [player]", "Get the health of a player."));
 				toReturn.add(formatCommand("/lookup [team]", "Use this to lookup a team."));
+				toReturn.add(formatCommand("/report [player] [reason]", "Use this to report a player."));
+				toReturn.add(formatCommand("/pm [player] [message]", "Use this to message a player."));
+				toReturn.add(formatCommand("/reply [message]", "Use this to reply to a player."));
 				MessageSender.send(toReturn, sender);
 				return true;
 			}
@@ -56,6 +59,8 @@ public class HelpCommand extends UHCCommand{
 				toReturn.add(formatCommand("/start [teamsize]", "Use this to start a match."));
 				toReturn.add(formatCommand("/playerban [player] [reason]", "Use this to permanently ban a player."));
 				toReturn.add(formatCommand("/warn [player] [reason]", "Use to warn a player."));
+				toReturn.add(formatCommand("/mute [player] [reason]", "Use this to mute a player."));
+				toReturn.add(formatCommand("/unmute [player]", "Use this to unmute a player."));
 				MessageSender.send(toReturn, sender);
 				return true;
 			}

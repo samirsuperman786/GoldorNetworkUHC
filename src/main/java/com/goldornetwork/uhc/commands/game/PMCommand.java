@@ -1,4 +1,4 @@
-package com.goldornetwork.uhc.commands.staff;
+package com.goldornetwork.uhc.commands.game;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,31 +12,27 @@ import com.goldornetwork.uhc.commands.UHCCommand;
 import com.goldornetwork.uhc.managers.world.listeners.team.ChatManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 
-public class UHCMuteCommand extends UHCCommand{
+public class PMCommand extends UHCCommand{
 
 	private ChatManager chatM;
-	public UHCMuteCommand(ChatManager chatM) {
-		super("mute", "[player] [reason]");
-		this.chatM = chatM;
+	
+	public PMCommand(ChatManager chatM) {
+		super("pm", "[player] [message]");
+		this.chatM=chatM;
 	}
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
-		Player banner = (Player) sender;
+		Player messenger = (Player) sender;
 		if(!(sender instanceof Player)){
 			return true;
 		}
 		else if(args.length==0){
-			MessageSender.send(ChatColor.RED, banner, "Please specify a player!");
-			return true;
-		}
-		
-		else if(args[0].equalsIgnoreCase("*")){
-			chatM.mutePlayers();
+			MessageSender.send(ChatColor.RED, messenger, "Please specify a player!");
 			return true;
 		}
 		else if(Bukkit.getOfflinePlayer(args[0]).isOnline()==false){
-			MessageSender.send(ChatColor.RED, banner, "Player " + args[0].toLowerCase() + " is not online!");
+			MessageSender.send(ChatColor.RED, messenger, "Player " + args[0].toLowerCase() + " is not online!");
 			return true;
 		}
 		else if(args.length<=1){
@@ -49,9 +45,10 @@ public class UHCMuteCommand extends UHCCommand{
 				str.append(args[i] + " ");
 			}
 			String msg = str.toString();
-			chatM.mute(banner, target, msg, 30);
+			chatM.pmPlayer(messenger, target, msg);
 			return true;
 		}
+		
 	}
 
 	@Override

@@ -2,22 +2,27 @@ package com.goldornetwork.uhc.commands.staff;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.goldornetwork.uhc.commands.UHCCommand;
+import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.world.listeners.team.ChatManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 
-public class UHCMuteCommand extends UHCCommand{
+public class UHCUnMuteCommand extends UHCCommand{
 
 	private ChatManager chatM;
-	public UHCMuteCommand(ChatManager chatM) {
-		super("mute", "[player] [reason]");
-		this.chatM = chatM;
+	private TeamManager teamM;
+	public UHCUnMuteCommand(ChatManager chatM, TeamManager teamM) {
+		super("unmute", "[player]");
+		this.chatM=chatM;
+		this.teamM=teamM;
 	}
 
 	@Override
@@ -32,25 +37,28 @@ public class UHCMuteCommand extends UHCCommand{
 		}
 		
 		else if(args[0].equalsIgnoreCase("*")){
-			chatM.mutePlayers();
+			chatM.unMutePlayers();
 			return true;
 		}
 		else if(Bukkit.getOfflinePlayer(args[0]).isOnline()==false){
 			MessageSender.send(ChatColor.RED, banner, "Player " + args[0].toLowerCase() + " is not online!");
 			return true;
 		}
-		else if(args.length<=1){
-			return false;
+		else if(args.length==1){
+			Player target = Bukkit.getPlayer(args[0]);
+			
+			if(chatM.isMuted(target.getUniqueId())){
+				chatM.unMute(target.getUniqueId());
+				return true;
+			}
+			else{
+				MessageSender.send(ChatColor.RED, banner, "Player " + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName() + ChatColor.RED + " is not muted.");
+				return true;
+			}
 		}
 		else{
-			Player target = Bukkit.getPlayerExact(args[0]);
-			StringBuilder str = new StringBuilder();
-			for(int i =1; i<args.length; i++){
-				str.append(args[i] + " ");
-			}
-			String msg = str.toString();
-			chatM.mute(banner, target, msg, 30);
-			return true;
+			
+			return false;
 		}
 	}
 
@@ -58,8 +66,9 @@ public class UHCMuteCommand extends UHCCommand{
 	public List<String> tabComplete(CommandSender sender, String[] args) {
 		List<String> toReturn = new ArrayList<String>();
 		if(args.length==1){
-			for(Player all : Bukkit.getOnlinePlayers()){
-				toReturn.add(all.getName());
+			for(UUID all : chatM.getMutedPlayers()){
+				OfflinePlayer target = Bukkit.getOfflinePlayer(all);
+				toReturn.add(target.getName());
 			}
 		}
 		return toReturn;

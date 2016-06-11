@@ -13,12 +13,14 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.goldornetwork.uhc.UHC;
-import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.managers.board.BoardManager;
+import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 
@@ -27,7 +29,7 @@ import com.goldornetwork.uhc.utils.MessageSender;
 
 
 
-public class TeamManager {
+public class TeamManager implements Listener{
 
 	//instances
 	private UHC plugin;
@@ -51,6 +53,7 @@ public class TeamManager {
 	public TeamManager(UHC plugin, BoardManager boardM) {
 		this.plugin=plugin;
 		this.boardM=boardM;
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
 	/**
@@ -320,6 +323,16 @@ public class TeamManager {
 			invitedPlayers.put(team, toAdd);
 		}
 	}
+	
+	public List<UUID> getInvitedPlayers(String team){
+		if(invitedPlayers.containsKey(team)){
+			return invitedPlayers.get(team);
+		}
+		else{
+			List<UUID> toReturn= new ArrayList<UUID>();
+			return toReturn;
+		}
+	}
 
 	/**
 	 * Used to disallow a player from joining a team
@@ -342,7 +355,7 @@ public class TeamManager {
 	 * @param team - the team to check for
 	 * @return <code> True </code> if the player is invited to the given team
 	 */
-	public boolean isPlayerInvitedToTeam(Player p, String team){
+	public boolean isPlayerInvitedToTeam(OfflinePlayer p, String team){
 		if(invitedPlayers.containsKey(team)){
 			if(invitedPlayers.get(team).contains(p.getUniqueId())){
 				return true;
@@ -451,7 +464,7 @@ public class TeamManager {
 		if(invitedPlayers.containsKey(team)){
 			for(UUID u: invitedPlayers.get(team)){
 				if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
-					MessageSender.alertMessage(Bukkit.getServer().getPlayer(u),ChatColor.RED, "Your invitation to team " + getColorOfTeam(team) + getTeamNameProper(team) + " has been revoked!");
+					MessageSender.alertMessage(Bukkit.getServer().getPlayer(u),ChatColor.RED, "Your invitation to team " + getColorOfTeam(team) + getTeamNameProper(team) + ChatColor.RED + " has been revoked!");
 				}
 			}
 			invitedPlayers.remove(team);
@@ -498,6 +511,11 @@ public class TeamManager {
 	 */
 	public void displayName(Player p, String team){
 		p.setDisplayName(getColorOfPlayer(p.getUniqueId()) + "["  + getTeamNameProper(team) + "] " + ChatColor.RED + p.getName() + ChatColor.WHITE);
+	}
+	
+	@EventHandler
+	public void on(GameStartEvent e){
+		invitedPlayers.clear();
 	}
 
 

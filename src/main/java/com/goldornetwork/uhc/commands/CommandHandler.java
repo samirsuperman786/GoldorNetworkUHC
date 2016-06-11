@@ -19,10 +19,14 @@ import com.goldornetwork.uhc.commands.game.HelpCommand;
 import com.goldornetwork.uhc.commands.game.HelpopCommand;
 import com.goldornetwork.uhc.commands.game.InfoCommand;
 import com.goldornetwork.uhc.commands.game.LookupCommand;
+import com.goldornetwork.uhc.commands.game.PMCommand;
+import com.goldornetwork.uhc.commands.game.ReplyCommand;
+import com.goldornetwork.uhc.commands.game.ReportCommand;
 import com.goldornetwork.uhc.commands.game.VoteCommand;
 import com.goldornetwork.uhc.commands.staff.StartCommand;
 import com.goldornetwork.uhc.commands.staff.UHCBanCommand;
 import com.goldornetwork.uhc.commands.staff.UHCMuteCommand;
+import com.goldornetwork.uhc.commands.staff.UHCUnMuteCommand;
 import com.goldornetwork.uhc.commands.staff.UHCWarnCommand;
 import com.goldornetwork.uhc.commands.team.CreateCommand;
 import com.goldornetwork.uhc.commands.team.InvitePlayerCommand;
@@ -160,6 +164,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 		cmds.add(new UHCBanCommand(teamM, uhcB));
 		cmds.add(new UHCWarnCommand(uhcWarn));
 		cmds.add(new UHCMuteCommand(chatM));
+		cmds.add(new UHCUnMuteCommand(chatM, teamM));
 		
 		//team
 		cmds.add(new CreateCommand(teamM));
@@ -178,6 +183,9 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 		cmds.add(new VoteCommand(voteM));
 		cmds.add(new HealthCommand(teamM));
 		cmds.add(new LookupCommand(teamM));
+		cmds.add(new PMCommand(chatM));
+		cmds.add(new ReplyCommand(chatM, teamM));
+		cmds.add(new ReportCommand(teamM));
 		
 		for(UHCCommand cmd : cmds){
 			PluginCommand pCmd = plugin.getCommand(cmd.getName());

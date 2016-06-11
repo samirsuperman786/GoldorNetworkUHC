@@ -55,24 +55,22 @@ public class UnInvitePlayerCommand extends UHCCommand {
 			return true;
 		}
 
-		else if(teamM.isPlayerOnline(args[0])==false){
-			MessageSender.send(ChatColor.RED, p, "Player " + args[0].toLowerCase() + " is not online!");
-			return true;
-		}
-		else if(teamM.isPlayerOnTeam(Bukkit.getServer().getPlayer(args[0]).getUniqueId())){
+		else if(teamM.isPlayerOnTeam(Bukkit.getServer().getOfflinePlayer(args[0]).getUniqueId())){
 			MessageSender.send(ChatColor.RED, p, "Player " + args[0] + " is already on a team!");
 			return true;
 		}
 		else{
-			if(teamM.isPlayerInvitedToTeam(Bukkit.getServer().getPlayer(args[0]), teamM.getTeamOfPlayer(p.getUniqueId()))){
-				teamM.unInvitePlayer(teamM.getTeamOfPlayer(p.getUniqueId()), Bukkit.getServer().getPlayer(args[0]).getUniqueId());
-				MessageSender.alertMessage(p, ChatColor.GREEN, "You have uninvited " + Bukkit.getServer().getPlayer(args[0]).getName());
-				MessageSender.alertMessage(Bukkit.getServer().getPlayer(args[0]), ChatColor.RED, "You have been uninvited to team " + teamM.getColorOfPlayer(p.getUniqueId()) + teamM.getTeamNameProper(teamM.getTeamOfPlayer(p.getUniqueId())) + ChatColor.RED + " by " + teamM.getColorOfPlayer(p.getUniqueId()) + p.getName());
+			if(teamM.isPlayerInvitedToTeam(Bukkit.getServer().getOfflinePlayer(args[0]), teamM.getTeamOfPlayer(p.getUniqueId()))){
+				teamM.unInvitePlayer(teamM.getTeamOfPlayer(p.getUniqueId()), Bukkit.getServer().getOfflinePlayer(args[0]).getUniqueId());
+				MessageSender.alertMessage(p, ChatColor.GREEN, "You have uninvited " + Bukkit.getServer().getOfflinePlayer(args[0]).getName());
+				if(Bukkit.getServer().getOfflinePlayer(args[0]).isOnline()){
+					MessageSender.alertMessage(Bukkit.getServer().getPlayer(args[0]), ChatColor.RED, "You have been uninvited to team " + teamM.getColorOfPlayer(p.getUniqueId()) + teamM.getTeamNameProper(teamM.getTeamOfPlayer(p.getUniqueId())) + ChatColor.RED + " by " + teamM.getColorOfPlayer(p.getUniqueId()) + p.getName());
+				}
 				return true;
 			}
 			else{
 				MessageSender.send(ChatColor.RED, p, "You have not invited player " + args[0]);
-				return false;
+				return true;
 			}
 		}
 
@@ -83,10 +81,9 @@ public class UnInvitePlayerCommand extends UHCCommand {
 		List<String> toReturn = new ArrayList<String>();
 		Player p = (Player) sender;
 		if(args.length==1 && teamM.isPlayerInGame(p.getUniqueId())){
-			for(UUID u : teamM.getPlayersOnATeam(teamM.getTeamOfPlayer(p.getUniqueId()))){
-				if(Bukkit.getOfflinePlayer(u).isOnline()){
-					toReturn.add(Bukkit.getServer().getPlayer(u).getName());
-				}
+			for(UUID u : teamM.getInvitedPlayers(teamM.getTeamOfPlayer(p.getUniqueId()))){
+				toReturn.add(Bukkit.getServer().getOfflinePlayer(u).getName());
+
 			}
 		}
 		return toReturn;

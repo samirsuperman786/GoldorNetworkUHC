@@ -1,7 +1,9 @@
 package com.goldornetwork.uhc.managers.world.listeners.team;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -25,7 +27,8 @@ public class ChatManager implements Listener{
 	private boolean mutePlayers;
 
 	private List<UUID> muted = new ArrayList<UUID>();
-	
+	private Map<UUID, UUID> recentMessengers = new HashMap<UUID, UUID>();
+
 	public ChatManager(UHC plugin, TeamManager teamM) {
 		this.plugin=plugin;
 		this.teamM=teamM;
@@ -37,11 +40,11 @@ public class ChatManager implements Listener{
 		muted.add(target.getUniqueId());
 		MessageSender.broadcast(PlayerUtils.getPrefix(banner) + teamM.getColorOfPlayer(banner.getUniqueId()) + banner.getName() + ChatColor.GOLD + " \u27A0 " + minutes + " Minute Mute \u27A0 " + PlayerUtils.getPrefix(target) + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName() + ChatColor.GOLD + " \u27A0 " + reason);
 		new BukkitRunnable() {
-			
+
 			@Override
 			public void run() {
 				unMute(target.getUniqueId());
-				
+
 			}
 		}.runTaskLater(plugin, minutes * 60 * 20);
 	}
@@ -51,9 +54,16 @@ public class ChatManager implements Listener{
 			Player p = Bukkit.getPlayer(target);
 			p.sendMessage(ChatColor.GOLD + "You have been unmuted.");
 		}
-		
+
 	}
-	
+	public boolean isMuted(UUID target){
+		return muted.contains(target);
+	}
+
+	public List<UUID> getMutedPlayers(){
+		return muted;
+	}
+
 	public void mutePlayers(){
 		mutePlayers=true;
 		MessageSender.broadcast("Chat has been muted.");
@@ -62,6 +72,25 @@ public class ChatManager implements Listener{
 	public void unMutePlayers(){
 		mutePlayers= false;
 		MessageSender.broadcast("Chat has been unmuted!");
+	}
+
+	public void pmPlayer(Player sender, Player target, String msg){
+		target.sendMessage(ChatColor.GOLD + "[PM] " + teamM.getColorOfPlayer(sender.getUniqueId()) + sender.getName() + ChatColor.GOLD + "\u279C" + teamM.getColorOfPlayer(target.getUniqueId()) + "me" + ChatColor.GOLD + "\u279C" + ChatColor.WHITE + msg);
+		sender.sendMessage(ChatColor.GOLD + "[PM] " + teamM.getColorOfPlayer(sender.getUniqueId()) + "me" + ChatColor.GOLD + "\u279C" + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName() + ChatColor.GOLD + "\u279C" + ChatColor.WHITE + msg);
+		recentMessengers.put(sender.getUniqueId(), target.getUniqueId());
+		recentMessengers.put(target.getUniqueId(), sender.getUniqueId());
+
+	}
+	public boolean hasRecentlyMessaged(Player sender){
+		return recentMessengers.containsKey(sender.getUniqueId());
+	}
+	public UUID getRecentRecipient(Player messenger){
+		return recentMessengers.get(messenger.getUniqueId());
+	}
+	public void reply(Player sender, String msg){
+		if(Bukkit.getOfflinePlayer(recentMessengers.get(sender.getUniqueId())).isOnline()){
+			pmPlayer(sender, Bukkit.getPlayer(recentMessengers.get(sender.getUniqueId())), msg);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
@@ -92,7 +121,7 @@ public class ChatManager implements Listener{
 						all.sendMessage(PlayerUtils.getPrefix(sender) + teamM.getColorOfPlayer(sender.getUniqueId()) + sender.getName() + ChatColor.WHITE + ": " + e.getMessage());
 					}
 				}
-				
+
 				else{
 					all.sendMessage(PlayerUtils.getPrefix(sender) + teamM.getColorOfPlayer(sender.getUniqueId()) + sender.getName() + ": " + e.getMessage());
 				}

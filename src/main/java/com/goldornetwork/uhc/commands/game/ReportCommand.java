@@ -1,4 +1,4 @@
-package com.goldornetwork.uhc.commands.staff;
+package com.goldornetwork.uhc.commands.game;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,34 +9,29 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.goldornetwork.uhc.commands.UHCCommand;
-import com.goldornetwork.uhc.managers.world.listeners.team.ChatManager;
+import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 
-public class UHCMuteCommand extends UHCCommand{
+public class ReportCommand extends UHCCommand{
 
-	private ChatManager chatM;
-	public UHCMuteCommand(ChatManager chatM) {
-		super("mute", "[player] [reason]");
-		this.chatM = chatM;
+	private TeamManager teamM;
+	public ReportCommand(TeamManager teamM) {
+		super("report", "[player] [reason]");
+		this.teamM=teamM;
 	}
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
-		Player banner = (Player) sender;
+		Player messenger = (Player) sender;
 		if(!(sender instanceof Player)){
 			return true;
 		}
 		else if(args.length==0){
-			MessageSender.send(ChatColor.RED, banner, "Please specify a player!");
-			return true;
-		}
-		
-		else if(args[0].equalsIgnoreCase("*")){
-			chatM.mutePlayers();
+			MessageSender.send(ChatColor.RED, messenger, "Please specify a player!");
 			return true;
 		}
 		else if(Bukkit.getOfflinePlayer(args[0]).isOnline()==false){
-			MessageSender.send(ChatColor.RED, banner, "Player " + args[0].toLowerCase() + " is not online!");
+			MessageSender.send(ChatColor.RED, messenger, "Player " + args[0].toLowerCase() + " is not online!");
 			return true;
 		}
 		else if(args.length<=1){
@@ -49,7 +44,7 @@ public class UHCMuteCommand extends UHCCommand{
 				str.append(args[i] + " ");
 			}
 			String msg = str.toString();
-			chatM.mute(banner, target, msg, 30);
+			MessageSender.sendToOPS(teamM.getColorOfPlayer(messenger.getUniqueId()) + messenger.getName() + ChatColor.GOLD + "\u27B5reports\u27B5" + teamM.getColorOfPlayer(target.getUniqueId())+ target.getName() + ChatColor.GOLD + "\u27B5" + msg);
 			return true;
 		}
 	}

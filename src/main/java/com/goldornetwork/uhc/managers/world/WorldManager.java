@@ -179,8 +179,6 @@ public class WorldManager implements Listener{
 	public void endGame(List<UUID> winners){
 		List<String> toBroadcast = new LinkedList<String>();
 
-		toBroadcast.add(ChatColor.AQUA + "------------------------------");
-
 		toBroadcast.add("Game has ended, thanks for playing!");
 		MessageSender.broadcast(toBroadcast);
 		new BukkitRunnable() {
@@ -214,6 +212,7 @@ public class WorldManager implements Listener{
 						}
 					}
 					String msg = ChatColor.GOLD + "Winners: " + str.toString();
+					toReturn.add(msg);
 					MessageSender.broadcast(toReturn);
 					MessageSender.broadcastTitle(ChatColor.GOLD + "Game Over!", msg);
 				}
