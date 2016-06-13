@@ -27,7 +27,10 @@ public class ChatManager implements Listener{
 	private boolean mutePlayers;
 
 	private List<UUID> muted = new ArrayList<UUID>();
+	private List<UUID> helpopCooldown = new ArrayList<UUID>();
+	private List<UUID> reportCooldown = new ArrayList<UUID>();
 	private Map<UUID, UUID> recentMessengers = new HashMap<UUID, UUID>();
+	
 
 	public ChatManager(UHC plugin, TeamManager teamM) {
 		this.plugin=plugin;
@@ -55,6 +58,59 @@ public class ChatManager implements Listener{
 			p.sendMessage(ChatColor.GOLD + "You have been unmuted.");
 		}
 
+	}
+	
+	public void helpop(Player target, String msg){
+		if(isMuted(target.getUniqueId())){
+			target.sendMessage(ChatColor.RED + "You are muted.");
+		}
+		else if(isOnHelpopCooldown(target.getUniqueId())){
+			target.sendMessage(ChatColor.RED + "You are on cooldown for that command.");
+		}
+		else{
+			MessageSender.sendToOPS(teamM.getColorOfPlayer(target.getUniqueId()) + target.getName() + ChatColor.WHITE + ": " + msg);
+			target.sendMessage(ChatColor.GOLD + "[HELPOP] " + ChatColor.GREEN + "me" + ChatColor.GOLD + "\u279COPS\u279C" + ChatColor.WHITE + msg);
+			helpopCooldown.add(target.getUniqueId());
+			new BukkitRunnable() {
+				
+				@Override
+				public void run() {
+					helpopCooldown.remove(target.getUniqueId());
+					
+				}
+			}.runTaskLater(plugin, 300L);
+			
+		}
+	}
+	public void report(Player messenger, Player target, String msg){
+		if(isMuted(messenger.getUniqueId())){
+			messenger.sendMessage(ChatColor.RED + "You are muted.");
+		}
+		else if(isOnReportCooldown(messenger.getUniqueId())){
+			messenger.sendMessage(ChatColor.RED + "You are on cooldown for that command.");
+		}
+		else{
+			MessageSender.sendToOPS(teamM.getColorOfPlayer(messenger.getUniqueId()) + messenger.getName() + ChatColor.GOLD + "\u27B5reports\u27B5" + teamM.getColorOfPlayer(target.getUniqueId())+ target.getName() + ChatColor.GOLD + "\u27B5" + msg);
+			messenger.sendMessage(ChatColor.GREEN + "Reported player " + target.getName());
+			reportCooldown.add(messenger.getUniqueId());
+			new BukkitRunnable(){
+
+				@Override
+				public void run() {
+					reportCooldown.remove(messenger.getUniqueId());
+					
+				}
+				
+			}.runTaskLater(plugin, 300L);
+		}
+	
+	}
+	
+	private boolean isOnReportCooldown(UUID target){
+		return reportCooldown.contains(target);
+	}
+	private boolean isOnHelpopCooldown(UUID target){
+		return helpopCooldown.contains(target);
 	}
 	public boolean isMuted(UUID target){
 		return muted.contains(target);

@@ -2,20 +2,19 @@ package com.goldornetwork.uhc.commands.game;
 
 import java.util.List;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.goldornetwork.uhc.commands.UHCCommand;
-import com.goldornetwork.uhc.managers.TeamManager;
+import com.goldornetwork.uhc.managers.world.listeners.team.ChatManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class HelpopCommand extends UHCCommand{
 
-	private TeamManager teamM;
-	public HelpopCommand(TeamManager teamM) {
+	private ChatManager chatM;
+	public HelpopCommand(ChatManager chatM) {
 		super("helpop", "[message]");
-		this.teamM=teamM;
+		this.chatM = chatM;
 	}
 
 	@Override
@@ -34,8 +33,7 @@ public class HelpopCommand extends UHCCommand{
 				str.append(args[i] + " ");
 			}
 			String msg = str.toString();
-			MessageSender.sendToOPS(teamM.getColorOfPlayer(target.getUniqueId()) + target.getName() + ChatColor.WHITE + ": " + msg);
-			target.sendMessage(ChatColor.GOLD + "[HELPOP] " + ChatColor.GREEN + "me" + ChatColor.GOLD + "\u279COPS\u279C" + ChatColor.WHITE + msg);
+			chatM.helpop(target, msg);
 			return true;
 		}
 	}

@@ -178,7 +178,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 		cmds.add(new KickCommand(teamM));
 
 		//game
-		cmds.add(new HelpopCommand(teamM));
+		cmds.add(new HelpopCommand(chatM));
 		cmds.add(new HelpCommand());
 		cmds.add(new InfoCommand(gamemodeM));
 		cmds.add(new VoteCommand(voteM));
@@ -186,7 +186,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 		cmds.add(new LookupCommand(teamM));
 		cmds.add(new PMCommand(chatM));
 		cmds.add(new ReplyCommand(chatM));
-		cmds.add(new ReportCommand(teamM));
+		cmds.add(new ReportCommand(chatM));
 		
 		for(UHCCommand cmd : cmds){
 			PluginCommand pCmd = plugin.getCommand(cmd.getName());

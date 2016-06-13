@@ -10,14 +10,15 @@ import org.bukkit.entity.Player;
 
 import com.goldornetwork.uhc.commands.UHCCommand;
 import com.goldornetwork.uhc.managers.TeamManager;
+import com.goldornetwork.uhc.managers.world.listeners.team.ChatManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class ReportCommand extends UHCCommand{
 
-	private TeamManager teamM;
-	public ReportCommand(TeamManager teamM) {
+	private ChatManager chatM;
+	public ReportCommand(ChatManager chatM) {
 		super("report", "[player] [reason]");
-		this.teamM=teamM;
+		this.chatM=chatM;
 	}
 
 	@Override
@@ -44,8 +45,7 @@ public class ReportCommand extends UHCCommand{
 				str.append(args[i] + " ");
 			}
 			String msg = str.toString();
-			MessageSender.sendToOPS(teamM.getColorOfPlayer(messenger.getUniqueId()) + messenger.getName() + ChatColor.GOLD + "\u27B5reports\u27B5" + teamM.getColorOfPlayer(target.getUniqueId())+ target.getName() + ChatColor.GOLD + "\u27B5" + msg);
-			messenger.sendMessage(ChatColor.GREEN + "Reported player " + target.getName());
+			chatM.report(messenger, target, msg);
 			return true;
 		}
 	}
