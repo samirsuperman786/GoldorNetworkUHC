@@ -36,14 +36,6 @@ public class JoinEvent implements Listener{
 	public void onJoin(PlayerJoinEvent e){
 		Player p = e.getPlayer();
 		
-		if(teamM.isPlayerInGame(p.getUniqueId())){
-			if(teamM.isTeamsEnabled()){
-				teamM.displayName(p, teamM.getTeamOfPlayer(p.getUniqueId()));
-			}
-		}
-		else if(teamM.isPlayerAnObserver(p.getUniqueId())){
-			p.setDisplayName(ChatColor.AQUA + "[Observer] " + p.getName()+ ChatColor.WHITE);
-		}
 		
 		if(State.getState().equals(State.OPEN)){
 			if(teamM.isPlayerInGame(p.getUniqueId())==false){

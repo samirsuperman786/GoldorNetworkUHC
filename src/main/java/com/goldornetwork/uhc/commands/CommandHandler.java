@@ -31,6 +31,7 @@ import com.goldornetwork.uhc.commands.staff.UHCWarnCommand;
 import com.goldornetwork.uhc.commands.team.CreateCommand;
 import com.goldornetwork.uhc.commands.team.InvitePlayerCommand;
 import com.goldornetwork.uhc.commands.team.JoinCommand;
+import com.goldornetwork.uhc.commands.team.KickCommand;
 import com.goldornetwork.uhc.commands.team.LeaveCommand;
 import com.goldornetwork.uhc.commands.team.PMCoordsCommand;
 import com.goldornetwork.uhc.commands.team.TeamChatCommand;
@@ -174,7 +175,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 		cmds.add(new LeaveCommand(teamM));
 		cmds.add(new PMCoordsCommand(teamM, teamI));
 		cmds.add(new TeamChatCommand(teamM, teamI));
-
+		cmds.add(new KickCommand(teamM));
 
 		//game
 		cmds.add(new HelpopCommand(teamM));
@@ -184,7 +185,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter{
 		cmds.add(new HealthCommand(teamM));
 		cmds.add(new LookupCommand(teamM));
 		cmds.add(new PMCommand(chatM));
-		cmds.add(new ReplyCommand(chatM, teamM));
+		cmds.add(new ReplyCommand(chatM));
 		cmds.add(new ReportCommand(teamM));
 		
 		for(UHCCommand cmd : cmds){

@@ -44,7 +44,7 @@ public class VoteCommand extends UHCCommand{
 							return true;
 						}
 						voteM.addVote(p, input);
-						MessageSender.send(ChatColor.GREEN, p, "You have voted for option " + input);
+						MessageSender.send(ChatColor.GREEN, p, "You have voted for option " + ChatColor.GOLD + input);
 						return true;
 					}
 					else{

@@ -45,6 +45,7 @@ public class ReportCommand extends UHCCommand{
 			}
 			String msg = str.toString();
 			MessageSender.sendToOPS(teamM.getColorOfPlayer(messenger.getUniqueId()) + messenger.getName() + ChatColor.GOLD + "\u27B5reports\u27B5" + teamM.getColorOfPlayer(target.getUniqueId())+ target.getName() + ChatColor.GOLD + "\u27B5" + msg);
+			messenger.sendMessage(ChatColor.GREEN + "Reported player " + target.getName());
 			return true;
 		}
 	}

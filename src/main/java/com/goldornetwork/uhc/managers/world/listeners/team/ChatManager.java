@@ -75,8 +75,26 @@ public class ChatManager implements Listener{
 	}
 
 	public void pmPlayer(Player sender, Player target, String msg){
-		target.sendMessage(ChatColor.GOLD + "[PM] " + teamM.getColorOfPlayer(sender.getUniqueId()) + sender.getName() + ChatColor.GOLD + "\u279C" + teamM.getColorOfPlayer(target.getUniqueId()) + "me" + ChatColor.GOLD + "\u279C" + ChatColor.WHITE + msg);
-		sender.sendMessage(ChatColor.GOLD + "[PM] " + teamM.getColorOfPlayer(sender.getUniqueId()) + "me" + ChatColor.GOLD + "\u279C" + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName() + ChatColor.GOLD + "\u279C" + ChatColor.WHITE + msg);
+		String prefixSender;
+		String prefixTarget;
+		String mePrefix = ChatColor.GREEN.toString();
+		if(teamM.isPlayerInGame(sender.getUniqueId()) && teamM.isPlayerInGame(target.getUniqueId())){
+			if(teamM.areTeamMates(sender, target)){
+				prefixTarget = ChatColor.GREEN.toString();
+				prefixSender = ChatColor.GREEN.toString();
+			}
+			else{
+				prefixTarget = ChatColor.RED.toString();
+				prefixSender = ChatColor.RED.toString();
+			}
+		}
+		else{
+			prefixSender = teamM.getColorOfPlayer(sender.getUniqueId());
+			prefixTarget = teamM.getColorOfPlayer(target.getUniqueId());
+		}
+		
+		target.sendMessage(ChatColor.GOLD + "[PM] " + prefixSender + sender.getName() + ChatColor.GOLD + "\u279C" + mePrefix + "me" + ChatColor.GOLD + "\u279C" + ChatColor.WHITE + msg);
+		sender.sendMessage(ChatColor.GOLD + "[PM] " + mePrefix + "me" + ChatColor.GOLD + "\u279C" + prefixTarget + target.getName() + ChatColor.GOLD + "\u279C" + ChatColor.WHITE + msg);
 		recentMessengers.put(sender.getUniqueId(), target.getUniqueId());
 		recentMessengers.put(target.getUniqueId(), sender.getUniqueId());
 

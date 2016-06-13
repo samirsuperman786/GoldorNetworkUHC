@@ -35,6 +35,7 @@ public class HelpopCommand extends UHCCommand{
 			}
 			String msg = str.toString();
 			MessageSender.sendToOPS(teamM.getColorOfPlayer(target.getUniqueId()) + target.getName() + ChatColor.WHITE + ": " + msg);
+			target.sendMessage(ChatColor.GOLD + "[HELPOP] " + ChatColor.GREEN + "me" + ChatColor.GOLD + "\u279COPS\u279C" + ChatColor.WHITE + msg);
 			return true;
 		}
 	}

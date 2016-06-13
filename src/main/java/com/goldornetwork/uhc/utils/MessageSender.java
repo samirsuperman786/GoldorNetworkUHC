@@ -14,6 +14,9 @@ public class MessageSender {
 		return (ChatColor.GOLD + "[GN] ");
 	}
 	
+	public static void send(Player target, String msg){
+		target.sendMessage(getPrefix() + msg);
+	}
 	public static void send(CommandSender sender, String msg){
 		sender.sendMessage(getPrefix() + msg);
 	}
@@ -23,7 +26,7 @@ public class MessageSender {
 	public static void send(ChatColor cc, CommandSender sender, String msg){
 		sender.sendMessage(getPrefix() + cc + msg);
 	}
-	public static void send(List<String> msg, Player p){
+	public static void send(Player p, List<String> msg){
 		List<String> toEdit = new LinkedList<String>();
 		for(String messages : msg){
 			toEdit.add(getPrefix() + ChatColor.GOLD + messages);
@@ -35,7 +38,7 @@ public class MessageSender {
 		p.sendMessage(toSend);
 	}
 	
-	public static void send(List<String> msg, CommandSender sender){
+	public static void send(CommandSender sender, List<String> msg){
 		List<String> toEdit = new LinkedList<String>();
 		for(String messages : msg){
 			toEdit.add(getPrefix() + ChatColor.GOLD + messages);
@@ -60,6 +63,10 @@ public class MessageSender {
 	
 	public static void noConsole(CommandSender sender){
 		sender.sendMessage(getPrefix() + ChatColor.RED + "Console cannot run this command!"); 
+	}
+	
+	public static void alertMessage(Player p, String msg){
+		p.sendMessage(getPrefix() + ChatColor.MAGIC + "G" + ChatColor.GOLD + msg + ChatColor.MAGIC + "G");
 	}
 	
 	public static void alertMessage(Player p, ChatColor cc, String msg){

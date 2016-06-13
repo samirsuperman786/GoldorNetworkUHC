@@ -3,7 +3,6 @@ package com.goldornetwork.uhc.commands.team;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -44,19 +43,20 @@ public class JoinCommand extends UHCCommand {
 
 		else if(args.length==1){
 			if(teamM.isTeamsEnabled()){
-				if(teamM.isValidTeam(args[0])){
-					if(teamM.isPlayerInvitedToTeam(p,args[0].toLowerCase())){
+				String teamToJoin = args[0];
+				if(teamM.isValidTeam(teamToJoin)){
+					if(teamM.isPlayerInvitedToTeam(p,teamToJoin)){
 						if(teamM.isTeamRoomToJoin(args[0].toLowerCase())){
 							if(teamM.isPlayerAnObserver(p.getUniqueId())){
 								teamM.removePlayerFromObservers(p);
 							}
-							MessageSender.alertMessage(p, ChatColor.GREEN, "You have joined team " + teamM.getColorOfTeam(args[0].toLowerCase()) + teamM.getTeamNameProper(args[0]));
+							MessageSender.alertMessage(p, ChatColor.GREEN, "You have joined team " + teamM.getColorOfTeam(teamToJoin) + teamM.getTeamNameProper(args[0]));
 							teamM.addPlayerToTeam(p, args[0].toLowerCase());
 							teamM.unInvitePlayer(args[0], p.getUniqueId());
 							return true;
 						}
 						else{
-							MessageSender.send(ChatColor.RED, p, "No room left on team " + args[0]);
+							MessageSender.send(ChatColor.RED, p, "No room left on team " + teamM.getColorOfTeam(teamToJoin) + teamM.getTeamNameProper(teamToJoin));
 							return true;
 						}
 

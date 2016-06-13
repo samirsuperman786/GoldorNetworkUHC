@@ -15,6 +15,9 @@ commands:
       description: Use this to join a team!
       usage: /<command> [team] 
       aliases: [j]
+   kick:
+      description: Use this to kick a team mate.
+      usage: /<command> [option] 
    leave:
       description: Use this to leave a team or the game!
       usage: /<command> [option] 

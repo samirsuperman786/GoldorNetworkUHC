@@ -8,16 +8,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.goldornetwork.uhc.commands.UHCCommand;
-import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.world.listeners.team.ChatManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class ReplyCommand extends UHCCommand{
 
-	private TeamManager teamM;
 	private ChatManager chatM;
 
-	public ReplyCommand(ChatManager chatM, TeamManager teamM) {
+	public ReplyCommand(ChatManager chatM) {
 		super("reply", "[message]");
 		this.chatM=chatM;
 	}

@@ -44,6 +44,8 @@ import com.goldornetwork.uhc.managers.world.events.ScatterEndEvent;
 import com.goldornetwork.uhc.utils.Medic;
 import com.goldornetwork.uhc.utils.MessageSender;
 
+import net.minecraft.server.v1_8_R3.MinecraftServer;
+
 public class WorldManager implements Listener{
 
 	private UHC plugin;
@@ -103,7 +105,7 @@ public class WorldManager implements Listener{
 
 		}
 		plugin.getServer().setIdleTimeout(60);
-		plugin.getServer().getWhitelistedPlayers().clear();
+		MinecraftServer.getServer().getPlayerList().getWhitelist().getValues().clear();
 		plugin.getServer().setWhitelist(true);
 	}
 	@EventHandler

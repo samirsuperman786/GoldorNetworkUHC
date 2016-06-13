@@ -15,7 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
@@ -26,6 +25,7 @@ import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
+import com.goldornetwork.uhc.managers.world.events.UHCDeathEvent;
 import com.goldornetwork.uhc.utils.MessageSender;
 import com.goldornetwork.uhc.utils.PlayerUtils;
 
@@ -68,6 +68,7 @@ public class KingsManager extends Gamemode implements Listener{
 						removePlayerFromLateKings(p);
 					}
 					if(lateDebuffs.contains(p.getUniqueId())){
+						MessageSender.alertMessage(p, ChatColor.RED, "Your king has died! You shall now suffer!");
 						p.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, Integer.MAX_VALUE, 0));
 						currentlyDebuffed.add(p.getUniqueId());
 						lateDebuffs.remove(p.getUniqueId());
@@ -79,9 +80,9 @@ public class KingsManager extends Gamemode implements Listener{
 		}
 	}
 	@EventHandler(priority =EventPriority.MONITOR)
-	public void on(PlayerDeathEvent e){
-		if(listOfKings.containsValue(e.getEntity().getUniqueId())){
-			debuffTeamMates(teamM.getTeamOfPlayer(e.getEntity().getUniqueId()));
+	public void on(UHCDeathEvent e){
+		if(listOfKings.containsValue(e.getOfflinePlayer().getUniqueId())){
+			debuffTeamMates(teamM.getTeamOfPlayer(e.getOfflinePlayer().getUniqueId()));
 		}
 	}
 	@EventHandler
@@ -104,6 +105,7 @@ public class KingsManager extends Gamemode implements Listener{
 			if(Bukkit.getServer().getPlayer(u).isOnline()){
 				Bukkit.getServer().getPlayer(u).addPotionEffect(new PotionEffect(PotionEffectType.WITHER, Integer.MAX_VALUE, 0));
 				currentlyDebuffed.add(u);
+				MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.RED, "Your king has died! You shall now suffer!");
 			}
 			else{
 				lateDebuffs.add(u);

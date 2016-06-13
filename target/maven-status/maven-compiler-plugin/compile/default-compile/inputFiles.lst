@@ -24,6 +24,7 @@ E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\State.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\staff\UHCUnMuteCommand.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\game\HelpCommand.java
+E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\events\UHCDeathEvent.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\gamemodes\Bows.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\listeners\team\TeamInteraction.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\WorldFactory.java
@@ -49,7 +50,6 @@ E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\WorldManager.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\utils\Medic.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\listeners\JoinEvent.java
-E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\listeners\LeaveEvent.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\gamemodes\BlockRush.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\UHCWarn.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\gamemodes\SkyHigh.java
@@ -64,6 +64,7 @@ E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\TeamManager.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\gamemodes\GoneFishing.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\team\UnInvitePlayerCommand.java
+E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\team\KickCommand.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\GameModeManager\gamemodes\Switcheroo.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\commands\game\LookupCommand.java
 E:\Random\eclipse\GoldorNetworkUHC\src\main\java\com\goldornetwork\uhc\managers\world\events\TeleportTeamEvent.java

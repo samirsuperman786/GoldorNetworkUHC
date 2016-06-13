@@ -44,35 +44,89 @@ public class UHCServer implements Listener{
 		else if(teamM.isPlayerInGame(target.getUniqueId())){
 			e.allow();
 		}
-		else if(plugin.getServer().getOnlinePlayers().size()<FAKE_PLAYER_SLOTS){
-			if(plugin.getServer().hasWhitelist()){
-				if(State.getState().equals(State.OPEN)){
-					e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "Server has already been re-whitelisted.");
+		else if(plugin.getServer().hasWhitelist()){
+			if(State.getState().equals(State.OPEN)){
+				if(plugin.getServer().getOnlinePlayers().size()<(FAKE_PLAYER_SLOTS)){
+					if(target.isWhitelisted()){
+						e.allow();
+					}
+					else{
+						e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "Server already re-whitelisted.");
+					}
 				}
-				else if(State.getState().equals(State.NOT_RUNNING)){
-					e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "Server not open yet.");
-				}
-				else if(State.getState().equals(State.INGAME) || State.getState().equals(State.SCATTER)){
-					e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "Match in progress.");
+				else if(plugin.getServer().getOnlinePlayers().size()<(FAKE_PLAYER_SLOTS + BUFFER_PLAYER_SLOTS)){
+					if(target.isWhitelisted()){
+						e.allow();
+					}
+					else{
+						e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "Server is full, but there are still " + ChatColor.GRAY + ((FAKE_PLAYER_SLOTS + BUFFER_PLAYER_SLOTS) - Bukkit.getServer().getOnlinePlayers().size()) + ChatColor.YELLOW + " slots left for whitelist.");
+					}
 				}
 				else{
-					e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "Server closed.");
+					e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "Server is completely full, there are no additional whitelist spots left.");
+				}
+			}
+			else if(State.getState().equals(State.NOT_RUNNING)){
+				if(plugin.getServer().getOnlinePlayers().size()<(FAKE_PLAYER_SLOTS)){
+					if(target.isWhitelisted()){
+						e.allow();
+					}
+					else{
+						e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "Server not open yet.");
+					}
+				}
+				else if(plugin.getServer().getOnlinePlayers().size()<(FAKE_PLAYER_SLOTS + BUFFER_PLAYER_SLOTS)){
+					if(target.isWhitelisted()){
+						e.allow();
+					}
+					else{
+						e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "Server is full, but there are still " + ChatColor.GRAY + ((FAKE_PLAYER_SLOTS + BUFFER_PLAYER_SLOTS) - Bukkit.getServer().getOnlinePlayers().size()) + ChatColor.YELLOW + " slots left for whitelist.");
+					}
+				}
+				else{
+					e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "Server is completely full, there are no additional whitelist spots left.");
+				}
+			}
+			else if(State.getState().equals(State.SCATTER)){
+				if(plugin.getServer().getOnlinePlayers().size()<(FAKE_PLAYER_SLOTS)){
+					e.allow();
+				}
+				else{
+					e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "Server is full.");
+				}
+			}
+			else if(State.getState().equals(State.INGAME)){
+				if(plugin.getServer().getOnlinePlayers().size()<(FAKE_PLAYER_SLOTS)){
+					e.allow();
+				}
+				else{
+					e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "Server is full.");
 				}
 			}
 			else{
-				e.allow();
+				e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "You may no longer join the UHC.");
 			}
+			
 		}
-		else if(plugin.getServer().getOnlinePlayers().size()>= FAKE_PLAYER_SLOTS){
-			if(target.isWhitelisted()==false){
-				e.disallow(PlayerLoginEvent.Result.KICK_FULL, ChatColor.RED + "Server is full!");
+		else if(plugin.getServer().hasWhitelist()==false){
+			if(plugin.getServer().getOnlinePlayers().size()<(FAKE_PLAYER_SLOTS)){
+				e.allow();
 			}
 			else if(plugin.getServer().getOnlinePlayers().size()<(FAKE_PLAYER_SLOTS + BUFFER_PLAYER_SLOTS)){
-				e.allow();
+				if(target.isWhitelisted()){
+					e.allow();
+				}
+				else{
+					e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "Server is full, but there are still " + ChatColor.GRAY + ((FAKE_PLAYER_SLOTS + BUFFER_PLAYER_SLOTS) - Bukkit.getServer().getOnlinePlayers().size()) + ChatColor.YELLOW + " slots left for whitelist.");
+				}
 			}
 			else{
-				e.disallow(PlayerLoginEvent.Result.KICK_FULL, ChatColor.RED + "Not enough slots left in this server.");
+				e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "Server is completely full, there are no additional whitelist spots left.");
 			}
 		}
+		else{
+			e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.YELLOW + "Can not join the server at this time.");
+		}
+		
 	}
 }

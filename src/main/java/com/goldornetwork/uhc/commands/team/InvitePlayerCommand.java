@@ -41,7 +41,7 @@ public class InvitePlayerCommand extends UHCCommand{
 			return true;
 		}
 
-		else if(teamM.isPlayerOwner(p)==false){
+		else if(teamM.isPlayerOwner(teamM.getTeamOfPlayer(p.getUniqueId()), p.getUniqueId())==false){
 			MessageSender.send(ChatColor.RED, p, "You are not the owner of the team!");
 			return true;
 		}
@@ -58,10 +58,11 @@ public class InvitePlayerCommand extends UHCCommand{
 			MessageSender.send(ChatColor.RED, p, "Player " + args[0] + " is already on a team!");
 			return true;
 		}
-		else {
-			teamM.invitePlayer(teamM.getTeamOfPlayer(p.getUniqueId()), Bukkit.getServer().getPlayer(args[0]).getUniqueId());
-			MessageSender.alertMessage(Bukkit.getServer().getPlayer(args[0]), ChatColor.GREEN, "You have been invited to team " + teamM.getColorOfPlayer(p.getUniqueId()) + teamM.getTeamNameProper(teamM.getTeamOfPlayer(p.getUniqueId())) + ChatColor.GREEN + " by " + teamM.getColorOfPlayer(p.getUniqueId()) + p.getName());
-			MessageSender.alertMessage(p, ChatColor.GREEN, "You have invited player " + Bukkit.getServer().getPlayer(args[0]).getName());
+		else{
+			Player target = Bukkit.getServer().getPlayer(args[0]);
+			teamM.invitePlayer(teamM.getTeamOfPlayer(p.getUniqueId()), target.getUniqueId());
+			MessageSender.alertMessage(target, ChatColor.GREEN + "You have been invited to team " + teamM.getColorOfPlayer(p.getUniqueId()) + teamM.getTeamNameProper(teamM.getTeamOfPlayer(p.getUniqueId())) + ChatColor.GREEN + " by " + teamM.getColorOfPlayer(p.getUniqueId()) + p.getName());
+			MessageSender.alertMessage(p, ChatColor.GREEN, "You have invited player " + target.getName());
 			return true;
 		}
 

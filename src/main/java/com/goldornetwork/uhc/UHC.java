@@ -2,8 +2,6 @@ package com.goldornetwork.uhc;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -29,7 +27,6 @@ import com.goldornetwork.uhc.managers.world.WorldFactory;
 import com.goldornetwork.uhc.managers.world.WorldManager;
 import com.goldornetwork.uhc.managers.world.listeners.DeathEvent;
 import com.goldornetwork.uhc.managers.world.listeners.JoinEvent;
-import com.goldornetwork.uhc.managers.world.listeners.LeaveEvent;
 import com.goldornetwork.uhc.managers.world.listeners.MoveEvent;
 import com.goldornetwork.uhc.managers.world.listeners.WeatherChange;
 import com.goldornetwork.uhc.managers.world.listeners.team.ChatManager;
@@ -57,7 +54,6 @@ public class UHC extends JavaPlugin {
 	private CommandHandler cmd;
 	private MoveEvent moveE;
 	private VoteManager voteM;
-	private Medic medic;
 	private WorldManager worldM;
 	private ChatManager chatM;
 	private WorldFactory worldF;
@@ -66,7 +62,6 @@ public class UHC extends JavaPlugin {
 	private UHCServer uhcServer;
 	private SpectatorRegionManager spectM;
 	private Runtime rt = Runtime.getRuntime();
-	private OperatingSystemMXBean compHandler = ManagementFactory.getOperatingSystemMXBean();
 	
 	private final static int fillMemoryTolerance = 500;
 	
@@ -92,7 +87,7 @@ public class UHC extends JavaPlugin {
 		
 		scatterM= new ScatterManager(plugin, teamM, moveE, chatM, worldF, chunkG, worldM);
 		
-		voteM = new VoteManager(plugin, gameModeM, teamM);
+		voteM = new VoteManager(plugin, gameModeM);
 		
 		timerM = new TimerManager(plugin, scatterM, teamM, voteM, chatM, worldM);
 		
@@ -100,7 +95,6 @@ public class UHC extends JavaPlugin {
 		
 		uhcServer=new UHCServer(plugin, teamM);
 		
-		medic= new Medic(plugin, teamM);
 		
 		teamI = new TeamInteraction(teamM);
 		
@@ -114,10 +108,10 @@ public class UHC extends JavaPlugin {
 		
 		//listeners
 		
+		new Medic(plugin, teamM);
 		new TeamInteraction(teamM);
-		new DeathEvent(plugin, teamM, scatterM, worldM);
+		new DeathEvent(plugin, teamM);
 		new JoinEvent(plugin, teamM, worldM);
-		new LeaveEvent(plugin,teamM, scatterM);
 		new WeatherChange(plugin);
 		new AntiXray(plugin);
 		

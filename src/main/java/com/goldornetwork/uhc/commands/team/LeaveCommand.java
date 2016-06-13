@@ -28,7 +28,7 @@ public class LeaveCommand extends UHCCommand{
 			MessageSender.noConsole(sender);
 			return true;
 		}
-		else if(teamM.isPlayerInGame(p.getUniqueId())==false){
+		else if(teamM.isPlayerOnTeam(p.getUniqueId())==false){
 			MessageSender.send(ChatColor.RED, sender, "You are not on a team");
 			return true;
 		}
@@ -39,14 +39,14 @@ public class LeaveCommand extends UHCCommand{
 			}
 			else if(State.getState().equals(State.OPEN)){
 				if(teamM.isTeamsEnabled()){
-					if(teamM.isPlayerOwner(p)){
-						teamM.removePlayerFromOwner(p);
+					if(teamM.isPlayerOwner(teamM.getTeamOfPlayer(p.getUniqueId()), p.getUniqueId())){
+						teamM.removePlayerFromOwner(teamM.getTeamOfPlayer(p.getUniqueId()), p.getUniqueId());
 						teamM.disbandTeam(teamM.getTeamOfPlayer(p.getUniqueId()));
 					}
 					else{
 						for(UUID u : teamM.getPlayersOnATeam(teamM.getTeamOfPlayer(p.getUniqueId()))){
 							if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
-								MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.GOLD, teamM.getColorOfPlayer(p.getUniqueId()) + p.getName() + ChatColor.GOLD + " has left the team.");
+								MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.GREEN + p.getName() + ChatColor.GOLD + " has left the team.");
 							}
 						}
 						teamM.removePlayerFromTeam(p.getUniqueId());
@@ -55,11 +55,13 @@ public class LeaveCommand extends UHCCommand{
 					return true;
 				}
 				else{
-					return false;
+					MessageSender.send(p, "Teams are not enabled yet.");
+					return true;
 				}
 			}
 			else{
-				return false;
+				MessageSender.send(p, "Can not leave a team yet.");
+				return true;
 			}
 
 		}

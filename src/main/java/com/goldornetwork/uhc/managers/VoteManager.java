@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,7 +24,6 @@ import com.goldornetwork.uhc.utils.MessageSender;
 public class VoteManager implements Listener{
 
 	private GameModeManager gamemodeM;
-	private TeamManager teamM;
 	private UHC plugin;
 	private Random random = new Random();
 	private final int NUMBEROFOPTIONS = 3;
@@ -35,11 +33,10 @@ public class VoteManager implements Listener{
 	private List<UUID> haveVoted = new ArrayList<UUID>();
 	private boolean voteActive;
 
-	public VoteManager(UHC plugin, GameModeManager gamemodeM, TeamManager teamM) {
+	public VoteManager(UHC plugin, GameModeManager gamemodeM) {
 		this.plugin=plugin;
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.gamemodeM = gamemodeM;
-		this.teamM=teamM;
 	}
 
 	public void setup(){
@@ -207,7 +204,7 @@ public class VoteManager implements Listener{
 				@Override
 				public void run() {
 					if(target.isOnline()){
-						MessageSender.send(getMessage(), target);
+						MessageSender.send(target, getMessage());
 					}					
 				}
 			}.runTaskLater(plugin, 10L);

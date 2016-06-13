@@ -88,7 +88,10 @@ public class TimerManager implements Listener{
 			@Override
 			public void run() {
 				timeTillVote--;
-				if(timeTillVote==0){
+				if(timeTillVote>=(2*60) && timeTillVote%(2*60) ==0){
+					voteM.broadcastOptions();
+				}
+				else if(timeTillVote==0){
 					voteM.enableOption(voteM.getWinner());
 					MessageSender.broadcast("Option " + (voteM.getWinner()+1) + " has won with " + ChatColor.GRAY + voteM.getWinnerVotes() + ChatColor.GOLD + " votes.");
 					cancel();

@@ -2,7 +2,6 @@ package com.goldornetwork.uhc.managers.board;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -15,10 +14,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
@@ -31,6 +28,7 @@ import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.world.WorldManager;
 import com.goldornetwork.uhc.managers.world.events.GameOpenEvent;
 import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
+import com.goldornetwork.uhc.managers.world.events.UHCDeathEvent;
 
 public class BoardManager implements Listener{
 
@@ -201,8 +199,8 @@ public class BoardManager implements Listener{
 			target.setScoreboard(mainBoard);
 		}
 	}
-	public Scoreboard getScoreboardOfPlayer(Player p){
-		return teamScoreBoards.get(teamOfPlayer.get(p.getUniqueId())).getScoreboard();
+	public Scoreboard getScoreboardOfPlayer(UUID u){
+		return teamScoreBoards.get(teamOfPlayer.get(u)).getScoreboard();
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -221,7 +219,7 @@ public class BoardManager implements Listener{
 		Player p = e.getPlayer();
 
 		if(teamOfPlayer.containsKey(p.getUniqueId())){
-			p.setScoreboard(getScoreboardOfPlayer(p));
+			p.setScoreboard(getScoreboardOfPlayer(p.getUniqueId()));
 		}
 		else{
 			p.setScoreboard(mainBoard);
@@ -230,8 +228,8 @@ public class BoardManager implements Listener{
 
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void on(PlayerDeathEvent e){
-		Player p = e.getEntity();
+	public void on(UHCDeathEvent e){
+		OfflinePlayer p = e.getOfflinePlayer();
 		if(teamOfPlayer.containsKey(p.getUniqueId())){
 			for(Team team : activeTeams){
 				if(!(team.getPlayers().contains(Bukkit.getOfflinePlayer(p.getUniqueId())))){
@@ -239,7 +237,7 @@ public class BoardManager implements Listener{
 				}
 
 			}
-			getScoreboardOfPlayer(p).getTeam(teamOfPlayer.get(p.getUniqueId())).removePlayer(p);
+			getScoreboardOfPlayer(p.getUniqueId()).getTeam(teamOfPlayer.get(p.getUniqueId())).removePlayer(p);
 
 		}
 

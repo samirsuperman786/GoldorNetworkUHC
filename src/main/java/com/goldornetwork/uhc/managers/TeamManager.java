@@ -91,7 +91,7 @@ public class TeamManager implements Listener{
 	}
 
 	public enum BASECOLORS{
-		BLUE, DARK_AQUA, DARK_BLUE, DARK_GRAY, DARK_PURPLE, DARK_RED, LIGHT_PURPLE, YELLOW
+		BLUE, DARK_AQUA, DARK_BLUE, DARK_PURPLE, LIGHT_PURPLE, YELLOW
 	}
 
 	/**
@@ -161,14 +161,19 @@ public class TeamManager implements Listener{
 		return playersInGame.contains(target);
 
 	}
-
-
+	
+	public void addPlayerToOwner(String team, UUID target){
+		ownerOfTeam.put(team, target);
+	}
 	/**
 	 * Removes a player from the status of owner
 	 * @param p the player to remove from owner
 	 */
-	public void removePlayerFromOwner(Player p){
-		ownerOfTeam.remove(p.getUniqueId());
+	public void removePlayerFromOwner(String team, UUID target){
+		if(ownerOfTeam.get(team).equals(target)){
+			ownerOfTeam.remove(team);
+		}
+		
 	}
 
 	/**
@@ -293,14 +298,18 @@ public class TeamManager implements Listener{
 	public void addPlayerToTeam(Player p, String team){
 		for(UUID u : getPlayersOnATeam(team.toLowerCase())){
 			if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
-				MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.GREEN, p.getName() + " has joined your team.");
+				MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.GREEN + p.getName() + ChatColor.GOLD + " has joined your team.");
 			}
 		}
 		boardM.addPlayerToTeam(team, p);
 		playersInGame.add(p.getUniqueId());
 		teamOfPlayer.put(p.getUniqueId(), team);
 		increaseTeamSize(team, 1);
-		displayName(p, team);
+		if(invitedPlayers.containsKey(team)){
+			if(invitedPlayers.get(team).contains(p.getUniqueId())){
+				invitedPlayers.get(team).remove(p.getUniqueId());
+			}
+		}
 	}
 
 	public boolean isPlayerOnTeam(UUID target){
@@ -314,19 +323,19 @@ public class TeamManager implements Listener{
 	 * @param target - the person to invite
 	 */
 	public void invitePlayer(String team, UUID target){
-		if(invitedPlayers.containsKey(team)){
-			invitedPlayers.get(team).add(target);
+		if(invitedPlayers.containsKey(team.toLowerCase())){
+			invitedPlayers.get(team.toLowerCase()).add(target);
 		}
 		else{
 			List<UUID> toAdd = new ArrayList<UUID>();
 			toAdd.add(target);
-			invitedPlayers.put(team, toAdd);
+			invitedPlayers.put(team.toLowerCase(), toAdd);
 		}
 	}
 	
 	public List<UUID> getInvitedPlayers(String team){
-		if(invitedPlayers.containsKey(team)){
-			return invitedPlayers.get(team);
+		if(invitedPlayers.containsKey(team.toLowerCase())){
+			return invitedPlayers.get(team.toLowerCase());
 		}
 		else{
 			List<UUID> toReturn= new ArrayList<UUID>();
@@ -340,9 +349,9 @@ public class TeamManager implements Listener{
 	 * @param target - the person to un-invite
 	 */
 	public void unInvitePlayer(String team, UUID target){
-		if(invitedPlayers.containsKey(team)){
-			if(invitedPlayers.get(team).contains(target)){
-				invitedPlayers.get(team).remove(target);
+		if(invitedPlayers.containsKey(team.toLowerCase())){
+			if(invitedPlayers.get(team.toLowerCase()).contains(target)){
+				invitedPlayers.get(team.toLowerCase()).remove(target);
 			}
 		}
 
@@ -356,8 +365,8 @@ public class TeamManager implements Listener{
 	 * @return <code> True </code> if the player is invited to the given team
 	 */
 	public boolean isPlayerInvitedToTeam(OfflinePlayer p, String team){
-		if(invitedPlayers.containsKey(team)){
-			if(invitedPlayers.get(team).contains(p.getUniqueId())){
+		if(invitedPlayers.containsKey(team.toLowerCase())){
+			if(invitedPlayers.get(team.toLowerCase()).contains(p.getUniqueId())){
 				return true;
 			}
 		}
@@ -372,8 +381,8 @@ public class TeamManager implements Listener{
 	 * @param p - the player to check for
 	 * @return <code> True </code> if the player is the owner
 	 */
-	public boolean isPlayerOwner(Player p){
-		return ownerOfTeam.containsValue(p.getUniqueId());
+	public boolean isPlayerOwner(String team, UUID u){
+		return ownerOfTeam.get(team).equals(u);
 	}
 
 	/**
@@ -388,7 +397,6 @@ public class TeamManager implements Listener{
 		}
 		p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1, false, false));
 		p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
-		p.setDisplayName(ChatColor.AQUA + "[Observer] " + p.getName()+ ChatColor.WHITE);
 		MessageSender.send(ChatColor.AQUA, p, "You are now spectating.");
 		boardM.addPlayerToObserver(p);
 	}
@@ -450,7 +458,7 @@ public class TeamManager implements Listener{
 
 	public boolean isTeamInactive(String team){
 		boolean allOffline=true;
-			for(UUID u : getPlayersOnATeam(team)){
+			for(UUID u : getPlayersOnATeam(team.toLowerCase())){
 				if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
 					allOffline=false;
 					break;
@@ -478,7 +486,10 @@ public class TeamManager implements Listener{
 		}
 		boardM.removeTeam(team);
 	}
-
+	
+	public boolean areTeamMates(Player first, Player second){
+		return getPlayersOnATeam(getTeamOfPlayer(first.getUniqueId())).contains(second.getUniqueId());
+	}
 
 	public String getTeamNameProper(String team){
 		String output = team.substring(0, 1).toUpperCase() + team.toLowerCase().substring(1);
@@ -504,14 +515,6 @@ public class TeamManager implements Listener{
 	}
 
 
-	/**
-	 * Used to edit the display name of a player
-	 * @param p - the player to change the display name of
-	 * @param team - the text to display in front of a players name
-	 */
-	public void displayName(Player p, String team){
-		p.setDisplayName(getColorOfPlayer(p.getUniqueId()) + "["  + getTeamNameProper(team) + "] " + ChatColor.RED + p.getName() + ChatColor.WHITE);
-	}
 	
 	@EventHandler
 	public void on(GameStartEvent e){

@@ -66,9 +66,10 @@ public class ScatterManager implements Listener{
 	private boolean teleported;
 	private boolean lateScatterComplete;
 	private int radius;
-	private final int LOADS_PER_SECOND = 1;
 	private int timer;
-	private BlockFace[] faces = new BlockFace[] { BlockFace.SELF, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH_EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH_WEST, BlockFace.NORTH_WEST};
+	private BlockFace[] faces = new BlockFace[] {
+			BlockFace.SELF, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, 
+			BlockFace.WEST, BlockFace.NORTH_EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH_WEST, BlockFace.NORTH_WEST};
 
 	//storage
 	private List<Location> validatedLocs = new ArrayList<Location>();
@@ -80,6 +81,7 @@ public class ScatterManager implements Listener{
 	private BlockingQueue<String> teamReadyToScatter;
 	private BlockingQueue<UUID> lateScatterReadyToScatter;
 	private Map<String, Boolean> isTeamOnline = new HashMap<String, Boolean>();
+	private List<UUID> lateSafeCheck = new ArrayList<UUID>();
 
 	public ScatterManager(UHC plugin, TeamManager teamM, MoveEvent moveE, ChatManager chatM, WorldFactory worldF, ChunkGenerator chunkG, WorldManager worldM) {
 		this.plugin=plugin;
@@ -287,6 +289,7 @@ public class ScatterManager implements Listener{
 											Player target = (Player) p;
 											initializePlayer(target);
 											teleported = target.teleport(location);
+											safeCheck(target);
 										}
 
 									}
@@ -353,6 +356,7 @@ public class ScatterManager implements Listener{
 		return new CoordXZ(x, z);
 	}
 
+
 	/**
 	 * Used to check if the a given location is appropriate for teleporting conditions
 	 * @param loc - the location to check
@@ -364,36 +368,31 @@ public class ScatterManager implements Listener{
 		Block landBlock = loc.clone().add(0, -1, 0).getBlock();
 		Block oneAboveLand = loc.clone().getBlock();
 		Block twoAboveLand = loc.clone().add(0, 1, 0).getBlock();
-		Block threeAboveLand = loc.clone().add(0, 2, 0).getBlock();
-		
-		
-			checkLoop:
+
+		checkLoop:
 			for(BlockFace face : faces){
-			
+
 				if(VALID_SPAWN_BLOCKS.contains(landBlock.getRelative(face).getType())==false){
 					valid=false;
 					break checkLoop;
 				}
 
-				else if(oneAboveLand.getRelative(face).getType().equals(Material.AIR)==false){
+				else if(oneAboveLand.getRelative(face).getType()!=(Material.AIR)){
 					valid=false;
 					break checkLoop;
 				}
-				
-				else if(twoAboveLand.getRelative(face).getType().equals(Material.AIR)==false){
+
+				else if(twoAboveLand.getRelative(face).getType()!=(Material.AIR)){
 					valid = false;
 					break checkLoop;
 				}
-				/*else if(threeAboveLand.getRelative(face).getType().equals(Material.AIR)==false){
-					valid = false;
-					break checkLoop;
-				}*/
-				
+
 			}
 
 
 		return valid;
 	}
+
 
 	@EventHandler
 	public void on(PlayerJoinEvent e){
@@ -402,6 +401,11 @@ public class ScatterManager implements Listener{
 			if(teamM.isPlayerInGame(e.getPlayer().getUniqueId())){
 				if(getLateScatters().contains(target.getUniqueId()) && !(lateScatterReadyToScatter.contains(target.getUniqueId()))){
 					handleLateScatter(target);
+				}
+				if(lateSafeCheck.contains(target.getUniqueId())){
+						safeCheck(target);
+						lateSafeCheck.remove(target.getUniqueId());
+					
 				}
 
 			}
@@ -455,6 +459,7 @@ public class ScatterManager implements Listener{
 									Player target = (Player) p;
 									initializePlayer(target);
 									lateScatterComplete = target.teleport(safeLocation);
+									safeCheck(target);
 									new BukkitRunnable() {
 
 										@Override
@@ -488,6 +493,36 @@ public class ScatterManager implements Listener{
 		}
 
 
+	}
+
+	private void safeCheck(OfflinePlayer p){
+
+		new BukkitRunnable() {
+
+			@Override
+			public void run() {
+
+				if(p.isOnline()){
+					Player target = (Player) p;
+					Block atLand = target.getLocation().clone().add(0, -1, 0).getBlock();
+					Block oneAboveLand = target.getLocation().getBlock();
+					Block twoAboveLand = target.getLocation().clone().add(0, 1, 0).getBlock();
+					Block threeAboveLand = target.getLocation().clone().add(0, 2, 0).getBlock();
+
+					for(BlockFace face : faces){
+						atLand.getRelative(face).setType(Material.GLASS);
+						oneAboveLand.getRelative(face).setType(Material.AIR);
+						twoAboveLand.getRelative(face).setType(Material.AIR);
+						threeAboveLand.getRelative(face).setType(Material.AIR);
+					}
+				}
+				else{
+					lateSafeCheck.add(p.getUniqueId());
+				}
+
+
+			}
+		}.runTaskLater(plugin, 5L);
 	}
 	public void handleLateScatter(Player p){
 		if(teamM.isTeamsEnabled()){
@@ -533,9 +568,9 @@ public class ScatterManager implements Listener{
 	 * @see findValidLocation()
 	 * @see validate()
 	 */
-	private static final Set<Material> VALID_SPAWN_BLOCKS = ImmutableSet.of(
+	private final Set<Material> VALID_SPAWN_BLOCKS = ImmutableSet.of(
 			Material.GRASS,
-            Material.SAND
+			Material.SAND
 			);
 
 	@EventHandler
