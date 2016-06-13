@@ -145,7 +145,7 @@ public class VoteManager implements Listener{
 		int comma=0;
 		for(Gamemode game : options.get(choice)){
 			game.enable(plugin);
-			toBroadcast.add(ChatColor.AQUA + game.getProperName() + " has been enabled");
+			toBroadcast.add(ChatColor.AQUA + game.getProperName() + " has been enabled.");
 			comma++;
 			String message = ChatColor.AQUA + game.getProperName();
 			String properMessage;
@@ -153,7 +153,7 @@ public class VoteManager implements Listener{
 				properMessage = message + ", ";
 			}
 			else{
-				properMessage=message;
+				properMessage= "and, " + message;
 			}
 			str.append(properMessage);
 

@@ -29,7 +29,7 @@ public class StartCommand extends UHCCommand{
 		//TODO work on easier start implementation
 
 		if(!State.getState().equals(State.NOT_RUNNING)){
-			MessageSender.send(ChatColor.RED, sender, "Match has already started!");
+			MessageSender.send(ChatColor.RED, sender, "Match has already started.");
 			return true;
 		}
 		else if(args.length==1){

@@ -31,7 +31,7 @@ public class CreateCommand extends UHCCommand{
 		}
 
 		else if(teamM.isPlayerInGame(p.getUniqueId())){
-			MessageSender.send(ChatColor.RED, p, "You are already on a team!");
+			MessageSender.send(ChatColor.RED, p, "You are already on a team.");
 			return true;
 		}
 
@@ -48,7 +48,7 @@ public class CreateCommand extends UHCCommand{
 					MessageSender.alertMessage(p, ChatColor.GREEN, "You have created a team, please use /invite");
 				}
 				else{
-					MessageSender.alertMessage(p, ChatColor.RED, "Teams are full!");
+					MessageSender.alertMessage(p, ChatColor.RED, "Teams are full.");
 				}
 				return true;
 			}

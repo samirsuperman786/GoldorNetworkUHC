@@ -33,29 +33,29 @@ public class InvitePlayerCommand extends UHCCommand{
 			return true;
 		}
 		else if(State.getState().equals(State.INGAME)){
-			MessageSender.send(ChatColor.RED, p, "Match has already started!");
+			MessageSender.send(ChatColor.RED, p, "Match has already started.");
 			return true;
 		}
 		else if(teamM.isPlayerInGame(p.getUniqueId())==false){
-			MessageSender.send(ChatColor.RED, p, "You are not on a team!");
+			MessageSender.send(ChatColor.RED, p, "You are not on a team.");
 			return true;
 		}
 
 		else if(teamM.isPlayerOwner(teamM.getTeamOfPlayer(p.getUniqueId()), p.getUniqueId())==false){
-			MessageSender.send(ChatColor.RED, p, "You are not the owner of the team!");
+			MessageSender.send(ChatColor.RED, p, "You are not the owner of the team.");
 			return true;
 		}
 		else if(args.length==0){
-			MessageSender.send(ChatColor.RED, p, "Please specify a player!");
+			MessageSender.send(ChatColor.RED, p, "Please specify a player.");
 			return true;
 		}
 
 		else if(teamM.isPlayerOnline(args[0])==false){
-			MessageSender.send(ChatColor.RED, p, "Player " + args[0].toLowerCase() + " is not online!");
+			MessageSender.send(ChatColor.RED, p, "Player " + args[0].toLowerCase() + " is not online.");
 			return true;
 		}
 		else if(teamM.isPlayerOnTeam(Bukkit.getPlayer(args[0]).getUniqueId())){
-			MessageSender.send(ChatColor.RED, p, "Player " + args[0] + " is already on a team!");
+			MessageSender.send(ChatColor.RED, p, "Player " + args[0] + " is already on a team.");
 			return true;
 		}
 		else{

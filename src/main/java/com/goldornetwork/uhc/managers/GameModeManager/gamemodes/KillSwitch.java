@@ -17,7 +17,7 @@ public class KillSwitch extends Gamemode implements Listener{
 
 	
 	public KillSwitch() {
-		super("Kill Switch", "KillSwitch", "When a player kills another player, that player will switch inventories!");
+		super("Kill Switch", "KillSwitch", "When a player kills another player, that player will switch inventories.");
 	}
 	@Override
 	public void onEnable() {}

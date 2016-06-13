@@ -472,7 +472,7 @@ public class TeamManager implements Listener{
 		if(invitedPlayers.containsKey(team)){
 			for(UUID u: invitedPlayers.get(team)){
 				if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
-					MessageSender.alertMessage(Bukkit.getServer().getPlayer(u),ChatColor.RED, "Your invitation to team " + getColorOfTeam(team) + getTeamNameProper(team) + ChatColor.RED + " has been revoked!");
+					MessageSender.alertMessage(Bukkit.getServer().getPlayer(u),ChatColor.RED, "Your invitation to team " + getColorOfTeam(team) + getTeamNameProper(team) + ChatColor.RED + " has been revoked.");
 				}
 			}
 			invitedPlayers.remove(team);

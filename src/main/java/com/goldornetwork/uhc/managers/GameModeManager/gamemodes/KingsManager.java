@@ -41,7 +41,7 @@ public class KingsManager extends Gamemode implements Listener{
 	private List<UUID> currentlyDebuffed = new ArrayList<UUID>();
 	
 	public KingsManager(TeamManager teamM) {
-		super("Kings", "Kings", "A random player on a team will receive special powers, and when that player dies, all his teamates shall suffer!");
+		super("Kings", "Kings", "A random player on a team will receive special powers, and when that player dies, all his teamates shall suffer.");
 		this.teamM=teamM;
 	}
 	@Override
@@ -68,7 +68,7 @@ public class KingsManager extends Gamemode implements Listener{
 						removePlayerFromLateKings(p);
 					}
 					if(lateDebuffs.contains(p.getUniqueId())){
-						MessageSender.alertMessage(p, ChatColor.RED, "Your king has died! You shall now suffer!");
+						MessageSender.alertMessage(p, ChatColor.RED, "Your king has died. You shall now suffer!");
 						p.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, Integer.MAX_VALUE, 0));
 						currentlyDebuffed.add(p.getUniqueId());
 						lateDebuffs.remove(p.getUniqueId());
@@ -105,7 +105,7 @@ public class KingsManager extends Gamemode implements Listener{
 			if(Bukkit.getServer().getPlayer(u).isOnline()){
 				Bukkit.getServer().getPlayer(u).addPotionEffect(new PotionEffect(PotionEffectType.WITHER, Integer.MAX_VALUE, 0));
 				currentlyDebuffed.add(u);
-				MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.RED, "Your king has died! You shall now suffer!");
+				MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.RED, "Your king has died. You shall now suffer!");
 			}
 			else{
 				lateDebuffs.add(u);

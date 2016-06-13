@@ -62,7 +62,7 @@ public class MessageSender {
 	}
 	
 	public static void noConsole(CommandSender sender){
-		sender.sendMessage(getPrefix() + ChatColor.RED + "Console cannot run this command!"); 
+		sender.sendMessage(getPrefix() + ChatColor.RED + "Console cannot run this command."); 
 	}
 	
 	public static void alertMessage(Player p, String msg){

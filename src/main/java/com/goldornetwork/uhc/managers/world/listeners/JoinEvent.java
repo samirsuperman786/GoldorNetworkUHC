@@ -40,7 +40,7 @@ public class JoinEvent implements Listener{
 		if(State.getState().equals(State.OPEN)){
 			if(teamM.isPlayerInGame(p.getUniqueId())==false){
 				if(teamM.isTeamsEnabled()){
-					MessageSender.alertMessage(p, ChatColor.RED, "You are currently not on a team! Use /create");
+					MessageSender.alertMessage(p, ChatColor.RED, "You are currently not on a team. Use /create");
 				}
 			}
 		}

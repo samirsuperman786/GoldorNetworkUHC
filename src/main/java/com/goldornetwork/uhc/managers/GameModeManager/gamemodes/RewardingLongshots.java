@@ -22,7 +22,7 @@ public class RewardingLongshots extends Gamemode implements Listener{
 	private TeamManager teamM;
 	
 	public RewardingLongshots(TeamManager teamM) {
-		super("Rewarding Longshots", "RewardingLongshots", "Players get higher rewards for longer shots!");
+		super("Rewarding Longshots", "RewardingLongshots", "Players get higher rewards for longer shots.");
 		this.teamM=teamM;
 	}
 	
@@ -58,22 +58,15 @@ public class RewardingLongshots extends Gamemode implements Listener{
 		
 		if(distance > 60 && distance < 100){
 			shooter.getInventory().addItem(new ItemStack(Material.GOLD_INGOT,1));
-			send(shooter, target, distance);
 		}
 		else if(distance>= 100 && distance < 160){
 			shooter.getInventory().addItem(new ItemStack(Material.DIAMOND,1));
-			send(shooter, target, distance);
 		}
 		else if(distance>= 160){
 			shooter.getInventory().addItem(new ItemStack(Material.DIAMOND,2));
-			send(shooter, target, distance);
 		}
 	}
 	
-	private void send(Player shooter, Player target, int distance){
-		MessageSender.send(ChatColor.GREEN, shooter, "You hit " + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName() + ChatColor.GREEN +  " at a distance of " + ChatColor.GRAY + distance + ChatColor.GREEN + " blocks!");
-		MessageSender.send(ChatColor.RED, target, "You got shot from a distance of " + ChatColor.GRAY + distance + ChatColor.RED + " blocks!");
-	}
 
 	
 }

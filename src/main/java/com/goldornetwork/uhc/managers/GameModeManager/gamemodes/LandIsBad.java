@@ -26,7 +26,7 @@ public class LandIsBad extends Gamemode implements Listener{
 	private Map<UUID, BukkitTask> playersToDamage= new HashMap<UUID, BukkitTask>();
 
 	public LandIsBad(UHC plugin, TeamManager teamM) {
-		super("Land is Bad", "LandIsBad", "After PVP is enabled, players who are not underwater will take a heart of damage every ten seconds!");
+		super("Land is Bad", "LandIsBad", "After PVP is enabled, players who are not underwater will take a heart of damage every ten seconds.");
 		this.plugin=plugin;
 		this.teamM=teamM;
 	}
@@ -53,7 +53,7 @@ public class LandIsBad extends Gamemode implements Listener{
 						if(p.getRemainingAir()!=p.getMaximumAir()){
 							p.setRemainingAir(p.getMaximumAir()-1);
 							if(playersToDamage.containsKey(u)){
-								MessageSender.send(ChatColor.GREEN, Bukkit.getServer().getPlayer(u), "You are now breathing water!");
+								MessageSender.send(ChatColor.GREEN, Bukkit.getServer().getPlayer(u), "You are now breathing water.");
 								playersToDamage.get(u).cancel();
 								playersToDamage.remove(u);
 							}
@@ -65,7 +65,7 @@ public class LandIsBad extends Gamemode implements Listener{
 									public void run() {
 										if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
 											Bukkit.getServer().getPlayer(u).damage(2);
-											MessageSender.send(ChatColor.RED, Bukkit.getServer().getPlayer(u), "Get to water!");
+											MessageSender.send(ChatColor.RED, Bukkit.getServer().getPlayer(u), "Get to water.");
 										}
 									}
 

@@ -45,14 +45,13 @@ public class InfoCommand extends UHCCommand{
 
 	private List<String> getMessage(){
 		List<String> toReturn = new LinkedList<String>();
-		toReturn.add(ChatColor.BLUE + "---------------");
 		if(gamemodeM.getEnabledGamemodes() != null){
-			toReturn.add(ChatColor.LIGHT_PURPLE + "--Enabled Gamemodes--");
+			toReturn.add(ChatColor.GOLD + "--Enabled Gamemodes--");
 			for(Gamemode game : gamemodeM.getEnabledGamemodes()){
 				toReturn.add(ChatColor.AQUA + game.getProperName() + ": " + ChatColor.DARK_AQUA + game.getDescription());
 			}
 		}
-		toReturn.add(ChatColor.LIGHT_PURPLE + "For a specific gamemode -> " + ChatColor.BLUE + "/info " + ChatColor.AQUA + "[gamemode]");
+		toReturn.add(ChatColor.LIGHT_PURPLE + "For a specific gamemode -> " + ChatColor.GOLD + "/info " + ChatColor.AQUA + "[gamemode]");
 		return toReturn;
 	}
 	@Override

@@ -32,7 +32,7 @@ public class VoteCommand extends UHCCommand{
 		else if(State.getState().equals(State.OPEN)){
 			Player p = (Player) sender;
 			if(voteM.isActive()==false){
-				MessageSender.send(ChatColor.RED, p, "No poll currently open!");
+				MessageSender.send(ChatColor.RED, p, "No poll currently open.");
 				return true;
 			}
 			else if(args.length==1){
@@ -40,7 +40,7 @@ public class VoteCommand extends UHCCommand{
 					int input = Integer.valueOf(args[0]);
 					if(voteM.isValidOption(input)){
 						if(voteM.hasVoted(p)){
-							MessageSender.send(ChatColor.RED, p, "You have already voted!");
+							MessageSender.send(ChatColor.RED, p, "You have already voted.");
 							return true;
 						}
 						voteM.addVote(p, input);
@@ -48,12 +48,12 @@ public class VoteCommand extends UHCCommand{
 						return true;
 					}
 					else{
-						MessageSender.send(ChatColor.RED, sender, args[0] + " is not a valid option!");
+						MessageSender.send(ChatColor.RED, sender, args[0] + " is not a valid option.");
 						return true;
 					}
 				}
 				else{
-					MessageSender.send(ChatColor.RED, sender, "Please use a number!");
+					MessageSender.send(ChatColor.RED, sender, "Please use a number.");
 					return false;
 				}
 			}
@@ -62,7 +62,7 @@ public class VoteCommand extends UHCCommand{
 			}
 		}
 		else{
-			MessageSender.send(ChatColor.RED, sender, "No poll currently open!");
+			MessageSender.send(ChatColor.RED, sender, "No poll currently open.");
 			return true;
 		}
 		

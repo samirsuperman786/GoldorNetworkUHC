@@ -28,7 +28,7 @@ public class HealthCommand extends UHCCommand {
 		}
 		else if(args.length==1){
 			if(teamM.isPlayerOnline(args[0])==false){
-				MessageSender.send(ChatColor.RED, sender, "Player " + args[0].toLowerCase() + " is not online!");
+				MessageSender.send(ChatColor.RED, sender, "Player " + args[0].toLowerCase() + " is not online.");
 				return true;
 			}
 			

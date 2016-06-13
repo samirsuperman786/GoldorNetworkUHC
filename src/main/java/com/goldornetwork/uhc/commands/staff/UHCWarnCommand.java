@@ -29,12 +29,12 @@ public class UHCWarnCommand extends UHCCommand{
 			return true;
 		}
 		else if(args.length==0){
-			MessageSender.send(ChatColor.RED, banner, "Please specify a player!");
+			MessageSender.send(ChatColor.RED, banner, "Please specify a player.");
 			return true;
 		}
 
 		else if(Bukkit.getOfflinePlayer(args[0]).isOnline()==false){
-			MessageSender.send(ChatColor.RED, banner, "Player " + args[0].toLowerCase() + " is not online!");
+			MessageSender.send(ChatColor.RED, banner, "Player " + args[0].toLowerCase() + " is not online.");
 			return true;
 		}
 		else if(args.length<=1){

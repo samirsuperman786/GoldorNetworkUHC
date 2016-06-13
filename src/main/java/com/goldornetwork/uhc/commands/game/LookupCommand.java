@@ -73,19 +73,24 @@ public class LookupCommand extends UHCCommand{
 	
 	private List<String> getFormat(String teamToFormat){
 		List<String> toReturn = new LinkedList<String>();
+		List<String> online = new ArrayList<String>();
+		List<String> offline = new ArrayList<String>();
 		String team = teamM.getTeamNameProper(teamToFormat);
 		String header = teamM.getColorOfTeam(team) + "Team " + team + ": ";
 		toReturn.add(header);
 		for(UUID u : teamM.getPlayersOnATeam(team)){
 			if(Bukkit.getOfflinePlayer(u).isOnline()){
 				Player target = Bukkit.getPlayer(u);
-				toReturn.add(PlayerUtils.getPrefix(target) + ChatColor.GREEN + "\u25CF" + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName() + ChatColor.WHITE + ": " + ChatColor.RED + target.getHealth() + "\u2665");
+				online.add(PlayerUtils.getPrefix(target) + ChatColor.GREEN + "\u25CF" + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName() + ChatColor.WHITE + ": " + ChatColor.RED + target.getHealth() + "\u2665");
 			}
 			else{
 				OfflinePlayer target = Bukkit.getOfflinePlayer(u);
-				toReturn.add(PlayerUtils.getPrefix(target) + ChatColor.RED + "\u25CF" + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName());
+				offline.add(PlayerUtils.getPrefix(target) + ChatColor.RED + "\u25CF" + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName());
 			}
 		}
+		toReturn.addAll(online);
+		toReturn.addAll(offline);
+		
 		return toReturn;
 	}
 

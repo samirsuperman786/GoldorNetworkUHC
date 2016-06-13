@@ -109,17 +109,20 @@ public class TimerManager implements Listener{
 			public void run() {
 				if(timeTillMatchStart >0){
 
-					if(timeTillMatchStart>=60 && timeTillMatchStart%60 ==0){
-						MessageSender.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart/60 + ChatColor.GOLD + " minutes");
+					if(timeTillMatchStart>60 && timeTillMatchStart%60 ==0){
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "Match Starting in " + ChatColor.DARK_RED + timeTillMatchStart/60 + ChatColor.DARK_AQUA + " minutes.");
 					}
-					else if(timeTillMatchStart <60 && timeTillMatchStart >=30 &&timeTillMatchStart%10==0){
-						MessageSender.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart + ChatColor.GOLD+ " seconds");
+					else if(timeTillMatchStart <=60 && timeTillMatchStart >=30 &&timeTillMatchStart%10==0){
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "Match Starting in " + ChatColor.DARK_RED + timeTillMatchStart + ChatColor.DARK_AQUA + " seconds.");
 					}
 					else if(timeTillMatchStart <=30 && timeTillMatchStart >=5 && timeTillMatchStart %5==0){
-						MessageSender.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart + ChatColor.GOLD+ " seconds");
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "Match Starting in " + ChatColor.DARK_RED + timeTillMatchStart + ChatColor.DARK_AQUA + " seconds.");
 					}
-					else if(timeTillMatchStart <= 5 && timeTillMatchStart >0){
-						MessageSender.broadcast("Match Starting in " + ChatColor.GRAY + timeTillMatchStart +ChatColor.GOLD+ " seconds");		
+					else if(timeTillMatchStart <= 5 && timeTillMatchStart >1){
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "Match Starting in " + ChatColor.DARK_RED + timeTillMatchStart +ChatColor.DARK_AQUA + " seconds.");		
+					}
+					else if(timeTillMatchStart==1){
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "Match Starting in " + ChatColor.DARK_RED + timeTillMatchStart +ChatColor.DARK_AQUA + " second.");
 					}
 					timeTillMatchStart--;
 
@@ -138,7 +141,6 @@ public class TimerManager implements Listener{
 							all.teleport(worldM.getCenter());
 						}
 					}
-					//pvpTimer();
 					cancel();
 
 				}
@@ -165,28 +167,31 @@ public class TimerManager implements Listener{
 			public void run() {
 				if(timeTillPVPStart>0){
 					if(timeTillPVPStart >= (5*60) && timeTillPVPStart % (5*60) == 0){
-						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart/60 + ChatColor.GOLD + " minutes");
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "PVP will be enabled in " + ChatColor.DARK_RED + timeTillPVPStart/60 + ChatColor.GOLD + " minutes.");
 					}
 					if(timeTillPVPStart== (299)){
 						scatterM.prePVPSetup();
 					}
-					else if(timeTillPVPStart<= (4*60) && timeTillPVPStart >= (1*60) && timeTillPVPStart % (1*60) ==0){
-						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart/60 + ChatColor.GOLD + " minute(s)");
+					else if(timeTillPVPStart<= (4*60) && timeTillPVPStart > (1*60) && timeTillPVPStart % (1*60) ==0){
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "PVP will be enabled in " + ChatColor.DARK_RED + timeTillPVPStart/60 + ChatColor.DARK_AQUA + " minutes.");
 					}
-					else if(timeTillPVPStart < 60 && timeTillPVPStart >=30 &&timeTillPVPStart%10==0){
-						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart + ChatColor.GOLD + " seconds");
+					else if(timeTillPVPStart <= 60 && timeTillPVPStart >=30 &&timeTillPVPStart%10==0){
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "PVP will be enabled in " + ChatColor.DARK_RED + timeTillPVPStart + ChatColor.DARK_AQUA + " seconds.");
 					}
 					else if(timeTillPVPStart <=30 && timeTillPVPStart >=5 && timeTillPVPStart %5==0){
-						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart + ChatColor.GOLD + " seconds");
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "PVP will be enabled in " + ChatColor.DARK_RED + timeTillPVPStart + ChatColor.DARK_AQUA + " seconds.");
 					}
-					else if(timeTillPVPStart <= 5 && timeTillPVPStart >0){
-						MessageSender.broadcast("PVP will be enabled in " + ChatColor.GRAY + timeTillPVPStart + ChatColor.GOLD + " second(s)");		
+					else if(timeTillPVPStart <= 5 && timeTillPVPStart >1){
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "PVP will be enabled in " + ChatColor.DARK_RED + timeTillPVPStart + ChatColor.DARK_AQUA + " seconds.");		
+					}
+					else if(timeTillPVPStart==1){
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "PVP will be enabled in " + ChatColor.DARK_RED + timeTillPVPStart + ChatColor.DARK_AQUA + " second.");
 					}
 					timeTillPVPStart--;
 				}
 				else if(timeTillPVPStart==0){
 					Bukkit.getPluginManager().callEvent(new PVPEnableEvent());
-					MessageSender.broadcast("PVP has been enabled!");
+					MessageSender.broadcast("PVP has been enabled.");
 					MessageSender.broadcastTitle(ChatColor.GOLD + "Meetup is now!", ChatColor.RED + "Get moving to (0, 0)");
 					cancel();
 				}

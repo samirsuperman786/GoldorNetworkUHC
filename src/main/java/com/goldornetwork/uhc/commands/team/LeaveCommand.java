@@ -29,7 +29,7 @@ public class LeaveCommand extends UHCCommand{
 			return true;
 		}
 		else if(teamM.isPlayerOnTeam(p.getUniqueId())==false){
-			MessageSender.send(ChatColor.RED, sender, "You are not on a team");
+			MessageSender.send(ChatColor.RED, sender, "You are not on a team.");
 			return true;
 		}
 		else if(args.length==0){

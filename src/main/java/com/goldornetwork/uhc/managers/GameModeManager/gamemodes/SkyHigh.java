@@ -29,14 +29,14 @@ public class SkyHigh extends Gamemode implements Listener{
 
 	//instances
 	private TeamManager teamM;
-	
+
 	//storage
 	private Map<UUID, BukkitTask> playersToDamage= new HashMap<UUID, BukkitTask>();
 	private List<UUID> lateSkyHigh = new ArrayList<UUID>();
 	UHC plugin;
-	
+
 	public SkyHigh(UHC plugin, TeamManager teamM) {
-		super("Sky High", "SkyHigh", "After PVP, players who are not above y=100 will take a heart of damage every 30 seconds!");
+		super("Sky High", "SkyHigh", "After PVP, players who are not above y=100 will take a heart of damage every 30 seconds.");
 		this.plugin=plugin;
 		this.teamM=teamM;
 	}
@@ -44,15 +44,15 @@ public class SkyHigh extends Gamemode implements Listener{
 	public void onEnable() {
 		playersToDamage.clear();
 		lateSkyHigh.clear();
-		
+
 	}
 	@Override
 	public void onDisable() {}
-	
+
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(GameStartEvent e){
 		distributeItems();
-		
+
 	}
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(PVPEnableEvent e){
@@ -62,7 +62,7 @@ public class SkyHigh extends Gamemode implements Listener{
 			public void run() {
 				runTask();
 			}
-			
+
 		}, 0L, 20L);
 	}
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -78,7 +78,7 @@ public class SkyHigh extends Gamemode implements Listener{
 	private void removePlayerFromLateSkyHigh(Player p){
 		lateSkyHigh.remove(p.getUniqueId());
 	}
-	
+
 	private void giveAPlayerSkyHighItems(Player p){
 		p.getInventory().addItem(new ItemStack(Material.DIAMOND_SPADE, 1));
 		p.getInventory().addItem(new ItemStack(Material.PUMPKIN, 10));
@@ -87,38 +87,45 @@ public class SkyHigh extends Gamemode implements Listener{
 		p.getInventory().addItem(new ItemStack(Material.SNOW_BLOCK, 64));
 		p.getInventory().addItem(new ItemStack(Material.STRING, 2));
 	}
-	
+
 	private void runTask(){
-			for(UUID u : teamM.getPlayersInGame()){
-				if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
+		for(UUID u : teamM.getPlayersInGame()){
+			if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
 				if(Bukkit.getServer().getPlayer(u).getLocation().getBlockY()<=100){
 					if(playersToDamage.containsKey(u)==false){
 						BukkitTask task = plugin.getServer().getScheduler().runTaskTimer(plugin, new Runnable(){
 							@Override
 							public void run() {
-								if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
-									Bukkit.getServer().getPlayer(u).damage(2);
-									MessageSender.send(ChatColor.RED, Bukkit.getServer().getPlayer(u), "You are below Y: 101");
+								if(teamM.isPlayerInGame(u)){
+									if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
+										Bukkit.getServer().getPlayer(u).damage(2);
+										MessageSender.send(ChatColor.RED, Bukkit.getServer().getPlayer(u), "You are below Y: 101");
+									}
 								}
-								
+
 							}
-							
+
 						}, 0L, 600L);
 						playersToDamage.put(u, task);
 					}
 				}
 				else if(Bukkit.getServer().getPlayer(u).getLocation().getBlockY()>=101){
 					if(playersToDamage.containsKey(u)){
-						MessageSender.send(ChatColor.GREEN, Bukkit.getServer().getPlayer(u), "You are now above Y: 100");
-						playersToDamage.get(u).cancel();
-						playersToDamage.remove(u);
+						if(teamM.isPlayerInGame(u)){
+							MessageSender.send(ChatColor.GREEN, Bukkit.getServer().getPlayer(u), "You are now above Y: 100");
+							playersToDamage.get(u).cancel();
+							playersToDamage.remove(u);
+						}
+						else{
+							playersToDamage.remove(u);
+						}
 					}
 				}
 			}
 		}
-		
+
 	}
-	
+
 	private void distributeItems(){
 		for(UUID u : teamM.getPlayersInGame()){
 			if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
@@ -130,5 +137,5 @@ public class SkyHigh extends Gamemode implements Listener{
 			}
 		}
 	}
-	
+
 }

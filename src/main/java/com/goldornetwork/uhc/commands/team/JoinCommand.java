@@ -29,7 +29,7 @@ public class JoinCommand extends UHCCommand {
 			return true;
 		}
 		else if(State.getState().equals(State.INGAME)){
-			MessageSender.send(ChatColor.RED, p, "Match has already started!");
+			MessageSender.send(ChatColor.RED, p, "Match has already started.");
 			return true;
 		}
 		else if(State.getState().equals(State.OPEN)==false){
@@ -37,7 +37,7 @@ public class JoinCommand extends UHCCommand {
 			return true;
 		}
 		else if(teamM.isPlayerInGame(p.getUniqueId())){
-			MessageSender.send(ChatColor.RED, sender, "You are already on a team");
+			MessageSender.send(ChatColor.RED, sender, "You are already on a team.");
 			return true;
 		}
 

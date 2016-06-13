@@ -127,7 +127,7 @@ public class ChatManager implements Listener{
 
 	public void unMutePlayers(){
 		mutePlayers= false;
-		MessageSender.broadcast("Chat has been unmuted!");
+		MessageSender.broadcast("Chat has been unmuted.");
 	}
 
 	public void pmPlayer(Player sender, Player target, String msg){

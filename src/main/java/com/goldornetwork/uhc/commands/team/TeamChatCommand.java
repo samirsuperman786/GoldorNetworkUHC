@@ -47,17 +47,17 @@ public class TeamChatCommand extends UHCCommand{
 					
 				}
 				else{
-					MessageSender.send(ChatColor.RED, p, "You are not on a team!");
+					MessageSender.send(ChatColor.RED, p, "You are not on a team.");
 					return true;
 				}
 			}
 			else{
-				MessageSender.send(ChatColor.RED, p, "You are not in the game!");
+				MessageSender.send(ChatColor.RED, p, "You are not in the game.");
 				return true;
 			}
 		}
 		else if(teamM.isTeamsEnabled()==false){
-			MessageSender.send(ChatColor.RED, p, "Teams are not enabled!");
+			MessageSender.send(ChatColor.RED, p, "Teams are not enabled.");
 			return true;
 		}
 		else{

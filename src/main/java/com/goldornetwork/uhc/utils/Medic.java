@@ -45,8 +45,11 @@ public class Medic implements Listener {
 					cancel();
 				}
 				else if(timeTillHeal>0){
-					if(timeTillHeal<=5){
-						MessageSender.broadcast(ChatColor.GOLD + "Final heal in " + ChatColor.GRAY + timeTillHeal);
+					if(timeTillHeal<=5 && timeTillHeal>1){
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "Final heal in " + ChatColor.DARK_RED + timeTillHeal + ChatColor.DARK_AQUA + " seconds.");
+					}
+					else if(timeTillHeal==1){
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "Final heal in " + ChatColor.DARK_RED + timeTillHeal + ChatColor.DARK_AQUA + " second.");
 					}
 				}
 				timeTillHeal--;

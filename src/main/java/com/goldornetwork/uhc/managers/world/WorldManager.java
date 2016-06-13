@@ -16,6 +16,7 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
@@ -23,6 +24,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
@@ -181,7 +183,7 @@ public class WorldManager implements Listener{
 	public void endGame(List<UUID> winners){
 		List<String> toBroadcast = new LinkedList<String>();
 
-		toBroadcast.add("Game has ended, thanks for playing!");
+		toBroadcast.add("Game has ended, thanks for playing.");
 		MessageSender.broadcast(toBroadcast);
 		new BukkitRunnable() {
 
@@ -338,4 +340,33 @@ public class WorldManager implements Listener{
 	public Location getCenter(){
 		return uhcWorld.getSpawnLocation();
 	}
+	
+	
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void on(EntityDamageByEntityEvent e){
+		if(State.getState().equals(State.INGAME)){
+			if(e.getEntity() instanceof Player){
+				if(e.getDamager() instanceof Arrow){
+					Arrow arrow = (Arrow) e.getDamager();
+					if(arrow.getShooter() instanceof Player){
+						Player target = (Player) e.getEntity();
+						Player shooter = (Player) arrow.getShooter();
+						if(teamM.isPlayerInGame(target.getUniqueId()) && teamM.isPlayerInGame(shooter.getUniqueId())){
+							send(shooter, target);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	private void send(Player shooter, Player target){
+		Location shooterLocation = shooter.getLocation();
+		Location targetLocation = target.getLocation();
+		int distance = (int) shooterLocation.distance(targetLocation);
+		MessageSender.send(ChatColor.GREEN, shooter, "You hit " + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName() + ChatColor.GREEN +  " at a distance of " + ChatColor.GRAY + distance + ChatColor.GREEN + " blocks.");
+		MessageSender.send(ChatColor.RED, target, "You got shot from a distance of " + ChatColor.GRAY + distance + ChatColor.RED + " blocks.");
+	}
+	
+	
 }

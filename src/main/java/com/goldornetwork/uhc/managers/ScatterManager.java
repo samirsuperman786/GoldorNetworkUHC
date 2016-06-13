@@ -585,11 +585,19 @@ public class ScatterManager implements Listener{
 				Bukkit.getPluginManager().callEvent(new GameStartEvent());
 				State.setState(State.INGAME);
 				moveE.unfreezePlayers();
-				MessageSender.broadcast("Scattering complete!");
-				chatM.unMutePlayers();
+				MessageSender.broadcast("Scattering complete.");
+				
 				for(Player online: Bukkit.getServer().getOnlinePlayers()){
 					online.setHealth(online.getHealth());
 				}
+				new BukkitRunnable() {
+					
+					@Override
+					public void run() {
+						chatM.unMutePlayers();
+					}
+				}.runTaskLater(plugin, 60L);
+				
 
 			}
 		}.runTaskLater(plugin, 100L);
@@ -599,7 +607,7 @@ public class ScatterManager implements Listener{
 	public void prePVPSetup(){
 		worldM.getUHCWorld().setTime(0);
 		worldM.getUHCWorld().setGameRuleValue("dodaylightcycle", "false");
-
+		MessageSender.broadcast("Permanent day enabled.");
 	}
 
 }

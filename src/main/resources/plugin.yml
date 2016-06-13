@@ -6,57 +6,58 @@ description: This is property of GoldorNetwork.
 version: 1.1
 commands:
    start:
-      description: Use this to start the match!
+      description: Use this to start the match.
       usage: /<command> 
    create:
-      description: Use this to create a team!
+      description: Use this to create a team.
       usage: /<command> 
    join:
-      description: Use this to join a team!
+      description: Use this to join a team.
       usage: /<command> [team] 
       aliases: [j]
    kick:
       description: Use this to kick a team mate.
       usage: /<command> [option] 
    leave:
-      description: Use this to leave a team or the game!
+      description: Use this to leave a team or the game.
       usage: /<command> [option] 
    invite:
-      description: Use this to invite a player to your team!
+      description: Use this to invite a player to your team.
       usage: /<command> [player]  
       aliases: [i]
    uninvite:
-      description: Use this to uninvite a player to your team!
+      description: Use this to uninvite a player to your team.
       usage: /<command> [player]
       aliases: [ui] 
    vote:
-      description: Use this to vote for a poll!
+      description: Use this to vote for a poll.
       usage: /<command> [option] 
    health:
-      description: Use this to get the health of a player!
+      description: Use this to get the health of a player.
       usage: /<command> [player] 
+      aliases: [h] 
    lookup:
-      description: Use this to lookup a team!
+      description: Use this to lookup a team.
       usage: /<command> [team]
       aliases: [l]
    info:
-      description: Use this to learn the gamemodes!
+      description: Use this to learn the gamemodes.
       usage: /<command> [gamemode] 
    pmc:
-      description: Use this to message your coordinates!
+      description: Use this to message your coordinates.
       usage: /<command>
    pmt:
-      description: Use this to only talk to your team!
+      description: Use this to only talk to your team.
       usage: /<command> [message]
       aliases: [t] 
    helpop:
-      description: Use this to talk to the moderators and admins!
+      description: Use this to talk to the moderators and admins.
       usage: /<command> [message]
    help:
-      description: Use this to understand commands!
-      usage: /<command> [query]
+      description: Use this to understand commands.
+      usage: /<command> [query] 
    playerban:
-      description: Use this to talk to the moderators and admins!
+      description: Use this to talk to the moderators and admins.
       usage: /<command> [player] [reason]
       aliases: [pban, pb]
    warn:

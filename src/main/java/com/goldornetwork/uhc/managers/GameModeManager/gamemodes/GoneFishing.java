@@ -28,7 +28,7 @@ public class GoneFishing extends Gamemode implements Listener {
 	private List <UUID> lateGoneFishing = new ArrayList<UUID>();
 	
 	public GoneFishing(TeamManager teamM) {
-		super("Gone Fishing", "GoneFishing", "Players spawn with infinite levels, 20 anvils, a fishing rod with: Luck of the Sea 250, Lure 250, and Unbreaking 150. Caution: Enchantment tables are disabled!");
+		super("Gone Fishing", "GoneFishing", "Players spawn with infinite levels, 20 anvils, a fishing rod with: Luck of the Sea 250, Lure 250, and Unbreaking 150. Caution: Enchantment tables are disabled.");
 		this.teamM=teamM;
 	}
 	

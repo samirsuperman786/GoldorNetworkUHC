@@ -33,25 +33,25 @@ public class UnInvitePlayerCommand extends UHCCommand {
 		}
 
 		else if(teamM.isTeamsEnabled()==false){
-			MessageSender.send(ChatColor.RED, p, "Teams are not enabled!");
+			MessageSender.send(ChatColor.RED, p, "Teams are not enabled.");
 			return true;
 		}
 
 		else if(State.getState().equals(State.INGAME)){
-			MessageSender.send(ChatColor.RED, p, "Match has already started!");
+			MessageSender.send(ChatColor.RED, p, "Match has already started.");
 			return true;
 		}
 		else if(teamM.isPlayerInGame(p.getUniqueId())==false){
-			MessageSender.send(ChatColor.RED, p, "You are not on a team!");
+			MessageSender.send(ChatColor.RED, p, "You are not on a team.");
 			return true;
 		}
 
 		else if(teamM.getOwnerOfTeam(teamM.getTeamOfPlayer(p.getUniqueId()))!=p.getUniqueId()){
-			MessageSender.send(ChatColor.RED, p, "You are not the owner of the team!");
+			MessageSender.send(ChatColor.RED, p, "You are not the owner of the team.");
 			return true;
 		}
 		else if(args.length==0){
-			MessageSender.send(ChatColor.RED, p, "Please specify a player!");
+			MessageSender.send(ChatColor.RED, p, "Please specify a player.");
 			return true;
 		}
 
