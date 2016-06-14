@@ -66,6 +66,7 @@ public class ScatterManager implements Listener{
 	private boolean teleported;
 	private boolean lateScatterComplete;
 	private int radius;
+	private final int BUFFER_BLOCKS = 20;
 	private int timer;
 	private BlockFace[] faces = new BlockFace[] {
 			BlockFace.SELF, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, 
@@ -347,12 +348,13 @@ public class ScatterManager implements Listener{
 		return radius;
 	}
 
-	private CoordXZ randomLocation(World world, int radius){
+	private CoordXZ randomLocation(World world, int initialRadius){
 		Random random = new Random();
+		int radius = (initialRadius - BUFFER_BLOCKS);
 		int x = random.nextInt(radius * 2) - radius;
 		int z = random.nextInt(radius * 2) - radius;
-		x= x+ worldM.getCenter().getBlockX();
-		z= z+ worldM.getCenter().getBlockZ();
+		x = x + worldM.getCenter().getBlockX();
+		z = z + worldM.getCenter().getBlockZ();
 		return new CoordXZ(x, z);
 	}
 
