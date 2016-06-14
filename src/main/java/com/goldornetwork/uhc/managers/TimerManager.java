@@ -145,9 +145,7 @@ public class TimerManager implements Listener{
 
 				}
 
-				else if(timeTillMatchStart==-1){
-					cancel();
-				}
+				
 			}
 		}.runTaskTimer(plugin, 0L, 20L);
 	}
@@ -201,16 +199,6 @@ public class TimerManager implements Listener{
 	}
 
 
-	/**
-	 * When called, this cancels the timer till match starts
-	 * @see countdownTimer()
-	 */
-	public void cancelMatch(){
-		MessageSender.broadcast("Match canceled");
-		timeTillMatchStart=-1;
-		State.setState(State.NOT_RUNNING);
-		teamM.setup();
-	}
 
 	/**
 	 * Used to check if the match has started 
