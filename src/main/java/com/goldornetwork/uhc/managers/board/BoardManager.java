@@ -15,6 +15,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -43,7 +45,9 @@ public class BoardManager implements Listener{
 	private Map<String, Team> teamScoreBoards = new HashMap<String, Team>();
 	private Map<String, Objective> teamHeaders = new HashMap<String, Objective>();
 	private Map<UUID, String> teamOfPlayer = new HashMap<UUID, String>();
-
+	
+	private List<UUID> invisible = new ArrayList<UUID>();
+	
 	//scoreboard
 	private Objective header;
 
@@ -63,7 +67,7 @@ public class BoardManager implements Listener{
 			all.setScoreboard(mainBoard);
 			all.setPlayerListName(ChatColor.stripColor(all.getName()));
 		}
-
+		invisibleChecker();
 	}
 
 	private void initializeInfo(Objective header){
@@ -131,7 +135,7 @@ public class BoardManager implements Listener{
 		newTeam.setCanSeeFriendlyInvisibles(true);
 		newTeam.setAllowFriendlyFire(false);
 		newTeam.setPrefix(ChatColor.GREEN + "");
-
+		
 		Team otherPlayers = teamBoard.registerNewTeam("others");
 		otherPlayers.setPrefix(ChatColor.RED + "");
 
@@ -157,6 +161,63 @@ public class BoardManager implements Listener{
 		activeTeams.add(newTeam);
 		return teamBoard;
 
+	}
+	
+	private void invisibleChecker(){
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				for(Player online : Bukkit.getOnlinePlayers()){
+					if(invisible.contains(online.getUniqueId())==false){
+						if(teamM.isPlayerInGame(online.getUniqueId())){
+							for(PotionEffect effect : online.getActivePotionEffects()){
+								if(effect.getType().equals(PotionEffectType.INVISIBILITY)){
+									invisible.add(online.getUniqueId());
+									playerIsInvisible(online.getUniqueId());
+								}
+							}
+						}
+					}
+					
+				}
+				
+				for(UUID invis : invisible){
+					if(plugin.getServer().getOfflinePlayer(invis).isOnline()){
+						Player target = plugin.getServer().getPlayer(invis);
+						boolean hasInvis = false;
+						for(PotionEffect effect : target.getActivePotionEffects()){
+							if(effect.getType().equals(PotionEffectType.INVISIBILITY)){
+								hasInvis = true;
+							}
+						}
+						if(hasInvis==false){
+							invisible.remove(target.getUniqueId());
+							playerIsVisible(invis);
+						}
+					}
+				}
+				
+			}
+		}.runTaskTimer(plugin, 0L, 20L);
+	}
+	
+	
+	private void playerIsInvisible(UUID u){
+		for(Team team : activeTeams){
+			if(!(team.equals(teamScoreBoards.get(teamM.getTeamOfPlayer(u))))){
+				team.getScoreboard().getTeam("others").removePlayer(Bukkit.getOfflinePlayer(u));
+			}
+		}
+		
+	}
+	
+	private void playerIsVisible(UUID u){
+		for(Team team : activeTeams){
+			if(!(team.equals(teamScoreBoards.get(teamM.getTeamOfPlayer(u))))){
+				team.getScoreboard().getTeam("others").addPlayer(Bukkit.getOfflinePlayer(u));
+			}
+		}
 	}
 
 	public void addPlayerToObserver(OfflinePlayer p){
