@@ -24,15 +24,21 @@ public class InfoCommand extends UHCCommand{
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if(args.length==0){
-			for(String msg : getMessage()){
-				MessageSender.send(sender, msg);
+			if(getMessage()!=null){
+				for(String msg : getMessage()){
+					MessageSender.send(sender, msg);
+				}
 			}
+			else{
+				MessageSender.send(sender, ChatColor.RED + "No gamemodes currently enabled. Please use /info [gamemode]");
+			}
+
 			return true;
 		}
 		else if(args.length==1){
 			if(gamemodeM.getGamemode(args[0])!=null){
 				Gamemode game = gamemodeM.getGamemode(args[0]);
-				MessageSender.send(sender, ChatColor.AQUA + game.getName() + ": " + ChatColor.DARK_AQUA + game.getDescription());
+				MessageSender.send(sender, ChatColor.AQUA + game.getProperName() + ": " + ChatColor.DARK_AQUA + game.getDescription());
 				return true;
 			}
 			return false;
@@ -40,18 +46,22 @@ public class InfoCommand extends UHCCommand{
 		else{
 			return false;
 		}
-		
+
 	}
 
 	private List<String> getMessage(){
 		List<String> toReturn = new LinkedList<String>();
-		if(gamemodeM.getEnabledGamemodes() != null){
-			toReturn.add(ChatColor.GOLD + "--Enabled Gamemodes--");
+		if(gamemodeM.getEnabledGamemodes().isEmpty()==false){
+			toReturn.add(ChatColor.GOLD + "Enabled Gamemodes: ");
 			for(Gamemode game : gamemodeM.getEnabledGamemodes()){
 				toReturn.add(ChatColor.AQUA + game.getProperName() + ": " + ChatColor.DARK_AQUA + game.getDescription());
 			}
+			toReturn.add(ChatColor.GOLD + "For a specific gamemode -> " + ChatColor.GOLD + "/info " + ChatColor.AQUA + "[gamemode]");
 		}
-		toReturn.add(ChatColor.LIGHT_PURPLE + "For a specific gamemode -> " + ChatColor.GOLD + "/info " + ChatColor.AQUA + "[gamemode]");
+
+		else if(gamemodeM.getEnabledGamemodes().isEmpty()){
+			return null;
+		}
 		return toReturn;
 	}
 	@Override

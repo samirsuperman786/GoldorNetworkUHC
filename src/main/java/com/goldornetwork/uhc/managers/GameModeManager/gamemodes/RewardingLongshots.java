@@ -1,6 +1,5 @@
 package com.goldornetwork.uhc.managers.GameModeManager.gamemodes;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
@@ -14,7 +13,6 @@ import org.bukkit.inventory.ItemStack;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
-import com.goldornetwork.uhc.utils.MessageSender;
 
 public class RewardingLongshots extends Gamemode implements Listener{
 	

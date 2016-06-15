@@ -30,7 +30,6 @@ public class TheHobbitManager extends Gamemode implements Listener{
 	//instances
 	private TeamManager teamM;
 
-
 	//storage
 	private List<UUID> lateHobbits = new ArrayList<UUID>();
 

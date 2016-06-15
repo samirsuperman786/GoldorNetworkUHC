@@ -1,5 +1,6 @@
 package com.goldornetwork.uhc.commands.game;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.bukkit.ChatColor;
@@ -70,7 +71,12 @@ public class VoteCommand extends UHCCommand{
 
 	@Override
 	public List<String> tabComplete(CommandSender sender, String[] args) {
-		return null;
+		List<String> toReturn = new LinkedList<String>();
+		
+		for(int i = 0; i<voteM.getNumberOfOptions(); i++){
+			toReturn.add(i + "");
+		}
+		return toReturn;
 	}
 
 }

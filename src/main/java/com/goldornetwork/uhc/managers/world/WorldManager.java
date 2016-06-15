@@ -228,14 +228,17 @@ public class WorldManager implements Listener{
 
 			@Override
 			public void run() {
-				if(timer>=60 && timer%60==0){
-					MessageSender.broadcast(ChatColor.GOLD + "Server closing in " + ChatColor.GRAY + (timer/60) + ChatColor.GOLD + " minute(s)");
+				if(timer>60 && timer%60==0){
+					MessageSender.broadcast(ChatColor.DARK_AQUA + "Server closing in " + ChatColor.DARK_RED + (timer/60) + ChatColor.DARK_AQUA + " minutes.");
 				}
-				else if(timer<60 && timer>=15 && timer%15==0){
-					MessageSender.broadcast(ChatColor.GOLD + "Server closing in " + ChatColor.GRAY + timer + ChatColor.GOLD + " seconds");
+				else if(timer<=60 && timer>=15 && timer%15==0){
+					MessageSender.broadcast(ChatColor.DARK_AQUA + "Server closing in " + ChatColor.DARK_RED + timer + ChatColor.DARK_AQUA + " seconds.");
 				}
-				else if(timer <=5 && timer>0){
-					MessageSender.broadcast(ChatColor.GOLD + "Server closing in " + ChatColor.GRAY + timer + ChatColor.GOLD + " seconds");
+				else if(timer <=5 && timer>1){
+					MessageSender.broadcast(ChatColor.DARK_AQUA + "Server closing in " + ChatColor.DARK_RED + timer + ChatColor.DARK_AQUA + " seconds.");
+				}
+				else if(timer==1){
+					MessageSender.broadcast(ChatColor.DARK_AQUA + "Server closing in " + ChatColor.DARK_RED + timer + ChatColor.DARK_AQUA + " second.");
 				}
 				else if(timer==0){
 					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "stop");
@@ -243,7 +246,7 @@ public class WorldManager implements Listener{
 				--timer;
 			}
 		}.runTaskTimer(plugin, 0L, 20L);
-
+		
 
 	}
 

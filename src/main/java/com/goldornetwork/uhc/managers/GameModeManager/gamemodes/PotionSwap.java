@@ -94,6 +94,7 @@ public class PotionSwap extends Gamemode implements Listener{
 	}
 	
 	private static final Set<PotionEffectType> ValidPotions = ImmutableSet.of(
+			PotionEffectType.ABSORPTION,
 			PotionEffectType.BLINDNESS, 
 			PotionEffectType.CONFUSION,
 			PotionEffectType.DAMAGE_RESISTANCE,

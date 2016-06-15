@@ -45,9 +45,9 @@ public class BoardManager implements Listener{
 	private Map<String, Team> teamScoreBoards = new HashMap<String, Team>();
 	private Map<String, Objective> teamHeaders = new HashMap<String, Objective>();
 	private Map<UUID, String> teamOfPlayer = new HashMap<UUID, String>();
-	
+
 	private List<UUID> invisible = new ArrayList<UUID>();
-	
+
 	//scoreboard
 	private Objective header;
 
@@ -71,7 +71,7 @@ public class BoardManager implements Listener{
 	}
 
 	private void initializeInfo(Objective header){
-		
+
 		Score teamsize = header.getScore(ChatColor.AQUA + "Max Team Size: ");
 		teamsize.setScore(teamM.getTeamSize());
 		updater(teamsize, 20L, new Callable<Integer>() {
@@ -79,22 +79,22 @@ public class BoardManager implements Listener{
 				return teamM.getTeamSize();
 			}
 		});
-		
+
 		Score playersInGame = header.getScore(ChatColor.GOLD + "Players: ");
 		updater(playersInGame, 40L, new Callable<Integer>(){
 			public Integer call(){
 				return teamM.getPlayersInGame().size();
 			}
 		});
-		
+
 		Score teamsLeft = header.getScore(ChatColor.GOLD + "Teams Left: ");
 		updater(teamsLeft, 40L, new Callable<Integer>(){
 			public Integer call(){
 				return teamM.getActiveTeams().size();
 			}
 		});
-		
-		
+
+
 
 		Score currentBorder = header.getScore(ChatColor.AQUA + "Border Radius: ");
 		currentBorder.setScore((int) worldM.getUHCWorld().getWorldBorder().getSize());
@@ -104,9 +104,9 @@ public class BoardManager implements Listener{
 
 			}
 		});
-		
-		
-		
+
+
+
 	}
 	private void initializeObserverBoard() {
 		header = mainBoard.registerNewObjective("header", "dummy");
@@ -135,7 +135,7 @@ public class BoardManager implements Listener{
 		newTeam.setCanSeeFriendlyInvisibles(true);
 		newTeam.setAllowFriendlyFire(false);
 		newTeam.setPrefix(ChatColor.GREEN + "");
-		
+
 		Team otherPlayers = teamBoard.registerNewTeam("others");
 		otherPlayers.setPrefix(ChatColor.RED + "");
 
@@ -146,8 +146,8 @@ public class BoardManager implements Listener{
 		Objective health = teamBoard.registerNewObjective("healthDisplayer", "health");
 		health.setDisplaySlot(DisplaySlot.BELOW_NAME);
 		health.setDisplayName(ChatColor.RED + "\u2665");
-		
-		
+
+
 		initializeInfo(header);
 		Score timeTillMatch = header.getScore(ChatColor.AQUA + "Match starts in: ");
 		updater(timeTillMatch, 20L, 0L, new Callable<Integer>() {
@@ -155,63 +155,77 @@ public class BoardManager implements Listener{
 				return timerM.getTimeTillMatchStart();
 			}
 		});
-		
+
 		teamHeaders.put(team, header);
 		teamScoreBoards.put(team, newTeam);
 		activeTeams.add(newTeam);
 		return teamBoard;
 
 	}
-	
+
 	private void invisibleChecker(){
 		new BukkitRunnable() {
-			
+
 			@Override
 			public void run() {
+				
+				
+				List<UUID> toRemove = new ArrayList<UUID>();
+				for(UUID invis : invisible){
+					if(teamM.isPlayerInGame(invis)){
+						if(plugin.getServer().getOfflinePlayer(invis).isOnline()){
+							Player target = plugin.getServer().getPlayer(invis);
+							boolean hasInvis = false;
+							for(PotionEffect effect : target.getActivePotionEffects()){
+								if(effect.getType().equals(PotionEffectType.INVISIBILITY)){
+									hasInvis = true;
+								}
+							}
+							if(hasInvis==false){
+								playerIsVisible(invis);
+								toRemove.add(target.getUniqueId());
+							}
+						}
+					}
+					else{
+						toRemove.add(invis);
+					}
+
+				}
+				
+				invisible.removeAll(toRemove);
+				
+				List<UUID> toAdd = new ArrayList<UUID>();
+				
 				for(Player online : Bukkit.getOnlinePlayers()){
 					if(invisible.contains(online.getUniqueId())==false){
 						if(teamM.isPlayerInGame(online.getUniqueId())){
 							for(PotionEffect effect : online.getActivePotionEffects()){
 								if(effect.getType().equals(PotionEffectType.INVISIBILITY)){
-									invisible.add(online.getUniqueId());
+									toAdd.add(online.getUniqueId());
 									playerIsInvisible(online.getUniqueId());
 								}
 							}
 						}
 					}
-					
+
 				}
-				
-				for(UUID invis : invisible){
-					if(plugin.getServer().getOfflinePlayer(invis).isOnline()){
-						Player target = plugin.getServer().getPlayer(invis);
-						boolean hasInvis = false;
-						for(PotionEffect effect : target.getActivePotionEffects()){
-							if(effect.getType().equals(PotionEffectType.INVISIBILITY)){
-								hasInvis = true;
-							}
-						}
-						if(hasInvis==false){
-							invisible.remove(target.getUniqueId());
-							playerIsVisible(invis);
-						}
-					}
-				}
-				
+				invisible.addAll(toAdd);
+
 			}
 		}.runTaskTimer(plugin, 0L, 20L);
 	}
-	
-	
+
+
 	private void playerIsInvisible(UUID u){
 		for(Team team : activeTeams){
 			if(!(team.equals(teamScoreBoards.get(teamM.getTeamOfPlayer(u))))){
 				team.getScoreboard().getTeam("others").removePlayer(Bukkit.getOfflinePlayer(u));
 			}
 		}
-		
+
 	}
-	
+
 	private void playerIsVisible(UUID u){
 		for(Team team : activeTeams){
 			if(!(team.equals(teamScoreBoards.get(teamM.getTeamOfPlayer(u))))){
@@ -311,7 +325,7 @@ public class BoardManager implements Listener{
 				return timerM.getTimeTillPVP();
 			}
 		});
-		
+
 		Score spectators = header.getScore(ChatColor.AQUA + "Observers: ");
 		spectators.setScore(teamM.getObservers().size());
 		updater(spectators, 60L, new Callable<Integer>() {
@@ -320,7 +334,7 @@ public class BoardManager implements Listener{
 			}
 		});
 	}
-	
+
 	//updaters
 
 
@@ -347,15 +361,15 @@ public class BoardManager implements Listener{
 
 		try {
 			new BukkitRunnable() {
-				
+
 				int i =expiration.call();
 				String toBlink = score.getEntry();
-				
+
 				@Override
 				public void run() {
-					
+
 					if(i>60){
-						
+
 						double k = i;
 						int toSet = (int) Math.ceil(k/60);
 						score.setScore(toSet);
@@ -377,7 +391,7 @@ public class BoardManager implements Listener{
 					else if(i==0){
 						score.getScoreboard().resetScores(toBlink);
 						cancel();
-						
+
 					}
 					i--;
 
@@ -392,11 +406,11 @@ public class BoardManager implements Listener{
 	@EventHandler
 	public void onUpdate(GameStartEvent e){
 		gameStartInit(this.header);
-		
+
 		for(String team : teamM.getActiveTeams()){
 			Objective header = teamHeaders.get(team);
 			gameStartInit(header);
-			
+
 		}
 
 	}
@@ -409,7 +423,7 @@ public class BoardManager implements Listener{
 				return timerM.getTimeTillMatchStart();
 			}
 		});
-		
+
 	}
 
 

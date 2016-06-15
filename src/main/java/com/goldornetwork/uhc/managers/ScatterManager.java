@@ -26,6 +26,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
@@ -512,7 +514,7 @@ public class ScatterManager implements Listener{
 					Block threeAboveLand = target.getLocation().clone().add(0, 2, 0).getBlock();
 
 					for(BlockFace face : faces){
-						atLand.getRelative(face).setType(Material.GLASS);
+						atLand.getRelative(face).setType(Material.STAINED_GLASS);
 						oneAboveLand.getRelative(face).setType(Material.AIR);
 						twoAboveLand.getRelative(face).setType(Material.AIR);
 						threeAboveLand.getRelative(face).setType(Material.AIR);
@@ -544,6 +546,7 @@ public class ScatterManager implements Listener{
 		p.setBedSpawnLocation(worldM.getCenter());
 		p.setLevel(0);
 		p.setExp(0L);
+		p.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 6200, 0));
 	}
 	/**
 	 * Used to indicate that the player no longer needs to be scattered

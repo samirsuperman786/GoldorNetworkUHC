@@ -32,9 +32,9 @@ public class LandIsBad extends Gamemode implements Listener{
 	}
 	@Override
 	public void onEnable() {
-		
+
 	}
-	
+
 	@EventHandler
 	public void on(PVPEnableEvent e){
 		plugin.getServer().getScheduler().runTaskTimer(plugin, new Runnable(){
@@ -44,37 +44,52 @@ public class LandIsBad extends Gamemode implements Listener{
 			}
 
 		}, 0L, 20L);
-		
+
 	}
 	private void runTask() {
-				for(UUID u : teamM.getPlayersInGame()){
-					if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
-						Player p = Bukkit.getServer().getPlayer(u);
-						if(p.getRemainingAir()!=p.getMaximumAir()){
-							p.setRemainingAir(p.getMaximumAir()-1);
-							if(playersToDamage.containsKey(u)){
-								MessageSender.send(ChatColor.GREEN, Bukkit.getServer().getPlayer(u), "You are now breathing water.");
-								playersToDamage.get(u).cancel();
-								playersToDamage.remove(u);
-							}
+		for(UUID u : teamM.getPlayersInGame()){
+			if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
+				Player p = Bukkit.getServer().getPlayer(u);
+				if(p.getRemainingAir()!=p.getMaximumAir()){
+					p.setRemainingAir(p.getMaximumAir()-1);
+					if(playersToDamage.containsKey(u)){
+						if(teamM.isPlayerInGame(u)){
+							MessageSender.send(ChatColor.GREEN, Bukkit.getServer().getPlayer(u), "You are now breathing water.");
+							playersToDamage.get(u).cancel();
+							playersToDamage.remove(u);
 						}
 						else{
-							if(playersToDamage.containsKey(u)==false){
-								BukkitTask task = plugin.getServer().getScheduler().runTaskTimer(plugin, new Runnable(){
-									@Override
-									public void run() {
+							playersToDamage.get(u).cancel();
+							playersToDamage.remove(u);
+						}
+					}
+				}
+				else{
+					if(playersToDamage.containsKey(u)==false){
+						if(teamM.isPlayerInGame(u)){
+							BukkitTask task = plugin.getServer().getScheduler().runTaskTimer(plugin, new Runnable(){
+								@Override
+								public void run() {
+									if(teamM.isPlayerInGame(u)){
 										if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
 											Bukkit.getServer().getPlayer(u).damage(2);
 											MessageSender.send(ChatColor.RED, Bukkit.getServer().getPlayer(u), "Get to water.");
 										}
 									}
+									else{
+										playersToDamage.get(u).cancel();
+										playersToDamage.remove(u);
+									}
+								}
 
-								}, 0L, 200L);
-								playersToDamage.put(u, task);
-							}
+							}, 200L, 200L);
+							playersToDamage.put(u, task);
 						}
+						
 					}
-				}	
+				}
+			}
+		}	
 
 	}
 }

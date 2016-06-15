@@ -173,6 +173,7 @@ public class UHC extends JavaPlugin {
 	@Override
 	public void onEnable(){
 		plugin = this;
+		//APIManager.initAPI(BossBarAPI.class);
 		createConfig();
 		instances();
 		worldF.setup();
@@ -187,6 +188,12 @@ public class UHC extends JavaPlugin {
 			}
 		}.runTaskLater(plugin, 20L);
 		
+	}
+	
+	@Override
+	public void onLoad() {
+		//APIManager.require(BossBarAPI.class, this);
+
 	}
 	public int AvailableMemory(){
 		return (int)((rt.maxMemory() - rt.totalMemory() + rt.freeMemory()) / 1048576);  // 1024*1024 = 1048576 (bytes in 1 MB)

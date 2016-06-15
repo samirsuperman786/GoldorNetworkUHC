@@ -105,7 +105,7 @@ public class SkyHigh extends Gamemode implements Listener{
 
 							}
 
-						}, 0L, 600L);
+						}, 600L, 600L);
 						playersToDamage.put(u, task);
 					}
 				}

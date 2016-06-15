@@ -65,7 +65,7 @@ public class VoteManager implements Listener{
 				MessageSender.broadcast(getMessage());				
 
 			}
-		}.runTaskLater(plugin, 100L);
+		}.runTaskLater(plugin, 80L);
 	}
 
 	private List<String> getMessage(){
@@ -153,7 +153,7 @@ public class VoteManager implements Listener{
 				properMessage = message + ", ";
 			}
 			else{
-				properMessage= "and, " + message;
+				properMessage= "and " + message;
 			}
 			str.append(properMessage);
 

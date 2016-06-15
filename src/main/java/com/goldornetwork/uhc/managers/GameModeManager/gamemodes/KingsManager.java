@@ -103,9 +103,11 @@ public class KingsManager extends Gamemode implements Listener{
 	private void debuffTeamMates(String team){
 		for(UUID u : teamM.getPlayersOnATeam(team)){
 			if(Bukkit.getServer().getPlayer(u).isOnline()){
-				Bukkit.getServer().getPlayer(u).addPotionEffect(new PotionEffect(PotionEffectType.WITHER, Integer.MAX_VALUE, 0));
-				currentlyDebuffed.add(u);
-				MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.RED, "Your king has died. You shall now suffer!");
+				if(teamM.isPlayerOwner(team, u)==false){
+					Bukkit.getServer().getPlayer(u).addPotionEffect(new PotionEffect(PotionEffectType.WITHER, Integer.MAX_VALUE, 0));
+					currentlyDebuffed.add(u);
+					MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.RED, "Your king has died. You shall now suffer!");
+				}
 			}
 			else{
 				lateDebuffs.add(u);
