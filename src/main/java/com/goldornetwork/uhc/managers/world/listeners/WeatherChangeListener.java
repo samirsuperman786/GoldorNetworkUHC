@@ -7,12 +7,13 @@ import org.bukkit.event.weather.WeatherChangeEvent;
 
 import com.goldornetwork.uhc.UHC;
 
-public class WeatherChange implements Listener{
+public class WeatherChangeListener implements Listener{
 
 	
-	public WeatherChange(UHC plugin) {
+	public WeatherChangeListener(UHC plugin){
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
+
 	@EventHandler
 	public void on(WeatherChangeEvent e){
 		if (e.toWeatherState()) {
@@ -21,13 +22,12 @@ public class WeatherChange implements Listener{
 		}
 		e.setCancelled(true);
 	}
-	
+
 	@EventHandler
-	public void on(ThunderChangeEvent e) {
+	public void on(ThunderChangeEvent e){
 		if (e.toThunderState()) {
 			e.setCancelled(true);
 			return;
 		}
-
 	}
 }

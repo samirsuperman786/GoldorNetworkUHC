@@ -29,6 +29,9 @@ commands:
       description: Use this to uninvite a player to your team.
       usage: /<command> [player]
       aliases: [ui] 
+   request:
+      description: Use this to request a player to be whitelisted.
+      usage: /<command> [player]
    vote:
       description: Use this to vote for a poll.
       usage: /<command> [option] 

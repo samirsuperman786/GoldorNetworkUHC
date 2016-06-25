@@ -8,11 +8,12 @@ import com.goldornetwork.uhc.UHC;
 
 public abstract class Gamemode{
 
-	private boolean enabled = false;
 	
 	private String description;
 	private String name;
 	private String properName;
+	private boolean enabled = false;
+	
 	
 	protected Gamemode(String properName, String name, String description){
 		this.description=description;
@@ -23,40 +24,46 @@ public abstract class Gamemode{
 	public String getName(){
 		return name;
 	}
+	
 	public String getProperName(){
 		return properName;
 	}
-	public String getDescription() {
+	
+	public String getDescription(){
 		return description;
 	}
-	public boolean enable(UHC plugin) {
-		if (isEnabled()) {
+	
+	public boolean enable(UHC plugin){
+		
+		if(isEnabled()){
 			return false;
 		}
-
-		if (this instanceof Listener) {
+		if(this instanceof Listener){
 			Bukkit.getPluginManager().registerEvents((Listener) this, plugin);
 		}
+		
 		enabled = true;
 		onEnable();
 		return true;
 	}
-	public boolean disable() {
-		if (!isEnabled()) {
+	
+	public boolean disable(){
+		if(!isEnabled()){
 			return false;
 		}
-		
-		if (this instanceof Listener) {
+		if(this instanceof Listener){
 			HandlerList.unregisterAll((Listener) this);
 		}
-
+		
 		enabled = false;
 		onDisable();
 		return true;
 	}
-	public boolean isEnabled() {
+	
+	public boolean isEnabled(){
 		return enabled;
 	}
+	
 	public void onDisable() {}
 	public void onEnable() {}
 }

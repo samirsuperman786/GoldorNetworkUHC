@@ -17,44 +17,41 @@ import com.goldornetwork.uhc.managers.GameModeManager.State;
 
 public class BedBombs extends Gamemode implements Listener {
 
+	
 	private Random random = new Random();
 	private TeamManager teamM;
+
 	
 	public BedBombs(TeamManager teamM) {
-		super("Bed Bombs", "BedBombs", "Beds explode when clicked on.");
+		super("Bed Bombs", "BedBombs", "Beds explode when right clicked on.");
 		this.teamM=teamM;
 	}
-	
+
 	@EventHandler
 	public void on(PlayerInteractEvent e){
 		if(!(State.getState().equals(State.INGAME))){
 			return;
 		}
-		
+
 		Block block = e.getClickedBlock();
 		Player p = e.getPlayer();
-		
 		if(teamM.isPlayerInGame(p.getUniqueId())==false){
 			return;
 		}
-		
-		else if (e.getAction() != Action.RIGHT_CLICK_BLOCK) {
+		else if (e.getAction() != Action.RIGHT_CLICK_BLOCK){
 			return;
 		}
-		
-		else if (block == null) {
+		else if (block == null){
 			return;
 		}
-		
 		else if(block.getType().equals(Material.BED_BLOCK)==false){
 			return;
 		}
-		
+
 		block.setType(Material.AIR);
 		e.setCancelled(true);
-		
 		Location pLoc = block.getLocation();
 		block.getWorld().createExplosion(pLoc.getX(), pLoc.getY(), pLoc.getZ(), random.nextInt(3) + 1, false, true);
-		
+
 	}
 }

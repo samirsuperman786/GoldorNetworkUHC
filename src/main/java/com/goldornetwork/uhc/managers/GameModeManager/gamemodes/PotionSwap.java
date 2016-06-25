@@ -1,6 +1,7 @@
 package com.goldornetwork.uhc.managers.GameModeManager.gamemodes;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -14,26 +15,27 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
-import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
+import com.goldornetwork.uhc.managers.world.customevents.GameStartEvent;
+import com.goldornetwork.uhc.managers.world.customevents.UHCJoinEvent;
 import com.google.common.collect.ImmutableSet;
 
 public class PotionSwap extends Gamemode implements Listener{
 
-	
-	//instances
+
 	private UHC plugin;
 	private TeamManager teamM;
 	private Random random = new Random();
-	//storage
-	private List<UUID> latePotionPlayers = new ArrayList<UUID>();
+	
+	private Set<UUID> latePotionPlayers = new HashSet<UUID>();
+
 	
 	public PotionSwap(UHC plugin, TeamManager teamM) {
 		super("Potion Swap","PotionSwap", "Every 5 minutes, players will receive a new potion effect.");
@@ -41,32 +43,23 @@ public class PotionSwap extends Gamemode implements Listener{
 		this.teamM=teamM;
 	}
 
-	@Override
-	public void onEnable() {
-		latePotionPlayers.clear();
-	}
-	
-	@Override
-	public void onDisable() {}
-	
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void on(PlayerJoinEvent e){
+	public void on(UHCJoinEvent e){
 		Player p = e.getPlayer();
-		if(State.getState().equals(State.INGAME)){
-			if(latePotionPlayers.contains(p.getUniqueId())){
-				giveAPlayerARandomPotion(p);
-				removePlayerFromLateGive(p);
-			}
+		if(latePotionPlayers.contains(p.getUniqueId())){
+			giveAPlayerARandomPotion(p);
+			removePlayerFromLateGive(p);
 		}
 	}
-	
+
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(GameStartEvent e){
 		run();
 	}
-	
+
 	private void run(){
-		plugin.getServer().getScheduler().runTaskTimer(plugin, new Runnable(){
+
+		new BukkitRunnable() {
 			@Override
 			public void run() {
 				for(UUID u : teamM.getPlayersInGame()){
@@ -78,10 +71,9 @@ public class PotionSwap extends Gamemode implements Listener{
 					}
 				}
 			}
-			
-		}, 0L, 6000L); //5 minutes
+		}.runTaskTimer(plugin, 0L, 6000L);
 	}
-	
+
 	private void giveAPlayerARandomPotion(Player p){
 		for(PotionEffect effect : p.getActivePotionEffects()){
 			p.removePotionEffect(effect.getType());
@@ -89,10 +81,11 @@ public class PotionSwap extends Gamemode implements Listener{
 		p.addPotionEffect(new PotionEffect(getRandomPotion(), 6200, 0));
 		p.getWorld().playEffect(p.getLocation(), Effect.POTION_BREAK, 10);
 	}
+
 	public void removePlayerFromLateGive(Player p){
 		latePotionPlayers.remove(p.getUniqueId());
 	}
-	
+
 	private static final Set<PotionEffectType> ValidPotions = ImmutableSet.of(
 			PotionEffectType.ABSORPTION,
 			PotionEffectType.BLINDNESS, 
@@ -117,9 +110,10 @@ public class PotionSwap extends Gamemode implements Listener{
 		int index = random.nextInt(toReturn.size());
 		return toReturn.get(index);
 	}
-	
+
 	@EventHandler
 	public void on(PlayerItemConsumeEvent e){
+
 		if(!(State.getState().equals(State.INGAME))){
 			return;
 		}
@@ -127,13 +121,6 @@ public class PotionSwap extends Gamemode implements Listener{
 			if(teamM.isPlayerInGame(e.getPlayer().getUniqueId())){
 				e.setCancelled(true);
 			}
-			
 		}
-		
-	}
-	
-
-	
-	
-	
+	}	
 }

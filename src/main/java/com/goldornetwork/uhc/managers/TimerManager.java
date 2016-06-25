@@ -5,24 +5,21 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.inventivetalent.bossbar.BossBar;
-import org.inventivetalent.bossbar.BossBarAPI;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.managers.chat.ChatManager;
 import com.goldornetwork.uhc.managers.world.WorldManager;
-import com.goldornetwork.uhc.managers.world.events.GameOpenEvent;
-import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
-import com.goldornetwork.uhc.managers.world.events.PVPEnableEvent;
-import com.goldornetwork.uhc.managers.world.listeners.team.ChatManager;
+import com.goldornetwork.uhc.managers.world.customevents.GameOpenEvent;
+import com.goldornetwork.uhc.managers.world.customevents.GameStartEvent;
+import com.goldornetwork.uhc.managers.world.customevents.MeetupEvent;
+import com.goldornetwork.uhc.managers.world.customevents.PVPEnableEvent;
 import com.goldornetwork.uhc.utils.MessageSender;
 
-import net.md_5.bungee.api.chat.TextComponent;
-
 public class TimerManager implements Listener{
-	//instances
+
+
 	private UHC plugin;
 	private ScatterManager scatterM;
 	private TeamManager teamM;
@@ -30,15 +27,13 @@ public class TimerManager implements Listener{
 	private ChatManager chatM;
 	private WorldManager worldM;
 
-	//storage
 	private int timeTillMatchStart;
 	private int timeTillPVPStart;
+	private int timeTillMeetup;
 	private int timeTillVote;
-	private BossBar bossBar;
-	private boolean matchStart;
 
 
-	public TimerManager(UHC plugin, ScatterManager scatterM, TeamManager teamM, VoteManager voteM, ChatManager chatM, WorldManager worldM) {
+	public TimerManager(UHC plugin, ScatterManager scatterM, TeamManager teamM, VoteManager voteM, ChatManager chatM, WorldManager worldM){
 		this.plugin=plugin;
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.scatterM=scatterM;
@@ -48,105 +43,64 @@ public class TimerManager implements Listener{
 		this.worldM=worldM;
 	}
 
-	/**
-	 * This does the following: sets the status of the server to not running and cancels all ongoing timers
-	 * 
-	 */
 	public void setup(){
 		config();
 		State.setState(State.NOT_RUNNING);
-		matchStart=false;
 	}
 
 	private void config(){
 		plugin.getConfig().addDefault("TIME-TILL-MATCH-START", 15);
-		plugin.getConfig().addDefault("TIME-TILL-PVP-START", 40);
+		plugin.getConfig().addDefault("TIME-TILL-PVP-START", 30);
+		plugin.getConfig().addDefault("TIME-TILL-MEETUP", 30);
 		plugin.getConfig().addDefault("TIME-TILL-VOTE-END", 5);
 		plugin.saveConfig();
 		this.timeTillMatchStart = (plugin.getConfig().getInt("TIME-TILL-MATCH-START")*60);
 		this.timeTillPVPStart = (plugin.getConfig().getInt("TIME-TILL-PVP-START")*60);
+		this.timeTillMeetup=(plugin.getConfig().getInt("TIME-TILL-MEETUP") *60);
 		this.timeTillVote = (plugin.getConfig().getInt("TIME-TILL-VOTE-END")*60);
 	}
 
-	/**
-	 * Used to start the match with a given time till it starts, and a time till PVP is enabled.
-	 * This allows players to create and join teams
-	 * @param timeTillMatchStarts - the time to wait until the match starts
-	 * @param timeTillPVPStarts - the time to wait until PVP is enabled after the match has started
-	 */
 	public void startMatch(Player online){
 		State.setState(State.OPEN);
 		Bukkit.getServer().getPluginManager().callEvent(new GameOpenEvent());
-		matchStart = true;
 		chatM.mutePlayers();
 		countdownTimer();
 		voteTimer();
-		//bossBar(online);
-	}
-	private void bossBar(Player online){
-		BossBar bossBar = BossBarAPI.addBar(online, // The receiver of the BossBar
-				new TextComponent("Match starting in"), // Displayed message
-				BossBarAPI.Color.BLUE, // Color of the bar
-				BossBarAPI.Style.NOTCHED_20, // Bar style
-				1.0f, // Progress (0.0 - 1.0)
-				timeTillMatchStart, // Timeout
-				1); // Timeout-interval
-		this.bossBar=bossBar;
 	}
 
 	private void voteTimer(){
-
 		voteM.broadcastOptions();
 		voteM.generateOptions();
 
 		new BukkitRunnable() {
-			
-			
 			@Override
 			public void run() {
 				timeTillVote--;
+
 				if(timeTillVote>=(2*60) && timeTillVote%(2*60) ==0 && voteM.isActive()){
 					voteM.broadcastOptions();
 				}
-				else if(timeTillVote==0){
+				if(timeTillVote==0){
 					voteM.enableOption(voteM.getWinner());
 					MessageSender.broadcast("Option " + (voteM.getWinner()+1) + " has won with " + ChatColor.GRAY + voteM.getWinnerVotes() + ChatColor.GOLD + " votes.");
 					cancel();
 				}
-
 			}
 		}.runTaskTimer(plugin, 100L, 20L);
 	}
 
-	@EventHandler
-	public void on(PlayerJoinEvent e){
-		//Player player = e.getPlayer();
-		//this.bossBar.addPlayer(player);
-	}
-
-	/**
-	 * When called, this will begin the count down to the start of the match
-	 */
 	private void countdownTimer(){
-		new BukkitRunnable() {
-			//double startingTime = timeTillMatchStart;
+
+		new BukkitRunnable(){
+			double startingTime = timeTillMatchStart;
 
 			@Override
-			public void run() {
+			public void run(){
 
-				/*float percentage = (float) (timeTillMatchStart/startingTime);
-				bossBar.setProgress(percentage);
-				if(timeTillMatchStart>60){
-					double k = timeTillMatchStart;
-					int toSet = (int) Math.ceil(k/60);
-					bossBar.setMessage(ChatColor.DARK_AQUA + "Match starting in " + ChatColor.DARK_RED + toSet + ChatColor.DARK_AQUA + " minutes.");
-				}
-				else{
-					bossBar.setMessage(ChatColor.DARK_AQUA + "Match starting in " + ChatColor.DARK_RED + timeTillMatchStart + ChatColor.DARK_AQUA + " seconds.");
-				}
-*/
+				float percentage = (float) (timeTillMatchStart/startingTime);
+				setExpTimer(percentage);
+
 				if(timeTillMatchStart >0){
-
 					if(timeTillMatchStart>60 && timeTillMatchStart%60 ==0){
 						MessageSender.broadcast(ChatColor.DARK_AQUA + "Match Starting in " + ChatColor.DARK_RED + timeTillMatchStart/60 + ChatColor.DARK_AQUA + " minutes.");
 					}
@@ -162,14 +116,14 @@ public class TimerManager implements Listener{
 					else if(timeTillMatchStart==1){
 						MessageSender.broadcast(ChatColor.DARK_AQUA + "Match Starting in " + ChatColor.DARK_RED + timeTillMatchStart +ChatColor.DARK_AQUA + " second.");
 					}
-					timeTillMatchStart--;
 
+					timeTillMatchStart--;
 				}
 				else if(timeTillMatchStart == 0){
-
 					MessageSender.broadcast("Match has started!");
 					MessageSender.broadcastTitle(ChatColor.GOLD + "Match has started!", ChatColor.GOLD + "Scattering...");
 					State.setState(State.SCATTER);
+
 					if(teamM.isTeamsEnabled()){
 						scatterM.scatter();
 					}
@@ -180,10 +134,7 @@ public class TimerManager implements Listener{
 						}
 					}
 					cancel();
-
 				}
-
-
 			}
 		}.runTaskTimer(plugin, 0L, 20L);
 	}
@@ -193,20 +144,15 @@ public class TimerManager implements Listener{
 		pvpTimer();
 		MessageSender.broadcastBigTitle(ChatColor.GOLD + "Go!");
 	}
-	/**
-	 * When called, this will begin the count down till PVP is enabled
-	 */
-	private void pvpTimer(){
-		new BukkitRunnable() {
 
+	private void pvpTimer(){
+
+		new BukkitRunnable() {
 			@Override
 			public void run() {
 				if(timeTillPVPStart>0){
 					if(timeTillPVPStart >= (5*60) && timeTillPVPStart % (5*60) == 0){
 						MessageSender.broadcast(ChatColor.DARK_AQUA + "PVP will be enabled in " + ChatColor.DARK_RED + timeTillPVPStart/60 + ChatColor.GOLD + " minutes.");
-					}
-					if(timeTillPVPStart== (299)){
-						scatterM.prePVPSetup();
 					}
 					else if(timeTillPVPStart<= (4*60) && timeTillPVPStart > (1*60) && timeTillPVPStart % (1*60) ==0){
 						MessageSender.broadcast(ChatColor.DARK_AQUA + "PVP will be enabled in " + ChatColor.DARK_RED + timeTillPVPStart/60 + ChatColor.DARK_AQUA + " minutes.");
@@ -223,29 +169,64 @@ public class TimerManager implements Listener{
 					else if(timeTillPVPStart==1){
 						MessageSender.broadcast(ChatColor.DARK_AQUA + "PVP will be enabled in " + ChatColor.DARK_RED + timeTillPVPStart + ChatColor.DARK_AQUA + " second.");
 					}
+
 					timeTillPVPStart--;
 				}
 				else if(timeTillPVPStart==0){
 					Bukkit.getPluginManager().callEvent(new PVPEnableEvent());
 					MessageSender.broadcast("PVP has been enabled.");
-					MessageSender.broadcastTitle(ChatColor.GOLD + "Meetup is now!", ChatColor.RED + "Get moving to (0, 0)");
+					meetupTimer();
 					cancel();
 				}
-
 			}
 		}.runTaskTimer(plugin, 0L, 20L);
 	}
 
+	private void meetupTimer(){
 
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if(timeTillMeetup>0){
+					if(timeTillMeetup >= (5*60) && timeTillMeetup % (5*60) == 0){
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "Meetup is in " + ChatColor.DARK_RED + timeTillMeetup/60 + ChatColor.GOLD + " minutes.");
+					}
+					if(timeTillMeetup== (299)){
+						scatterM.preMeetupSetup();
+					}
+					else if(timeTillMeetup<= (4*60) && timeTillMeetup > (1*60) && timeTillMeetup % (1*60) ==0){
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "Meetup is in " + ChatColor.DARK_RED + timeTillMeetup/60 + ChatColor.DARK_AQUA + " minutes.");
+					}
+					else if(timeTillMeetup <= 60 && timeTillMeetup >=30 &&timeTillMeetup%10==0){
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "Meetup is in " + ChatColor.DARK_RED + timeTillMeetup + ChatColor.DARK_AQUA + " seconds.");
+					}
+					else if(timeTillMeetup <=30 && timeTillMeetup >=5 && timeTillMeetup %5==0){
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "Meetup is in " + ChatColor.DARK_RED + timeTillMeetup + ChatColor.DARK_AQUA + " seconds.");
+					}
+					else if(timeTillMeetup <= 5 && timeTillMeetup >1){
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "Meetup is in " + ChatColor.DARK_RED + timeTillMeetup + ChatColor.DARK_AQUA + " seconds.");		
+					}
+					else if(timeTillMeetup==1){
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "Meetup is in " + ChatColor.DARK_RED + timeTillMeetup + ChatColor.DARK_AQUA + " second.");
+					}
 
-	/**
-	 * Used to check if the match has started 
-	 * @return <code> True </code> if the match has started
-	 */
-	public boolean hasMatchStarted(){
-		return matchStart;
+					timeTillMeetup--;
+				}
+				else if(timeTillMeetup==0){
+					Bukkit.getPluginManager().callEvent(new MeetupEvent());
+					MessageSender.broadcast("Meetup is now.");
+					MessageSender.broadcastTitle(ChatColor.GOLD + "Meetup is now!", ChatColor.RED + "Get moving to (0, 0)");
+					cancel();
+				}	
+			}
+		}.runTaskTimer(plugin, 0L, 20L);
 	}
 
+	private void setExpTimer(float percentage){
+		for(Player online : plugin.getServer().getOnlinePlayers()){
+			online.setExp(percentage);
+		}
+	}
 	public int getTimeTillMatchStart(){
 		return timeTillMatchStart;
 	}
@@ -254,5 +235,7 @@ public class TimerManager implements Listener{
 		return timeTillPVPStart;
 	}
 
-
+	public int getTimeTillMeetup(){
+		return timeTillMeetup;
+	}
 }

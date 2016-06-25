@@ -39,10 +39,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
-import com.goldornetwork.uhc.managers.world.events.GameEndEvent;
-import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
-import com.goldornetwork.uhc.managers.world.events.PVPEnableEvent;
-import com.goldornetwork.uhc.managers.world.events.ScatterEndEvent;
+import com.goldornetwork.uhc.managers.world.customevents.GameEndEvent;
+import com.goldornetwork.uhc.managers.world.customevents.GameStartEvent;
+import com.goldornetwork.uhc.managers.world.customevents.MeetupEvent;
+import com.goldornetwork.uhc.managers.world.customevents.PVPEnableEvent;
 import com.goldornetwork.uhc.utils.Medic;
 import com.goldornetwork.uhc.utils.MessageSender;
 
@@ -50,15 +50,18 @@ import net.minecraft.server.v1_8_R3.MinecraftServer;
 
 public class WorldManager implements Listener{
 
+
 	private UHC plugin;
 	private TeamManager teamM;
 	private WorldFactory worldF;
 	private ChunkGenerator chunkG;
 	private Random random = new Random();
+
 	private int timer;
 	private int radius;
 	private World uhcWorld;
-	
+
+
 	public WorldManager(UHC plugin, TeamManager teamM, WorldFactory worldF, ChunkGenerator chunkG) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.plugin=plugin;
@@ -82,15 +85,16 @@ public class WorldManager implements Listener{
 		wb.setDamageAmount(.5);
 		wb.setWarningTime(15);
 		wb.setWarningDistance(20);
+
 		for(Entity e : getUHCWorld().getEntities()){
 			if(!(e instanceof Player)){
 				e.remove();
 			}
 		}
 		chunkG.generate(getUHCWorld(), getCenter(), radius);
-
 		plugin.getConfig().addDefault("ENDGAME-GRACE-PERIOD", 2);
 		this.timer=((plugin.getConfig().getInt("ENDGAME-GRACE-PERIOD")) *60);
+
 		for(Player all : Bukkit.getOnlinePlayers()){
 			all.setGameMode(GameMode.ADVENTURE);
 			all.setMaxHealth(20);
@@ -100,12 +104,11 @@ public class WorldManager implements Listener{
 			for(PotionEffect effect : all.getActivePotionEffects()){
 				all.removePotionEffect(effect.getType());
 			}
-			all.setDisplayName(all.getName());
 			all.getInventory().clear();
 			all.getInventory().setArmorContents(null);
 			all.teleport(worldF.getLobby().getSpawnLocation());
-
 		}
+
 		plugin.getServer().setIdleTimeout(60);
 		MinecraftServer.getServer().getPlayerList().getWhitelist().getValues().clear();
 		plugin.getServer().setWhitelist(true);
@@ -119,28 +122,29 @@ public class WorldManager implements Listener{
 		getUHCWorld().setGameRuleValue("doMobSpawning", "true");
 		getUHCWorld().setGameRuleValue("dodaylightcycle", "true");
 		getUHCWorld().setTime(60);
+		getUHCWorld().setThundering(false);
+		getUHCWorld().setStorm(false);
+		
 		new BukkitRunnable() {
-			
 			@Override
 			public void run() {
 				plugin.getServer().setIdleTimeout(4);
-				
 			}
 		}.runTaskLater(plugin, 1200L);
-		
 	}
-	@EventHandler
-	public void on(ScatterEndEvent e){
 
+	@EventHandler
+	public void on(MeetupEvent e){
+		shrinkBorder();
 	}
+
 	@EventHandler
 	public void on(PVPEnableEvent e){
-		shrinkBorder();
 		getUHCWorld().setPVP(true);
 	}
 
 	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent e){
+	public void on(PlayerJoinEvent e){
 		Player target = e.getPlayer();
 		e.setJoinMessage(ChatColor.GREEN + "\u2713" + teamM.getColorOfPlayer(target.getUniqueId()) +  target.getName());
 		target.setHealth(target.getHealth());
@@ -148,14 +152,16 @@ public class WorldManager implements Listener{
 			online.hidePlayer(target);
 			online.showPlayer(target);
 		}
-
 	}
 
-
 	@EventHandler
-	public void onPlayerLeave(PlayerQuitEvent e){
+	public void on(PlayerQuitEvent e){
 		Player target = e.getPlayer();
 		e.setQuitMessage(ChatColor.RED + "\u2717" + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName());
+		
+		if(teamM.isPlayerAnObserver(target.getUniqueId())){
+			teamM.removePlayerFromObservers(target);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
@@ -172,30 +178,25 @@ public class WorldManager implements Listener{
 				e.setCancelled(true);	
 			}
 		}
-
 	}
-
 
 	@EventHandler
 	public void on(GameEndEvent e){
 		endGame(e.getWinners());
 	}
+
 	public void endGame(List<UUID> winners){
 		List<String> toBroadcast = new LinkedList<String>();
 
 		toBroadcast.add("Game has ended, thanks for playing.");
 		MessageSender.broadcast(toBroadcast);
-		new BukkitRunnable() {
 
+		new BukkitRunnable() {
 			@Override
 			public void run() {
 				if(winners!=null){
 					List<String> toReturn = new ArrayList<String>();
-					//toReturn.add("Winners are: ");
-					
-					//fireworks(getUHCWorld());
 					int comma = 0;
-
 					StringBuilder str = new StringBuilder();
 
 					for(UUID u : winners){
@@ -209,7 +210,7 @@ public class WorldManager implements Listener{
 							properMessage=message;
 						}
 						str.append(properMessage);
-						
+
 						if(Bukkit.getOfflinePlayer(u).isOnline()){
 							Player target = Bukkit.getServer().getPlayer(u);
 							target.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 4));
@@ -220,12 +221,10 @@ public class WorldManager implements Listener{
 					MessageSender.broadcast(toReturn);
 					MessageSender.broadcastTitle(ChatColor.GOLD + "Game Over!", msg);
 				}
-
 			}
 		}.runTaskLater(plugin, 10L);
 
 		new BukkitRunnable() {
-
 			@Override
 			public void run() {
 				if(timer>60 && timer%60==0){
@@ -243,17 +242,16 @@ public class WorldManager implements Listener{
 				else if(timer==0){
 					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "stop");
 				}
+
 				--timer;
 			}
 		}.runTaskTimer(plugin, 0L, 20L);
-		
-
 	}
 
+	@SuppressWarnings("unused")
 	private void fireworks(World world){
 
 		new BukkitRunnable() {
-
 			@Override
 			public void run() {
 				for(Player online : Bukkit.getServer().getOnlinePlayers()){
@@ -274,19 +272,18 @@ public class WorldManager implements Listener{
 					fwMeta.setPower(2);
 					fw.setFireworkMeta(fwMeta);
 					fw.detonate();
-
 				}
-
 			}
 		}.runTaskTimer(plugin, 0L, 30L);
-
 	}
+
 	@EventHandler
 	public void on(PlayerChangedWorldEvent e){
 		if(e.getFrom().getPlayers().isEmpty()){
 			Bukkit.unloadWorld(e.getFrom(), false);
 		}
 	}
+
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(PlayerMoveEvent e){
 		if(e.getPlayer().getWorld().equals(getLobby())){
@@ -303,39 +300,38 @@ public class WorldManager implements Listener{
 	public World getLobby(){
 		return worldF.getLobby();
 	}
+
 	public void shrinkBorder(){
+
 		new BukkitRunnable() {
-			
 			@Override
 			public void run() {
 				getUHCWorld().getWorldBorder().setSize(500, 15*60);
 				MessageSender.broadcast("The worldborder will now slowly shrink to a radius of 250.");
+
 				new BukkitRunnable() {
-					
 					@Override
 					public void run() {
 						getUHCWorld().getWorldBorder().setSize(300, 10*60);
 						MessageSender.broadcast("The worldborder will now slowly shrink to a radius of 150.");
-						
+
 						new BukkitRunnable() {
-							
 							@Override
 							public void run() {
 								getUHCWorld().getWorldBorder().setSize(100, 5*60);
 								MessageSender.broadcast("The worldborder will now slowly shrink to a radius of 50.");
-								
 							}
 						}.runTaskLater(plugin, 36000L);
 					}
 				}.runTaskLater(plugin, 36000L);
-				
 			}
 		}.runTaskLater(plugin, 100L);
-		
 	}
+
 	public void newUHCWorld(){
 		uhcWorld = worldF.create();
 	}
+
 	public World getUHCWorld(){
 		return this.uhcWorld;
 	}
@@ -343,17 +339,18 @@ public class WorldManager implements Listener{
 	public Location getCenter(){
 		return uhcWorld.getSpawnLocation();
 	}
-	
-	
+
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(EntityDamageByEntityEvent e){
 		if(State.getState().equals(State.INGAME)){
 			if(e.getEntity() instanceof Player){
 				if(e.getDamager() instanceof Arrow){
 					Arrow arrow = (Arrow) e.getDamager();
+
 					if(arrow.getShooter() instanceof Player){
 						Player target = (Player) e.getEntity();
 						Player shooter = (Player) arrow.getShooter();
+
 						if(teamM.isPlayerInGame(target.getUniqueId()) && teamM.isPlayerInGame(shooter.getUniqueId())){
 							send(shooter, target);
 						}
@@ -362,14 +359,15 @@ public class WorldManager implements Listener{
 			}
 		}
 	}
-	
+
 	private void send(Player shooter, Player target){
 		Location shooterLocation = shooter.getLocation();
 		Location targetLocation = target.getLocation();
 		int distance = (int) shooterLocation.distance(targetLocation);
-		MessageSender.send(ChatColor.GREEN, shooter, "You hit " + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName() + ChatColor.GREEN +  " at a distance of " + ChatColor.GRAY + distance + ChatColor.GREEN + " blocks.");
-		MessageSender.send(ChatColor.RED, target, "You got shot from a distance of " + ChatColor.GRAY + distance + ChatColor.RED + " blocks.");
+		
+		MessageSender.send(shooter, ChatColor.GREEN + "You hit " + teamM.getColorOfPlayer(target.getUniqueId())
+		+ target.getName() + ChatColor.GREEN +  " at a distance of " + ChatColor.GRAY + distance + ChatColor.GREEN + " blocks.");
+
+		MessageSender.send(target, ChatColor.RED + "You got shot from a distance of " + ChatColor.GRAY + distance + ChatColor.RED + " blocks.");
 	}
-	
-	
 }

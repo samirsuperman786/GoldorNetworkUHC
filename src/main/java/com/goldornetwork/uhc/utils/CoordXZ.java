@@ -1,9 +1,12 @@
-package com.goldornetwork.uhc.managers.world;
+package com.goldornetwork.uhc.utils;
 
 public class CoordXZ {
 
-	public int x, z;
+	
+	public int x;
+	public int z;
 
+	
 	public CoordXZ(int x, int z){
 		this.x = x;
 		this.z = z;
@@ -11,13 +14,15 @@ public class CoordXZ {
 
 	@Override
 	public boolean equals(Object obj){
-		if (this == obj)
+		if (this == obj){
 			return true;
-		else if (obj == null || obj.getClass() != this.getClass())
+		}
+
+		else if (obj == null || obj.getClass() != this.getClass()){
 			return false;
+		}
 
 		CoordXZ test = (CoordXZ)obj;
 		return test.x == this.x && test.z == this.z;
 	}
-
 }

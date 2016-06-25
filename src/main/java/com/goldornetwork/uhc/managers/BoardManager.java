@@ -1,9 +1,11 @@
-package com.goldornetwork.uhc.managers.board;
+package com.goldornetwork.uhc.managers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -25,15 +27,15 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import com.goldornetwork.uhc.UHC;
-import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.world.WorldManager;
-import com.goldornetwork.uhc.managers.world.events.GameOpenEvent;
-import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
-import com.goldornetwork.uhc.managers.world.events.UHCDeathEvent;
+import com.goldornetwork.uhc.managers.world.customevents.GameOpenEvent;
+import com.goldornetwork.uhc.managers.world.customevents.GameStartEvent;
+import com.goldornetwork.uhc.managers.world.customevents.PVPEnableEvent;
+import com.goldornetwork.uhc.managers.world.customevents.UHCDeathEvent;
 
 public class BoardManager implements Listener{
 
+	
 	private UHC plugin;
 	private TeamManager teamM;
 	private Scoreboard mainBoard;
@@ -41,21 +43,18 @@ public class BoardManager implements Listener{
 	private WorldManager worldM;
 	private TimerManager timerM;
 
-	private List<Team> activeTeams = new ArrayList<Team>(); 
+	private Set<Team> activeTeams = new HashSet<Team>(); 
 	private Map<String, Team> teamScoreBoards = new HashMap<String, Team>();
 	private Map<String, Objective> teamHeaders = new HashMap<String, Objective>();
 	private Map<UUID, String> teamOfPlayer = new HashMap<UUID, String>();
-
-	private List<UUID> invisible = new ArrayList<UUID>();
-
-	//scoreboard
+	private Set<UUID> invisible = new HashSet<UUID>();
 	private Objective header;
 
+	
 	public BoardManager(UHC plugin) {
 		this.plugin=plugin;
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
-
 
 	public void setup(TeamManager teamM, WorldManager worldM, TimerManager timerM){
 		this.teamM=teamM;
@@ -63,15 +62,14 @@ public class BoardManager implements Listener{
 		this.timerM=timerM;
 		mainBoard=Bukkit.getServer().getScoreboardManager().getNewScoreboard();
 		initializeObserverBoard();
+		invisibleChecker();
 		for(Player all : Bukkit.getServer().getOnlinePlayers()){
 			all.setScoreboard(mainBoard);
 			all.setPlayerListName(ChatColor.stripColor(all.getName()));
 		}
-		invisibleChecker();
 	}
 
 	private void initializeInfo(Objective header){
-
 		Score teamsize = header.getScore(ChatColor.AQUA + "Max Team Size: ");
 		teamsize.setScore(teamM.getTeamSize());
 		updater(teamsize, 20L, new Callable<Integer>() {
@@ -94,19 +92,13 @@ public class BoardManager implements Listener{
 			}
 		});
 
-
-
 		Score currentBorder = header.getScore(ChatColor.AQUA + "Border Radius: ");
 		currentBorder.setScore((int) worldM.getUHCWorld().getWorldBorder().getSize());
 		updater(currentBorder, 100L, new Callable<Integer>() {
 			public Integer call(){
 				return (int) (10*(Math.round((worldM.getUHCWorld().getWorldBorder().getSize())/2)/10));
-
 			}
 		});
-
-
-
 	}
 	private void initializeObserverBoard() {
 		header = mainBoard.registerNewObjective("header", "dummy");
@@ -117,9 +109,7 @@ public class BoardManager implements Listener{
 		objective.setDisplaySlot(DisplaySlot.BELOW_NAME);
 		objective.setDisplayName(ChatColor.RED + "\u2665");
 
-
 		initializeInfo(header);
-
 
 		observerTeam = mainBoard.registerNewTeam("observers");
 		observerTeam.setPrefix(ChatColor.AQUA + "[Observer] ");
@@ -147,8 +137,8 @@ public class BoardManager implements Listener{
 		health.setDisplaySlot(DisplaySlot.BELOW_NAME);
 		health.setDisplayName(ChatColor.RED + "\u2665");
 
-
 		initializeInfo(header);
+
 		Score timeTillMatch = header.getScore(ChatColor.AQUA + "Match starts in: ");
 		updater(timeTillMatch, 20L, 0L, new Callable<Integer>() {
 			public Integer call(){
@@ -159,18 +149,17 @@ public class BoardManager implements Listener{
 		teamHeaders.put(team, header);
 		teamScoreBoards.put(team, newTeam);
 		activeTeams.add(newTeam);
-		return teamBoard;
 
+		return teamBoard;
 	}
 
 	private void invisibleChecker(){
-		new BukkitRunnable() {
 
+		new BukkitRunnable() {
 			@Override
 			public void run() {
-				
-				
 				List<UUID> toRemove = new ArrayList<UUID>();
+
 				for(UUID invis : invisible){
 					if(teamM.isPlayerInGame(invis)){
 						if(plugin.getServer().getOfflinePlayer(invis).isOnline()){
@@ -190,13 +179,11 @@ public class BoardManager implements Listener{
 					else{
 						toRemove.add(invis);
 					}
-
 				}
-				
 				invisible.removeAll(toRemove);
-				
+
 				List<UUID> toAdd = new ArrayList<UUID>();
-				
+
 				for(Player online : Bukkit.getOnlinePlayers()){
 					if(invisible.contains(online.getUniqueId())==false){
 						if(teamM.isPlayerInGame(online.getUniqueId())){
@@ -208,24 +195,23 @@ public class BoardManager implements Listener{
 							}
 						}
 					}
-
 				}
 				invisible.addAll(toAdd);
-
 			}
 		}.runTaskTimer(plugin, 0L, 20L);
 	}
 
-
+	@SuppressWarnings("deprecation")
 	private void playerIsInvisible(UUID u){
+
 		for(Team team : activeTeams){
 			if(!(team.equals(teamScoreBoards.get(teamM.getTeamOfPlayer(u))))){
 				team.getScoreboard().getTeam("others").removePlayer(Bukkit.getOfflinePlayer(u));
 			}
 		}
-
 	}
 
+	@SuppressWarnings("deprecation")
 	private void playerIsVisible(UUID u){
 		for(Team team : activeTeams){
 			if(!(team.equals(teamScoreBoards.get(teamM.getTeamOfPlayer(u))))){
@@ -234,16 +220,21 @@ public class BoardManager implements Listener{
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public void addPlayerToObserver(OfflinePlayer p){
 		observerTeam.addPlayer(p);
+
 		if(p.isOnline()){
 			Player target = (Player) p;
 			target.setPlayerListName(ChatColor.AQUA + target.getName());
 			target.setScoreboard(mainBoard);
 		}
 	}
+
+	@SuppressWarnings("deprecation")
 	public void removePlayerFromObservers(OfflinePlayer p){
 		observerTeam.removePlayer(p);
+
 		if(p.isOnline()){
 			Player target = (Player) p;
 			target.setPlayerListName(target.getName());
@@ -260,26 +251,30 @@ public class BoardManager implements Listener{
 		teamScoreBoards.remove(team);
 	}
 
+	@SuppressWarnings("deprecation")
 	public void addPlayerToTeam(String team, Player p){
 		teamScoreBoards.get(team).addPlayer(p);
 		teamOfPlayer.put(p.getUniqueId(), team.toLowerCase());
 		p.setScoreboard(teamScoreBoards.get(team).getScoreboard());
-
 	}
+	@SuppressWarnings("deprecation")
 	public void removePlayerFromTeam(String team, OfflinePlayer p){
 		teamScoreBoards.get(team).removePlayer(p);
 		teamOfPlayer.remove(p.getUniqueId());
+
 		if(p.isOnline()){
 			Player target = (Player) p;
 			target.setScoreboard(mainBoard);
 		}
 	}
-	public Scoreboard getScoreboardOfPlayer(UUID u){
+	private Scoreboard getScoreboardOfPlayer(UUID u){
 		return teamScoreBoards.get(teamOfPlayer.get(u)).getScoreboard();
 	}
 
+	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(GameStartEvent e){
+
 		for(Team team : activeTeams){
 			for(UUID u : teamM.getPlayersInGame()){
 				if(!(team.getPlayers().contains(Bukkit.getOfflinePlayer(u)))){
@@ -302,24 +297,24 @@ public class BoardManager implements Listener{
 	}
 
 
+	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(UHCDeathEvent e){
 		OfflinePlayer p = e.getOfflinePlayer();
+
 		if(teamOfPlayer.containsKey(p.getUniqueId())){
 			for(Team team : activeTeams){
 				if(!(team.getPlayers().contains(Bukkit.getOfflinePlayer(p.getUniqueId())))){
 					team.getScoreboard().getTeam("others").removePlayer(p);
 				}
-
 			}
 			getScoreboardOfPlayer(p.getUniqueId()).getTeam(teamOfPlayer.get(p.getUniqueId())).removePlayer(p);
-
 		}
-
 	}
 
 	private void gameStartInit(Objective header){
-		Score timeTillPVP = header.getScore(ChatColor.AQUA + "Time Till Meetup: ");
+
+		Score timeTillPVP = header.getScore(ChatColor.AQUA + "Time Till PVP: ");
 		updater(timeTillPVP, 20L, 0L, new Callable<Integer>() {
 			public Integer call(){
 				return timerM.getTimeTillPVP();
@@ -335,33 +330,39 @@ public class BoardManager implements Listener{
 		});
 	}
 
+	private void meetupStartInit(Objective header){
+
+		Score timeTillMeetup = header.getScore(ChatColor.AQUA + "Time Till Meetup: ");
+		updater(timeTillMeetup, 20L, 0L, new Callable<Integer>() {
+			public Integer call(){
+				return timerM.getTimeTillMeetup();
+			}
+		});
+	}
+
 	//updaters
 
-
-
 	private void updater(Score score, long frequency, Callable<Integer> func){
-		new BukkitRunnable() {
 
+		new BukkitRunnable() {
 			@Override
 			public void run() {
 				int val = 0;
+
 				try {
 					val = func.call();
 				} catch (Exception e) {
-
 					e.printStackTrace();
 				}
+
 				score.setScore(val);
-
-
 			}
 		}.runTaskTimer(plugin, 0L, frequency);
 	}
 	private void updater(Score score, long frequency, long delay, Callable<Integer> expiration){
-
 		try {
-			new BukkitRunnable() {
 
+			new BukkitRunnable() {
 				int i =expiration.call();
 				String toBlink = score.getEntry();
 
@@ -369,7 +370,6 @@ public class BoardManager implements Listener{
 				public void run() {
 
 					if(i>60){
-
 						double k = i;
 						int toSet = (int) Math.ceil(k/60);
 						score.setScore(toSet);
@@ -385,17 +385,15 @@ public class BoardManager implements Listener{
 						else{
 							toBlink = ChatColor.RED + ChatColor.stripColor(score.getEntry());
 						}
+
 						Score toChange = score.getObjective().getScore(toBlink);
 						toChange.setScore(i);
 					}
 					else if(i==0){
 						score.getScoreboard().resetScores(toBlink);
 						cancel();
-
 					}
 					i--;
-
-
 				}
 			}.runTaskTimer(plugin, delay, frequency);
 		} catch (Exception e) {
@@ -410,22 +408,27 @@ public class BoardManager implements Listener{
 		for(String team : teamM.getActiveTeams()){
 			Objective header = teamHeaders.get(team);
 			gameStartInit(header);
-
 		}
-
 	}
 
 	@EventHandler
 	public void onUpdate(GameOpenEvent e){
+
 		Score timeTillMatch = header.getScore(ChatColor.AQUA + "Match Starts In: ");
 		updater(timeTillMatch, 20L, 0L, new Callable<Integer>() {
 			public Integer call(){
 				return timerM.getTimeTillMatchStart();
 			}
 		});
-
 	}
 
+	@EventHandler
+	public void onUpdate(PVPEnableEvent e){
+		meetupStartInit(this.header);
 
-
+		for(String team : teamM.getActiveTeams()){
+			Objective header = teamHeaders.get(team);
+			meetupStartInit(header);
+		}
+	}
 }

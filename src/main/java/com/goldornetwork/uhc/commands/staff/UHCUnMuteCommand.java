@@ -7,18 +7,21 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.goldornetwork.uhc.commands.UHCCommand;
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.world.listeners.team.ChatManager;
+import com.goldornetwork.uhc.managers.chat.ChatManager;
 import com.goldornetwork.uhc.utils.MessageSender;
+import com.goldornetwork.uhc.utils.PlayerUtils;
 
 public class UHCUnMuteCommand extends UHCCommand{
 
+
 	private ChatManager chatM;
 	private TeamManager teamM;
+
+
 	public UHCUnMuteCommand(ChatManager chatM, TeamManager teamM) {
 		super("unmute", "[player]");
 		this.chatM=chatM;
@@ -26,44 +29,39 @@ public class UHCUnMuteCommand extends UHCCommand{
 	}
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		Player banner = (Player) sender;
-		if(!(sender instanceof Player)){
+	public boolean execute(Player sender, String[] args) {
+		if(args.length==0){
+			MessageSender.send(sender, ChatColor.RED + "Please specify a player.");
 			return true;
 		}
-		else if(args.length==0){
-			MessageSender.send(ChatColor.RED, banner, "Please specify a player.");
-			return true;
-		}
-		
 		else if(args[0].equalsIgnoreCase("*")){
 			chatM.unMutePlayers();
 			return true;
 		}
-		else if(Bukkit.getOfflinePlayer(args[0]).isOnline()==false){
-			MessageSender.send(ChatColor.RED, banner, "Player " + args[0].toLowerCase() + " is not online.");
+		else if(PlayerUtils.isPlayerOnline(args[0])==false){
+			MessageSender.send(sender, ChatColor.RED + "Player " + args[0].toLowerCase() + " is not online.");
 			return true;
 		}
 		else if(args.length==1){
-			Player target = Bukkit.getPlayer(args[0]);
-			
+			Player target = PlayerUtils.getPlayer(args[0]);
+
 			if(chatM.isMuted(target.getUniqueId())){
 				chatM.unMute(target.getUniqueId());
 				return true;
 			}
 			else{
-				MessageSender.send(ChatColor.RED, banner, "Player " + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName() + ChatColor.RED + " is not muted.");
+				MessageSender.send(sender, ChatColor.RED + "Player " + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName()
+				+ ChatColor.RED + " is not muted.");
 				return true;
 			}
 		}
 		else{
-			
 			return false;
 		}
 	}
 
 	@Override
-	public List<String> tabComplete(CommandSender sender, String[] args) {
+	public List<String> tabComplete(Player sender, String[] args) {
 		List<String> toReturn = new ArrayList<String>();
 		if(args.length==1){
 			for(UUID all : chatM.getMutedPlayers()){

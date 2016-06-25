@@ -3,10 +3,12 @@ package com.goldornetwork.uhc.managers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
@@ -23,6 +25,7 @@ import com.goldornetwork.uhc.utils.MessageSender;
 
 public class VoteManager implements Listener{
 
+	
 	private GameModeManager gamemodeM;
 	private UHC plugin;
 	private Random random = new Random();
@@ -30,9 +33,10 @@ public class VoteManager implements Listener{
 	private final int AMOUNTTOENABLE = 3;
 	private List<List<Gamemode>> options= new LinkedList<List<Gamemode>>();
 	private Map<Integer, Integer> mostPopularVote = new HashMap<Integer, Integer>();
-	private List<UUID> haveVoted = new ArrayList<UUID>();
+	private Set<UUID> haveVoted = new HashSet<UUID>();
 	private boolean voteActive;
 
+	
 	public VoteManager(UHC plugin, GameModeManager gamemodeM) {
 		this.plugin=plugin;
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -45,25 +49,25 @@ public class VoteManager implements Listener{
 		options.clear();
 		voteActive=false;
 	}
+
 	public int getNumberOfOptions(){
 		return NUMBEROFOPTIONS;
 	}
+
 	public boolean isValidOption(int option){
 		if(option> 0 && option <=NUMBEROFOPTIONS){
 			return true;
 		}
+
 		return false;
 	}
 
 	public void broadcastOptions(){
 
 		new BukkitRunnable() {
-
 			@Override
 			public void run() {
-
 				MessageSender.broadcast(getMessage());				
-
 			}
 		}.runTaskLater(plugin, 80L);
 	}
@@ -71,10 +75,9 @@ public class VoteManager implements Listener{
 	private List<String> getMessage(){
 		List<String> toBroadcast = new LinkedList<String>();
 		toBroadcast.add("[Options] Please use /vote [option], also /info [gamemode]");
-		
+
 		for(int i = 0; i<getNumberOfOptions(); i++){
 			int comma = 0;
-
 			StringBuilder str = new StringBuilder();
 
 			for(Gamemode game : getOptions().get(i)){
@@ -87,33 +90,36 @@ public class VoteManager implements Listener{
 				else{
 					properMessage=message;
 				}
-				str.append(properMessage);
 
+				str.append(properMessage);
 			}
 			String msg = str.toString();
 			toBroadcast.add("Option " + (i + 1) + ": " + msg);
-
 		}
+
 		return toBroadcast;
 	}
 
 	public void generateOptions(){
 		voteActive=true;
+
 		for(int k = 0; k<NUMBEROFOPTIONS; k++){
 			List<Gamemode> toAdd = new ArrayList<Gamemode>();
 			toAdd.clear();
+
 			for(int i =0; i<AMOUNTTOENABLE; i++){
 				boolean matched = false;
+
 				while(matched==false){
 					Gamemode game;
 					int index;
 					index = random.nextInt(gamemodeM.getNumberOfGamemodes()) ;
 					game = gamemodeM.getGameMode(gamemodeM.getGamemodes().get(index).getClass());
+
 					while(isValid(game)==false){
 						index = random.nextInt(gamemodeM.getNumberOfGamemodes());
 						game = gamemodeM.getGameMode(gamemodeM.getGamemodes().get(index).getClass());
 					}
-					//TODO loop through options and check if selected gamemode is already an option
 					if(toAdd.contains(game)){
 						matched=false;
 					}
@@ -128,11 +134,11 @@ public class VoteManager implements Listener{
 			mostPopularVote.put(k, 0);
 		}
 	}
+
 	private boolean isValid(Gamemode game){
 		boolean valid = true;
 		return valid;
 	}
-
 
 	public List<List<Gamemode>> getOptions(){
 		return options;
@@ -143,6 +149,7 @@ public class VoteManager implements Listener{
 		List<String> toBroadcast = new LinkedList<String>();
 		StringBuilder str = new StringBuilder();
 		int comma=0;
+
 		for(Gamemode game : options.get(choice)){
 			game.enable(plugin);
 			toBroadcast.add(ChatColor.AQUA + game.getProperName() + " has been enabled.");
@@ -155,8 +162,8 @@ public class VoteManager implements Listener{
 			else{
 				properMessage= "and " + message;
 			}
-			str.append(properMessage);
 
+			str.append(properMessage);
 		}
 		String msg = str.toString();
 		MessageSender.broadcastSmallTitle(msg + " have been enabled.");
@@ -184,6 +191,7 @@ public class VoteManager implements Listener{
 				currentWinner=entry.getKey();
 			}
 		}
+
 		return currentWinner;
 	}
 
@@ -199,8 +207,8 @@ public class VoteManager implements Listener{
 	public void on(PlayerJoinEvent e){
 		Player target =e.getPlayer();
 		if(isActive()){
-			new BukkitRunnable() {
 
+			new BukkitRunnable() {
 				@Override
 				public void run() {
 					if(target.isOnline()){
@@ -208,10 +216,6 @@ public class VoteManager implements Listener{
 					}					
 				}
 			}.runTaskLater(plugin, 10L);
-
 		}
-
 	}
-
-
 }

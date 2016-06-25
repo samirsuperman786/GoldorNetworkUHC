@@ -1,17 +1,19 @@
-package com.goldornetwork.uhc.managers.world.events;
+package com.goldornetwork.uhc.managers.world.customevents;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class TeleportTeamEvent extends Event{
+public class LateScatterEvent extends Event {
 
 	
 	private static final HandlerList HANDLERS = new HandlerList();
 
-	public HandlerList getHandlers() {
+	
+	public HandlerList getHandlers(){
 		return HANDLERS;
 	}
-	public static HandlerList getHandlerList() {
+
+	public static HandlerList getHandlerList(){
 		return HANDLERS;
 	}
 }

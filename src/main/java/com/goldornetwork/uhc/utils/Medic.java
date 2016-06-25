@@ -12,15 +12,17 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
+import com.goldornetwork.uhc.managers.world.customevents.GameStartEvent;
 
 public class Medic implements Listener {
 
+	
 	private UHC plugin;
 	private TeamManager teamM;
 
+	
 	private int timeTillHeal;
-	public Medic(UHC plugin, TeamManager teamM) {
+	public Medic(UHC plugin, TeamManager teamM){
 		this.plugin=plugin;
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.teamM=teamM;
@@ -29,8 +31,8 @@ public class Medic implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(GameStartEvent e){
-		new BukkitRunnable() {
 
+		new BukkitRunnable() {
 			@Override
 			public void run() {
 				if(timeTillHeal == 0){
@@ -42,6 +44,7 @@ public class Medic implements Listener {
 							Bukkit.getPlayer(u).setSaturation(20L);
 						}
 					}
+
 					cancel();
 				}
 				else if(timeTillHeal>0){
@@ -52,16 +55,15 @@ public class Medic implements Listener {
 						MessageSender.broadcast(ChatColor.DARK_AQUA + "Final heal in " + ChatColor.DARK_RED + timeTillHeal + ChatColor.DARK_AQUA + " second.");
 					}
 				}
-				timeTillHeal--;
 
+				timeTillHeal--;
 			}
 		}.runTaskTimer(plugin, 0L, 20L);
 	}
-	
+
 	public static void heal(Player p){
 		p.setHealth(p.getMaxHealth());
 		p.setFoodLevel(20);
 		p.setSaturation(20L);
 	}
-	
 }

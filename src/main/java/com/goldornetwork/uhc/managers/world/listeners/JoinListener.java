@@ -16,31 +16,34 @@ import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.managers.world.WorldManager;
+import com.goldornetwork.uhc.managers.world.customevents.UHCJoinEvent;
 import com.goldornetwork.uhc.utils.Medic;
 import com.goldornetwork.uhc.utils.MessageSender;
 
-public class JoinEvent implements Listener{
+public class JoinListener implements Listener{
 
-	//instances
+	
+	private UHC plugin;
 	private TeamManager teamM;
 	private WorldManager worldM;
 	private Random random = new Random();
+
 	
-	public JoinEvent(UHC plugin, TeamManager teamM, WorldManager worldM) {
+	public JoinListener(UHC plugin, TeamManager teamM, WorldManager worldM) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.teamM=teamM;
 		this.worldM=worldM;
+		this.plugin=plugin;
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onJoin(PlayerJoinEvent e){
+	public void on(PlayerJoinEvent e){
 		Player p = e.getPlayer();
-		
-		
+
 		if(State.getState().equals(State.OPEN)){
 			if(teamM.isPlayerInGame(p.getUniqueId())==false){
 				if(teamM.isTeamsEnabled()){
-					MessageSender.alertMessage(p, ChatColor.RED, "You are currently not on a team. Use /create");
+					MessageSender.alertMessage(p, ChatColor.RED + "You are currently not on a team. Use /create");
 				}
 			}
 		}
@@ -61,9 +64,10 @@ public class JoinEvent implements Listener{
 			p.teleport(toTeleport);
 			Medic.heal(p);
 		}
-		
-
+		if(State.getState().equals(State.INGAME)){
+			if(teamM.isPlayerInGame(p.getUniqueId())){
+				plugin.getServer().getPluginManager().callEvent(new UHCJoinEvent(p));
+			}
+		}
 	}
-
-
 }

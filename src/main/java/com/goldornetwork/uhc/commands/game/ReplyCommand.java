@@ -4,16 +4,17 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.goldornetwork.uhc.commands.UHCCommand;
-import com.goldornetwork.uhc.managers.world.listeners.team.ChatManager;
+import com.goldornetwork.uhc.managers.chat.ChatManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class ReplyCommand extends UHCCommand{
 
+
 	private ChatManager chatM;
+
 
 	public ReplyCommand(ChatManager chatM) {
 		super("reply", "[message]");
@@ -21,33 +22,30 @@ public class ReplyCommand extends UHCCommand{
 	}
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		Player messenger = (Player) sender;
-		if(!(sender instanceof Player)){
-			return true;
-		}
-		else if(args.length==0){
+	public boolean execute(Player sender, String[] args){
+
+		if(args.length==0){
 			return false;
 		}
-		else if(chatM.hasRecentlyMessaged(messenger)==false){
-			MessageSender.send(ChatColor.RED, messenger, "No one to reply to.");
+		else if(chatM.hasRecentlyMessaged(sender)==false){
+			MessageSender.send(sender, ChatColor.RED + "No one to reply to.");
 			return true;
 		}
 		else if(args.length>0){
-			if(Bukkit.getOfflinePlayer(chatM.getRecentRecipient(messenger)).isOnline()){
+
+			if(Bukkit.getOfflinePlayer(chatM.getRecentRecipient(sender)).isOnline()){
 				StringBuilder str = new StringBuilder();
 				for(int i =0; i<args.length; i++){
 					str.append(args[i] + " ");
 				}
 				String msg = str.toString();
-				chatM.reply(messenger, msg);
+				chatM.reply(sender, msg);
 			}
 			else{
-				MessageSender.send(ChatColor.RED, messenger, "Player " + Bukkit.getOfflinePlayer(chatM.getRecentRecipient(messenger)).getName() + ChatColor.RED + " is not online.");
+				MessageSender.send(sender, ChatColor.RED + "Player " + Bukkit.getOfflinePlayer(chatM.getRecentRecipient(sender)).getName()
+						+ ChatColor.RED + " is not online.");
 			}
-
 			return true;
-
 		}
 		else{
 			return false;
@@ -55,7 +53,7 @@ public class ReplyCommand extends UHCCommand{
 	}
 
 	@Override
-	public List<String> tabComplete(CommandSender sender, String[] args) {
+	public List<String> tabComplete(Player sender, String[] args) {
 		return null;
 	}
 
