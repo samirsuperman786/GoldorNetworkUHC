@@ -3,19 +3,20 @@ package com.goldornetwork.uhc.commands.team;
 import java.util.List;
 
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.goldornetwork.uhc.commands.UHCCommand;
 import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.managers.world.listeners.team.TeamInteraction;
+import com.goldornetwork.uhc.managers.chat.TeamInteraction;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class TeamChatCommand extends UHCCommand{
 
+
 	private TeamInteraction teamI;
 	private TeamManager teamM;
-	
+
+
 	public TeamChatCommand(TeamManager teamM, TeamInteraction teamI) {
 		super("pmt", "[message]");
 		this.teamI=teamI;
@@ -23,15 +24,11 @@ public class TeamChatCommand extends UHCCommand{
 	}
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		Player p = (Player) sender;
-		if(!(sender instanceof Player)){
-			MessageSender.noConsole(sender);
-			return true;
-		}
-		else if(teamM.isTeamsEnabled()){
-			if(teamM.isPlayerInGame(p.getUniqueId())){
-				if(teamM.isPlayerOnTeam(p.getUniqueId())){
+	public boolean execute(Player sender, String[] args) {
+		if(teamM.isTeamsEnabled()){
+
+			if(teamM.isPlayerInGame(sender.getUniqueId())){
+				if(teamM.isPlayerOnTeam(sender.getUniqueId())){
 					if(args.length==0){
 						return false;
 					}
@@ -41,23 +38,22 @@ public class TeamChatCommand extends UHCCommand{
 							str.append(args[i] + " ");
 						}
 						String msg = str.toString();
-						teamI.sendMsgTeamates(teamM.getTeamOfPlayer(p.getUniqueId()), p, msg);
+						teamI.sendMsgTeamates(teamM.getTeamOfPlayer(sender.getUniqueId()), sender, msg);
 						return true;
 					}
-					
 				}
 				else{
-					MessageSender.send(ChatColor.RED, p, "You are not on a team!");
+					MessageSender.send(sender, ChatColor.RED + "You are not on a team.");
 					return true;
 				}
 			}
 			else{
-				MessageSender.send(ChatColor.RED, p, "You are not in the game!");
+				MessageSender.send(sender, ChatColor.RED + "You are not in the game.");
 				return true;
 			}
 		}
 		else if(teamM.isTeamsEnabled()==false){
-			MessageSender.send(ChatColor.RED, p, "Teams are not enabled!");
+			MessageSender.send(sender, ChatColor.RED + "Teams are not enabled.");
 			return true;
 		}
 		else{
@@ -66,9 +62,7 @@ public class TeamChatCommand extends UHCCommand{
 	}
 
 	@Override
-	public List<String> tabComplete(CommandSender sender, String[] args) {
-		// TODO Auto-generated method stub
+	public List<String> tabComplete(Player sender, String[] args) {
 		return null;
 	}
-
 }

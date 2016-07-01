@@ -21,35 +21,41 @@ import com.goldornetwork.uhc.managers.GameModeManager.State;
 
 public class CutClean extends Gamemode implements Listener{
 
+	
 	private TeamManager teamM;
 	private Random random = new Random();
+
 	
 	public CutClean(TeamManager teamM) {
 		super("Cut Clean", "CutClean", "Pretty much any drop is smelted.");
 		this.teamM=teamM;
 	}
-	
+
 	@EventHandler
 	public void on(BlockBreakEvent e){
 		if(State.getState().equals(State.INGAME)==false){
 			return;
 		}
+
 		Player target = e.getPlayer();
 		if(teamM.isPlayerInGame(target.getUniqueId())==false){
 			return;
 		}
+
 		Block block = e.getBlock();
 		if(getSmeltedBlock(block)==null){
 			return;
 		}
+
 		dropItem(target.getLocation(), new ItemStack(getSmeltedBlock(block)));
 		target.giveExp(e.getExpToDrop());
 		e.setCancelled(true);
 		block.setType(Material.AIR);
 	}
-	
+
 	@EventHandler
 	public void on(EntityDeathEvent e){
+
 		if(State.getState().equals(State.INGAME)==false){
 			return;
 		}
@@ -79,6 +85,7 @@ public class CutClean extends Gamemode implements Listener{
 	}
 	private List<ItemStack> getSmelted(Entity mob){
 		List<Material> toAdd = new ArrayList<Material>();
+
 		switch(mob.getType()){
 		case CHICKEN: 
 			toAdd.add(Material.COOKED_CHICKEN);
@@ -106,17 +113,18 @@ public class CutClean extends Gamemode implements Listener{
 		default:
 			return null;
 		}
+
 		List<ItemStack> toReturn = new ArrayList<ItemStack>();
+
 		for(Material toItem :toAdd){
 			int amount = random.nextInt(3);
 			toReturn.add(new ItemStack(toItem, amount));
-			
 		}
+
 		return toReturn;
 	}
-	
+
 	private void dropItem(Location loc, ItemStack item){
 		loc.getWorld().dropItem(loc, item);
 	}
-	
 }

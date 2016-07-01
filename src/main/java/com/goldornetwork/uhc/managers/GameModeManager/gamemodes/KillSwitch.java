@@ -17,14 +17,9 @@ public class KillSwitch extends Gamemode implements Listener{
 
 	
 	public KillSwitch() {
-		super("Kill Switch", "KillSwitch", "When a player kills another player, that player will switch inventories!");
+		super("Kill Switch", "KillSwitch", "When a player kills another player, that player will switch inventories.");
 	}
-	@Override
-	public void onEnable() {}
-	
-	@Override
-	public void onDisable() {}
-	
+
 	@EventHandler(priority=EventPriority.MONITOR)
 	public void on(PlayerDeathEvent e){
 		if(State.getState().equals(State.INGAME)){
@@ -35,6 +30,7 @@ public class KillSwitch extends Gamemode implements Listener{
 			}
 		}
 	}
+
 	private void run(Player target, Player killer, PlayerDeathEvent e){
 		ItemStack[] targetInventory = target.getInventory().getContents();
 		Inventory killerInventory = killer.getInventory();
@@ -42,7 +38,6 @@ public class KillSwitch extends Gamemode implements Listener{
 		killerInventory.setContents(targetInventory);
 		killer.getInventory().setArmorContents(target.getInventory().getArmorContents());
 		e.getDrops().clear();
-		MessageSender.alertMessage(killer, ChatColor.GOLD, "You have switched inventories with " +  target.getName());
+		MessageSender.alertMessage(killer, ChatColor.GOLD + "You have switched inventories with " +  target.getName());
 	}
-	
 }

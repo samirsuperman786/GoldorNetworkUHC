@@ -3,13 +3,14 @@ package com.goldornetwork.uhc.managers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,26 +21,28 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
+import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.SkyHigh;
+import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.WetCombat;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class VoteManager implements Listener{
 
+	
 	private GameModeManager gamemodeM;
-	private TeamManager teamM;
 	private UHC plugin;
 	private Random random = new Random();
 	private final int NUMBEROFOPTIONS = 3;
 	private final int AMOUNTTOENABLE = 3;
 	private List<List<Gamemode>> options= new LinkedList<List<Gamemode>>();
 	private Map<Integer, Integer> mostPopularVote = new HashMap<Integer, Integer>();
-	private List<UUID> haveVoted = new ArrayList<UUID>();
+	private Set<UUID> haveVoted = new HashSet<UUID>();
 	private boolean voteActive;
 
-	public VoteManager(UHC plugin, GameModeManager gamemodeM, TeamManager teamM) {
+	
+	public VoteManager(UHC plugin, GameModeManager gamemodeM) {
 		this.plugin=plugin;
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.gamemodeM = gamemodeM;
-		this.teamM=teamM;
 	}
 
 	public void setup(){
@@ -48,9 +51,11 @@ public class VoteManager implements Listener{
 		options.clear();
 		voteActive=false;
 	}
+
 	public int getNumberOfOptions(){
 		return NUMBEROFOPTIONS;
 	}
+
 	public boolean isValidOption(int option){
 		if(option> 0 && option <=NUMBEROFOPTIONS){
 			return true;
@@ -61,23 +66,19 @@ public class VoteManager implements Listener{
 	public void broadcastOptions(){
 
 		new BukkitRunnable() {
-
 			@Override
 			public void run() {
-
 				MessageSender.broadcast(getMessage());				
-
 			}
-		}.runTaskLater(plugin, 100L);
+		}.runTaskLater(plugin, 80L);
 	}
 
 	private List<String> getMessage(){
 		List<String> toBroadcast = new LinkedList<String>();
 		toBroadcast.add("[Options] Please use /vote [option], also /info [gamemode]");
-		
+
 		for(int i = 0; i<getNumberOfOptions(); i++){
 			int comma = 0;
-
 			StringBuilder str = new StringBuilder();
 
 			for(Gamemode game : getOptions().get(i)){
@@ -85,38 +86,41 @@ public class VoteManager implements Listener{
 				String message = ChatColor.AQUA + game.getProperName();
 				String properMessage;
 				if(comma<getOptions().get(i).size()){
-					properMessage = message + ", ";
+					properMessage = message + ChatColor.GRAY + " + ";
 				}
 				else{
 					properMessage=message;
 				}
-				str.append(properMessage);
 
+				str.append(properMessage);
 			}
 			String msg = str.toString();
 			toBroadcast.add("Option " + (i + 1) + ": " + msg);
-
 		}
+
 		return toBroadcast;
 	}
 
 	public void generateOptions(){
 		voteActive=true;
+
 		for(int k = 0; k<NUMBEROFOPTIONS; k++){
 			List<Gamemode> toAdd = new ArrayList<Gamemode>();
 			toAdd.clear();
+
 			for(int i =0; i<AMOUNTTOENABLE; i++){
 				boolean matched = false;
+
 				while(matched==false){
 					Gamemode game;
 					int index;
 					index = random.nextInt(gamemodeM.getNumberOfGamemodes()) ;
 					game = gamemodeM.getGameMode(gamemodeM.getGamemodes().get(index).getClass());
-					while(isValid(game)==false){
+
+					while(isValid(toAdd, game)==false){
 						index = random.nextInt(gamemodeM.getNumberOfGamemodes());
 						game = gamemodeM.getGameMode(gamemodeM.getGamemodes().get(index).getClass());
 					}
-					//TODO loop through options and check if selected gamemode is already an option
 					if(toAdd.contains(game)){
 						matched=false;
 					}
@@ -131,11 +135,18 @@ public class VoteManager implements Listener{
 			mostPopularVote.put(k, 0);
 		}
 	}
-	private boolean isValid(Gamemode game){
+
+	private boolean isValid(List<Gamemode> gamemodes, Gamemode game){
 		boolean valid = true;
+		List<Gamemode> combined = new ArrayList<Gamemode>();
+		combined.addAll(gamemodes);
+		combined.add(game);
+		if(combined.contains(gamemodeM.getGameMode(SkyHigh.class)) && combined.contains(WetCombat.class)){
+			valid=false;
+		}
+		
 		return valid;
 	}
-
 
 	public List<List<Gamemode>> getOptions(){
 		return options;
@@ -144,25 +155,13 @@ public class VoteManager implements Listener{
 	public void enableOption(int choice){
 		voteActive=false;
 		List<String> toBroadcast = new LinkedList<String>();
-		StringBuilder str = new StringBuilder();
-		int comma=0;
+
 		for(Gamemode game : options.get(choice)){
 			game.enable(plugin);
-			toBroadcast.add(ChatColor.AQUA + game.getName() + " has been enabled");
-			comma++;
-			String message = ChatColor.AQUA + game.getProperName();
-			String properMessage;
-			if(comma<getOptions().get(choice).size()){
-				properMessage = message + ", ";
-			}
-			else{
-				properMessage=message;
-			}
-			str.append(properMessage);
-
+			toBroadcast.add(ChatColor.AQUA + game.getProperName() + " has been enabled.");
 		}
-		String msg = str.toString();
-		MessageSender.broadcastSmallTitle(msg + " have been enabled.");
+		
+		MessageSender.broadcastTitle(ChatColor.AQUA + "Gamemodes have been enabled.", ChatColor.GOLD + "Use" + ChatColor.RED + " /info " + ChatColor.GOLD + "to learn them!");
 		MessageSender.broadcast(toBroadcast);
 	}
 
@@ -187,6 +186,7 @@ public class VoteManager implements Listener{
 				currentWinner=entry.getKey();
 			}
 		}
+
 		return currentWinner;
 	}
 
@@ -202,19 +202,15 @@ public class VoteManager implements Listener{
 	public void on(PlayerJoinEvent e){
 		Player target =e.getPlayer();
 		if(isActive()){
-			new BukkitRunnable() {
 
+			new BukkitRunnable() {
 				@Override
 				public void run() {
 					if(target.isOnline()){
-						MessageSender.send(getMessage(), target);
+						MessageSender.send(target, getMessage());
 					}					
 				}
 			}.runTaskLater(plugin, 10L);
-
 		}
-
 	}
-
-
 }

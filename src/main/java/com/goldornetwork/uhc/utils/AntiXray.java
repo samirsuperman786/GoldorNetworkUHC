@@ -17,19 +17,17 @@ import com.goldornetwork.uhc.managers.GameModeManager.State;
 
 public class AntiXray implements Listener{
 
-	
+
 	private Map<UUID, Integer> amountOfDiamondsMined = new HashMap<UUID, Integer>();
 	private final int DIAMONDTHRESHOLD = 20;
+
 	
-	public AntiXray(UHC plugin) {
+	public AntiXray(UHC plugin){
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
-		setup();
 	}
-	private void setup(){
-		amountOfDiamondsMined.clear();
-	}
+
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onBreak(BlockBreakEvent e){
+	public void on(BlockBreakEvent e){
 		if(State.getState().equals(State.INGAME)){
 			if(e instanceof Player){
 				if(e.getBlock().getType().equals(Material.DIAMOND_ORE)){
@@ -38,9 +36,8 @@ public class AntiXray implements Listener{
 				}
 			}
 		}
-		
 	}
-	
+
 	private void run(Player p, BlockBreakEvent e){
 		if(amountOfDiamondsMined.containsKey(p.getUniqueId())==false){
 			amountOfDiamondsMined.put(p.getUniqueId(), 1);

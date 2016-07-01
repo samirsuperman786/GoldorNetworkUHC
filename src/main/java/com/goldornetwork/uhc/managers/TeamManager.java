@@ -3,9 +3,11 @@ package com.goldornetwork.uhc.managers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -13,23 +15,19 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.goldornetwork.uhc.UHC;
-import com.goldornetwork.uhc.managers.GameModeManager.State;
-import com.goldornetwork.uhc.managers.board.BoardManager;
+import com.goldornetwork.uhc.managers.world.customevents.GameStartEvent;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 
-
-//TODO kick player from team
-
+public class TeamManager implements Listener{
 
 
-public class TeamManager {
-
-	//instances
 	private UHC plugin;
 	private BoardManager boardM;
 	private Random random = new Random();
@@ -38,24 +36,23 @@ public class TeamManager {
 	private int MaxTeams;
 	private boolean isTeamsEnabled;
 
-	private List<UUID> playersInGame = new ArrayList<UUID>();
-	private List<UUID> observers = new ArrayList<UUID>();
-	private List<String> listOfActiveTeams = new ArrayList<String>();
-
+	private Set<UUID> playersInGame = new HashSet<UUID>();
+	private Set<UUID> observers = new HashSet<UUID>();
+	private Set<String> listOfActiveTeams = new HashSet<String>();
+	
 	private Map<UUID, String> teamOfPlayer = new HashMap<UUID, String>();
 	private Map<String, String> colorOfTeam = new HashMap<String, String>();
 	private Map<String, Integer> playersOnCurrentTeam = new HashMap<String, Integer>();
 	private Map<String, UUID> ownerOfTeam = new HashMap<String, UUID>();
-	private Map<String, List<UUID>> invitedPlayers = new HashMap<String, List<UUID>>();
+	private Map<String, Set<UUID>> invitedPlayers = new HashMap<String, Set<UUID>>();
+	
 
 	public TeamManager(UHC plugin, BoardManager boardM) {
 		this.plugin=plugin;
 		this.boardM=boardM;
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
-	/**
-	 * Does the following: removes all players from ingame, removes all observers, and basically starts a new blank TeamManager
-	 */
 	public void setup(){
 		config();
 		this.playersPerTeam=0;
@@ -82,20 +79,15 @@ public class TeamManager {
 		this.MaxTeams=plugin.getConfig().getInt("MAX-TEAMS");
 	}
 
-
 	public enum TEAMS{
 		ALPHA, BETA, GAMMA, DELTA, EPSILON, ZETA, ETA, THETA, IOTA, KAPPA, LAMBDA, MU, NU, XI, OMICRON, PI, RHO, SIGMA, TAU, UPSILON, PHI, CHI, PSI, OMEGA
 	}
 
 	public enum BASECOLORS{
-		BLUE, DARK_AQUA, DARK_BLUE, DARK_GRAY, DARK_PURPLE, DARK_RED, LIGHT_PURPLE, YELLOW
+		BLUE, DARK_AQUA, DARK_BLUE, DARK_PURPLE, LIGHT_PURPLE, YELLOW
 	}
 
-	/**
-	 * Sets up new teams based on how many teams are given
-	 * @param numberOfTeams - the number of teams to create
-	 */
-	private void initializeT(){
+	private void initializeTeams(){
 		List<BASECOLORS> colorsCombinations = Arrays.asList(BASECOLORS.values());
 		int i = 0;
 		for(String team : plugin.getTeamConfig().getStringList("TEAM-NAMES")){
@@ -106,288 +98,187 @@ public class TeamManager {
 				break;
 			}
 		}
-
 	}
 
-
-
-
-	/**
-	 * Sets up teams with a give team size
-	 * @param teamSize - the number of teams to create
-	 */
 	public void setupTeams(int teamSize){
 		isTeamsEnabled = true;
 		this.playersPerTeam = teamSize;
-		initializeT();
-
+		initializeTeams();
 	}
 
 	public int getTeamSize(){
 		return this.playersPerTeam;
 	}
+	
+	public void setTeamSize(int val){
+		this.playersPerTeam=val;
+	}
 
-	/**
-	 * Checks if teams are enabled
-	 * @return <code> True </code> if teams are enabled
-	 */
 	public boolean isTeamsEnabled(){
 		return isTeamsEnabled;
 	}
 
-	/**
-	 * Checks if a given team exists
-	 * @param team the team to check
-	 * @return <code> True </code> if the given team exists
-	 */
 	public boolean isValidTeam(String team){
-		if(listOfActiveTeams.contains(team.toLowerCase())){
-			return true;
-		}
-		else{
-			return false;
-		}
+		return listOfActiveTeams.contains(team.toLowerCase());
 	}
 
-	/**
-	 * Checks if a given player is in game
-	 * @param p the player to check 
-	 * @return <code> True </code> if the player is in game
-	 */
 	public boolean isPlayerInGame(UUID target){
 		return playersInGame.contains(target);
-
 	}
 
-
-	/**
-	 * Removes a player from the status of owner
-	 * @param p the player to remove from owner
-	 */
-	public void removePlayerFromOwner(Player p){
-		ownerOfTeam.remove(p.getUniqueId());
+	public void addPlayerToOwner(String team, UUID target){
+		ownerOfTeam.put(team, target);
 	}
 
-	/**
-	 * Removes a given player from a any team that player is on
-	 * @param p the player to remove from a team
-	 */
+	public void removePlayerFromOwner(String team, UUID target){
+		if(ownerOfTeam.get(team).equals(target)){
+			ownerOfTeam.remove(team);
+		}
+	}
+
 	public void removePlayerFromTeam(UUID target){
 		OfflinePlayer offTarget = Bukkit.getOfflinePlayer(target);
 		boardM.removePlayerFromTeam(getTeamOfPlayer(target), offTarget);
-		decreaseTeamSize(getTeamOfPlayer(target), 1);
+		decreaseTeamCount(getTeamOfPlayer(target), 1);
 		playersInGame.remove(target);
 		teamOfPlayer.remove(target);
-		
-		if(offTarget.isOnline()){
-			Player p = (Player) offTarget;
-			p.setDisplayName(p.getName());
-		}
 	}
 
-
-
-
-	/**
-	 * Checks if a given player is an observer
-	 * @param p the player to check
-	 * @return <code> True </code> if the give player is observing
-	 */
 	public boolean isPlayerAnObserver(UUID u){
 		return observers.contains(u);
-		
-
 	}
 
-
-	/**
-	 * Gets a list of players in game
-	 * @return <code> List[UUID] </code> of players in game
-	 */
-	public List<UUID> getPlayersInGame(){
+	public Set<UUID> getPlayersInGame(){
 		return playersInGame;
 	}
 
-	/**
-	 * Gets a list of observers
-	 * @return <code> List[UUID] </code> of observers
-	 */
-	public List<UUID> getObservers(){
+	public Set<UUID> getObservers(){
 		return observers;
 	}
 
-	/**
-	 * Retrieves the team of a given player
-	 * @param p - the player to get the team of
-	 * @return <code> String </code> of the given players team
-	 */
 	public String getTeamOfPlayer(UUID target){
 		return teamOfPlayer.get(target).toLowerCase();
 	}
 
-
-	/**
-	 * Retrieves the owner of a team
-	 * @param team - the team to get the owner from
-	 * @return <code> UUID </code> of the owner
-	 */
 	public UUID getOwnerOfTeam(String team){
 		return ownerOfTeam.get(team);
 	}
 
-	/**
-	 * Checks if a player is online with a given string
-	 * @param target - the name of a player to check for
-	 * @return <code> True </code> if the player is online
-	 */
-	public boolean isPlayerOnline(String target){
-		if(Bukkit.getServer().getOfflinePlayer(target).isOnline()){
-			return true;
-		}
-		else{
-			return false;
-		}
-	}
-
-	/**
-	 * Used to create a new team with a given player
-	 * @param p the player who creates the team
-	 * @return <code> True </code> if the team could be created
-	 */
-	public boolean createRandomTeam(Player p){
+	public boolean createRandomTeam(Player target){
 		boolean foundTeam = false;
 		for(Map.Entry<String, Integer> entry : playersOnCurrentTeam.entrySet()){
 			if(entry.getValue()==0){
-				listOfActiveTeams.add(entry.getKey());
-				boardM.createTeam(entry.getKey());
-				addPlayerToTeam(p, entry.getKey());
-				ownerOfTeam.put(entry.getKey(), p.getUniqueId());
+				String team = entry.getKey();
+				listOfActiveTeams.add(team);
+				boardM.createTeam(team);
+				addPlayerToTeam(target, team);
+				ownerOfTeam.put(team, target.getUniqueId());
 				foundTeam= true;
 				break;
 			}
-
 		}
+
 		return foundTeam;
-
 	}
 
-	/**
-	 * Checks if there is room to join a specified team
-	 * @param team - the team to check for
-	 * @return <code> True </code> if there is room to join
-	 */
-	public boolean isTeamRoomToJoin(String team){
+	public boolean isRoomToJoin(String team){
 		return (playersPerTeam - playersOnCurrentTeam.get(team.toLowerCase())>0);
-
 	}
 
-
-	/**
-	 * Used to add a specified player to a given team
-	 * @param p - the player who is joining a team
-	 * @param team - the team to add the player to
-	 */
 	public void addPlayerToTeam(Player p, String team){
+
 		for(UUID u : getPlayersOnATeam(team.toLowerCase())){
 			if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
-				MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.GREEN, p.getName() + " has joined your team.");
+				MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.GREEN + p.getName() + ChatColor.GOLD + " has joined your team.");
 			}
 		}
-		boardM.addPlayerToTeam(team, p);
+
+		
 		playersInGame.add(p.getUniqueId());
 		teamOfPlayer.put(p.getUniqueId(), team);
-		increaseTeamSize(team, 1);
-		displayName(p, team);
+		increaseTeamCount(team, 1);
+		boardM.addPlayerToTeam(team, p);
+		if(invitedPlayers.containsKey(team)){
+			if(invitedPlayers.get(team).contains(p.getUniqueId())){
+				invitedPlayers.get(team).remove(p.getUniqueId());
+			}
+		}
 	}
 
 	public boolean isPlayerOnTeam(UUID target){
 		return teamOfPlayer.containsKey(target);
-		
+
 	}
 
-	/**
-	 * Used to permit an arbitrary player to join the team of another player
-	 * @param inviter - the person who is inviting
-	 * @param target - the person to invite
-	 */
 	public void invitePlayer(String team, UUID target){
-		if(invitedPlayers.containsKey(team)){
-			invitedPlayers.get(team).add(target);
+
+		if(invitedPlayers.containsKey(team.toLowerCase())){
+			invitedPlayers.get(team.toLowerCase()).add(target);
 		}
 		else{
-			List<UUID> toAdd = new ArrayList<UUID>();
+			Set<UUID> toAdd = new HashSet<UUID>();
 			toAdd.add(target);
-			invitedPlayers.put(team, toAdd);
+			invitedPlayers.put(team.toLowerCase(), toAdd);
 		}
 	}
 
-	/**
-	 * Used to disallow a player from joining a team
-	 * @param inviter - the person who is un-inviting
-	 * @param target - the person to un-invite
-	 */
+	public Set<UUID> getInvitedPlayers(String team){
+		if(invitedPlayers.containsKey(team.toLowerCase())){
+			return invitedPlayers.get(team.toLowerCase());
+		}
+		else{
+			Set<UUID> toReturn= new HashSet<UUID>();
+			return toReturn;
+		}
+	}
+
 	public void unInvitePlayer(String team, UUID target){
-		if(invitedPlayers.containsKey(team)){
-			if(invitedPlayers.get(team).contains(target)){
-				invitedPlayers.get(team).remove(target);
+		if(invitedPlayers.containsKey(team.toLowerCase())){
+			if(invitedPlayers.get(team.toLowerCase()).contains(target)){
+				invitedPlayers.get(team.toLowerCase()).remove(target);
 			}
 		}
-
 	}
 
+	public boolean isPlayerInvitedToTeam(OfflinePlayer p, String team){
 
-	/**
-	 * Used to check if a player is invited to a team
-	 * @param p - the player to check for
-	 * @param team - the team to check for
-	 * @return <code> True </code> if the player is invited to the given team
-	 */
-	public boolean isPlayerInvitedToTeam(Player p, String team){
-		if(invitedPlayers.containsKey(team)){
-			if(invitedPlayers.get(team).contains(p.getUniqueId())){
+		if(invitedPlayers.containsKey(team.toLowerCase())){
+			if(invitedPlayers.get(team.toLowerCase()).contains(p.getUniqueId())){
 				return true;
 			}
 		}
 		return false;
+	}
+	
 
+	public boolean isPlayerOwner(String team, UUID u){
+		return ownerOfTeam.get(team).equals(u);
 	}
 
-
-
-	/**
-	 * Used to check if a given player is the owner of a team
-	 * @param p - the player to check for
-	 * @return <code> True </code> if the player is the owner
-	 */
-	public boolean isPlayerOwner(Player p){
-		return ownerOfTeam.containsValue(p.getUniqueId());
-	}
-
-	/**
-	 * Used to add a given player to observers
-	 * @param p - the player to add to observers
-	 */
 	public void addPlayerToObservers(Player p){
 		observers.add(p.getUniqueId());
 		p.setGameMode(GameMode.SPECTATOR);
+
 		for(PotionEffect effect : p.getActivePotionEffects()){
 			p.removePotionEffect(effect.getType());
 		}
-		p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1, false, false));
+		p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false, false));
 		p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
-		p.setDisplayName(ChatColor.AQUA + "[Observer] " + p.getName()+ ChatColor.WHITE);
-		MessageSender.send(ChatColor.AQUA, p, "You are now spectating.");
+		MessageSender.send(p, ChatColor.AQUA + "You are now spectating.");
 		boardM.addPlayerToObserver(p);
 	}
+
 	public void removePlayerFromObservers(Player p){
 		observers.remove(p.getUniqueId());
+
 		for(PotionEffect effect : p.getActivePotionEffects()){
 			p.removePotionEffect(effect.getType());
 		}
 		boardM.removePlayerFromObservers(p);
 	}
-	
+
 	public String getColorOfPlayer(UUID target){
+
 		if(isPlayerAnObserver(target)){
 			return ChatColor.AQUA.toString();
 		}
@@ -395,23 +286,14 @@ public class TeamManager {
 			return isPlayerOnTeam(target) ? getColorOfTeam(getTeamOfPlayer(target)) : ChatColor.WHITE.toString();
 		}
 		else{
-			return ChatColor.GRAY.toString();
+			return ChatColor.WHITE.toString();
 		}
-
 	}
-	/** Used to get the color of a team
-	 * @param team - the team to get the color of
-	 * @return <code> ChatColor </code> of the team
-	 */
+
 	public String getColorOfTeam(String team){
 		return colorOfTeam.get(team.toLowerCase());
 	}
 
-	/**
-	 * Used to retrieve the players on a specified team
-	 * @param team - the team to get the list of players from
-	 * @return <code> List[UUID] </code> of players on a specified team
-	 */
 	public List<UUID> getPlayersOnATeam(String team){
 		List<UUID> players = new ArrayList<UUID>();
 		if(teamOfPlayer.containsValue(team.toLowerCase())){
@@ -423,86 +305,55 @@ public class TeamManager {
 		}
 		return players;
 	}
-	/**
-	 * Used to retrieve the list of teams in game
-	 * @return <code> List[String] </code> of teams in game
-	 */
 
-	public List<String> getActiveTeams(){
+	public Set<String> getActiveTeams(){
 		return listOfActiveTeams;
 	}
+
 	public boolean isActiveTeam(String team){
 		return listOfActiveTeams.contains(team.toLowerCase());
 	}
 
-	public boolean isTeamInactive(String team){
-		boolean allOffline=true;
-		while(allOffline){
-			for(UUID u : getPlayersOnATeam(team)){
-				if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
-					allOffline=false;
-					break;
-				}
-			}
-			if(allOffline==false){
-				break;
-			}
-		}
-		return allOffline;
-	}
 	public void disbandTeam(String team){
 		listOfActiveTeams.remove(team);
+
 		if(invitedPlayers.containsKey(team)){
 			for(UUID u: invitedPlayers.get(team)){
 				if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
-					MessageSender.alertMessage(Bukkit.getServer().getPlayer(u),ChatColor.RED, "Your invitation to team " + getColorOfTeam(team) + getTeamNameProper(team) + " has been revoked!");
+					
+					MessageSender.alertMessage(Bukkit.getServer().getPlayer(u),ChatColor.RED + "Your invitation to team " + getColorOfTeam(team)
+					+ getTeamNameProper(team) + ChatColor.RED + " has been revoked.");
 				}
 			}
 			invitedPlayers.remove(team);
 		}
 
 		for(UUID u : getPlayersOnATeam(team)){
-			if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
-				MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.RED, "Your team has been disbanded.");
-			}
 			removePlayerFromTeam(u);
 		}
+
 		boardM.removeTeam(team);
 	}
 
+	public boolean areTeamMates(UUID first, UUID second){
+		return getPlayersOnATeam(getTeamOfPlayer(first)).contains(second);
+	}
 
 	public String getTeamNameProper(String team){
 		String output = team.substring(0, 1).toUpperCase() + team.toLowerCase().substring(1);
 		return output;
 	}
 
-	/**
-	 * used to increase the number of players currently on a team
-	 * @param team - the team to increase
-	 * @param numberToIncrease - the increment to increase
-	 */
-	private void increaseTeamSize(String team, Integer numberToIncrease){
+	private void increaseTeamCount(String team, Integer numberToIncrease){
 		playersOnCurrentTeam.replace(team.toLowerCase(), playersOnCurrentTeam.get(team.toLowerCase()) + numberToIncrease);
 	}
 
-	/**
-	 * used to decrease the number of players currently on a team
-	 * @param team - the team to decrease
-	 * @param numberToDecrease - the increment to decrease by
-	 */
-	private void decreaseTeamSize(String team, Integer numberToDecrease){
+	private void decreaseTeamCount(String team, Integer numberToDecrease){
 		playersOnCurrentTeam.replace(team.toLowerCase(), playersOnCurrentTeam.get(team.toLowerCase()) - numberToDecrease);
 	}
 
-
-	/**
-	 * Used to edit the display name of a player
-	 * @param p - the player to change the display name of
-	 * @param team - the text to display in front of a players name
-	 */
-	public void displayName(Player p, String team){
-		p.setDisplayName(getColorOfPlayer(p.getUniqueId()) + "["  + getTeamNameProper(team) + "] " + ChatColor.RED + p.getName() + ChatColor.WHITE);
+	@EventHandler
+	public void on(GameStartEvent e){
+		invitedPlayers.clear();
 	}
-
-
 }

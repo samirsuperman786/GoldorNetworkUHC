@@ -1,7 +1,7 @@
 package com.goldornetwork.uhc.managers.GameModeManager.gamemodes;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -18,37 +18,40 @@ import com.goldornetwork.uhc.managers.world.WorldManager;
 
 public class BlockRush extends Gamemode implements Listener{
 
-	//instances
+	
 	private WorldManager worldM;
-	//storage
-	private List<Material> firstBlocksMined = new ArrayList<Material>();
+
+	private Set<Material> firstBlocksMined = new HashSet<Material>();
+
+	
 	public BlockRush(WorldManager worldM) {
-		super("Block Rush", "BlockRush", "First one to mine a unique block gets a diamond!");
+		super("Block Rush", "BlockRush", "First one to mine a unique block gets a diamond.");
 		this.worldM=worldM;
 	}
+
 	@Override
 	public void onEnable() {
 		firstBlocksMined.clear();
 	}
+
 	@Override
 	public void onDisable() {
 		firstBlocksMined.clear();
 	}
+
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(BlockBreakEvent e){
 		if(State.getState().equals(State.INGAME)){
-				Player p = e.getPlayer();
-				if(firstBlocksMined.contains(e.getBlock().getType())==false){
-					run(p, e);
-					
-				}
+			Player p = e.getPlayer();
+			if(firstBlocksMined.contains(e.getBlock().getType())==false){
+				run(p, e);
+			}
 		}
 	}
-	
+
 	private void run(Player p, BlockBreakEvent e){
 		p.getInventory().addItem(new ItemStack(Material.DIAMOND));
 		worldM.getUHCWorld().playSound(p.getLocation(), Sound.NOTE_SNARE_DRUM, 3.0F, .5F);
 		firstBlocksMined.add(e.getBlock().getType());
 	}
-	
 }

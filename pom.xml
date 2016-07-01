@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.goldornetwork</groupId>
 	<artifactId>GoldorNetworkUHC</artifactId>
-	<version>.2</version>
+	<version>1.0</version>
 
 
 	<build>
@@ -11,6 +11,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -22,21 +23,26 @@
 
 	<repositories>
 		<repository>
-			<id>bukkit-repo</id>
-			<url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+			<id>spigot-repo</id>
+			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
 
+		<repository>
+			<id>inventive-repo</id>
+			<url>https://repo.inventivetalent.org/content/groups/public/</url>
+		</repository>
 	</repositories>
 
 
 	<dependencies>
+
 		<dependency>
-			<groupId>org.bukkit</groupId>
-			<artifactId>bukkit</artifactId>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-api</artifactId>
 			<version>1.8.8-R0.1-SNAPSHOT</version>
-			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>craftbukkit</artifactId>
@@ -45,13 +51,13 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.inventivetalent</groupId>
+			<artifactId>tabapi</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+
 	</dependencies>
-
-
-
-
-
-
 
 
 </project>

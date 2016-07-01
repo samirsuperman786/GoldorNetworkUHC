@@ -1,7 +1,7 @@
 package com.goldornetwork.uhc.managers.GameModeManager.gamemodes;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -15,32 +15,32 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
-import com.goldornetwork.uhc.managers.world.events.GameStartEvent;
+import com.goldornetwork.uhc.managers.world.customevents.GameStartEvent;
 
 public class RunBabyRun extends Gamemode implements Listener{
 
 	private TeamManager teamM;
 	private UHC plugin;
-	
-	//storage
+
 	private final static double HEALTH_THRESHOLD=3;
-	private List<UUID> lowHealth = new ArrayList<UUID>();
+	private Set<UUID> lowHealth = new HashSet<UUID>();
 	private PotionEffect speedBuff = new PotionEffect(PotionEffectType.SPEED,Integer.MAX_VALUE, 2, true, true);
+
 	
 	public RunBabyRun(UHC plugin,TeamManager teamM) {
-		super("Run Baby Run", "RunBabyRun", "If you are at or below " + HEALTH_THRESHOLD + " hearts, you gain speed 3!");
+		super("Run Baby Run", "RunBabyRun", "If you are at or below " + HEALTH_THRESHOLD + " hearts, you gain speed 3.");
 		this.plugin=plugin;
 		this.teamM=teamM;
 	}
-	
+
 	@EventHandler
 	public void on(GameStartEvent e){
 		runTask();
 	}
-	
+
 	public void runTask(){
+
 		new BukkitRunnable() {
-			
 			@Override
 			public void run() {
 				for(UUID u : teamM.getPlayersInGame()){
@@ -60,15 +60,14 @@ public class RunBabyRun extends Gamemode implements Listener{
 						}
 					}
 				}
-				
 			}
 		}.runTaskTimer(plugin, 60L, 20L);
 	}
-	
+
 	public void addBuffs(Player p){
 		p.addPotionEffect(speedBuff);
 	}
-	
+
 	public void removeBuffs(Player p){
 		p.removePotionEffect(speedBuff.getType());
 	}

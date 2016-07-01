@@ -6,18 +6,19 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.goldornetwork.uhc.commands.UHCCommand;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.utils.MessageSender;
+import com.goldornetwork.uhc.utils.PlayerUtils;
 
 public class UnInvitePlayerCommand extends UHCCommand {
 
-	//instances
+
 	private TeamManager teamM;
+
 
 	public UnInvitePlayerCommand(TeamManager teamM) {
 		super("uninvite", "[player]");
@@ -25,71 +26,62 @@ public class UnInvitePlayerCommand extends UHCCommand {
 	}
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		Player p = (Player) sender;
-		if(!(sender instanceof Player)){
-			MessageSender.noConsole(sender);
+	public boolean execute(Player sender, String[] args) {
+		if(teamM.isTeamsEnabled()==false){
+			MessageSender.send(sender, ChatColor.RED + "Teams are not enabled.");
 			return true;
 		}
-
-		else if(teamM.isTeamsEnabled()==false){
-			MessageSender.send(ChatColor.RED, p, "Teams are not enabled!");
-			return true;
-		}
-
 		else if(State.getState().equals(State.INGAME)){
-			MessageSender.send(ChatColor.RED, p, "Match has already started!");
+			MessageSender.send(sender, ChatColor.RED + "Match has already started.");
 			return true;
 		}
-		else if(teamM.isPlayerInGame(p.getUniqueId())==false){
-			MessageSender.send(ChatColor.RED, p, "You are not on a team!");
+		else if(teamM.isPlayerInGame(sender.getUniqueId())==false){
+			MessageSender.send(sender, ChatColor.RED + "You are not on a team.");
 			return true;
 		}
-
-		else if(teamM.getOwnerOfTeam(teamM.getTeamOfPlayer(p.getUniqueId()))!=p.getUniqueId()){
-			MessageSender.send(ChatColor.RED, p, "You are not the owner of the team!");
+		else if(teamM.getOwnerOfTeam(teamM.getTeamOfPlayer(sender.getUniqueId()))!=sender.getUniqueId()){
+			MessageSender.send(sender, ChatColor.RED + "You are not the owner of the team.");
 			return true;
 		}
 		else if(args.length==0){
-			MessageSender.send(ChatColor.RED, p, "Please specify a player!");
+			MessageSender.send(sender, ChatColor.RED + "Please specify a player.");
 			return true;
 		}
-
-		else if(teamM.isPlayerOnline(args[0])==false){
-			MessageSender.send(ChatColor.RED, p, "Player " + args[0].toLowerCase() + " is not online!");
-			return true;
-		}
-		else if(teamM.isPlayerOnTeam(Bukkit.getServer().getPlayer(args[0]).getUniqueId())){
-			MessageSender.send(ChatColor.RED, p, "Player " + args[0] + " is already on a team!");
+		else if(teamM.isPlayerOnTeam(PlayerUtils.getOfflinePlayer(args[0]).getUniqueId())){
+			teamM.unInvitePlayer(teamM.getTeamOfPlayer(sender.getUniqueId()), PlayerUtils.getOfflinePlayer(args[0]).getUniqueId());
+			MessageSender.alertMessage(sender, ChatColor.GREEN + "You have uninvited " + PlayerUtils.getOfflinePlayer(args[0]).getName());
 			return true;
 		}
 		else{
-			if(teamM.isPlayerInvitedToTeam(Bukkit.getServer().getPlayer(args[0]), teamM.getTeamOfPlayer(p.getUniqueId()))){
-				teamM.unInvitePlayer(teamM.getTeamOfPlayer(p.getUniqueId()), Bukkit.getServer().getPlayer(args[0]).getUniqueId());
-				MessageSender.alertMessage(p, ChatColor.GREEN, "You have uninvited " + Bukkit.getServer().getPlayer(args[0]).getName());
-				MessageSender.alertMessage(Bukkit.getServer().getPlayer(args[0]), ChatColor.RED, "You have been uninvited to team " + teamM.getColorOfPlayer(p.getUniqueId()) + teamM.getTeamNameProper(teamM.getTeamOfPlayer(p.getUniqueId())) + ChatColor.RED + " by " + teamM.getColorOfPlayer(p.getUniqueId()) + p.getName());
+
+			if(teamM.isPlayerInvitedToTeam(PlayerUtils.getOfflinePlayer(args[0]), teamM.getTeamOfPlayer(sender.getUniqueId()))){
+				teamM.unInvitePlayer(teamM.getTeamOfPlayer(sender.getUniqueId()), PlayerUtils.getOfflinePlayer(args[0]).getUniqueId());
+				MessageSender.alertMessage(sender, ChatColor.GREEN + "You have uninvited " + PlayerUtils.getOfflinePlayer(args[0]).getName());
+				if(PlayerUtils.isPlayerOnline(args[0])){
+
+					MessageSender.alertMessage(PlayerUtils.getPlayer(args[0]), ChatColor.RED + "You have been uninvited to team "
+							+ teamM.getColorOfPlayer(sender.getUniqueId()) + teamM.getTeamNameProper(teamM.getTeamOfPlayer(sender.getUniqueId())) + ChatColor.RED 
+							+ " by " + teamM.getColorOfPlayer(sender.getUniqueId()) + sender.getName());
+				}
 				return true;
 			}
 			else{
-				MessageSender.send(ChatColor.RED, p, "You have not invited player " + args[0]);
-				return false;
+				MessageSender.send(sender, ChatColor.RED + "You have not invited player " + args[0]);
+				return true;
 			}
 		}
 
 	}
 
 	@Override
-	public List<String> tabComplete(CommandSender sender, String[] args) {
+	public List<String> tabComplete(Player sender, String[] args) {
 		List<String> toReturn = new ArrayList<String>();
-		Player p = (Player) sender;
-		if(args.length==1 && teamM.isPlayerInGame(p.getUniqueId())){
-			for(UUID u : teamM.getPlayersOnATeam(teamM.getTeamOfPlayer(p.getUniqueId()))){
-				if(Bukkit.getOfflinePlayer(u).isOnline()){
-					toReturn.add(Bukkit.getServer().getPlayer(u).getName());
-				}
+		if(args.length==1 && teamM.isPlayerInGame(sender.getUniqueId())){
+			for(UUID u : teamM.getInvitedPlayers(teamM.getTeamOfPlayer(sender.getUniqueId()))){
+				toReturn.add(Bukkit.getServer().getOfflinePlayer(u).getName());
+
 			}
 		}
 		return toReturn;
 	}
-
 }

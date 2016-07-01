@@ -8,13 +8,14 @@ import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
+import com.goldornetwork.uhc.utils.CoordXZ;
 
 public class ChunkGenerator {
 
 
-	//instances
 	private UHC plugin;
 
+	
 	public ChunkGenerator(UHC plugin) {
 		this.plugin=plugin;
 	}
@@ -34,7 +35,6 @@ public class ChunkGenerator {
 	private int z;
 	private int segment_passed;
 	private int k;
-	
 
 	//storage
 	private boolean generating;
@@ -42,7 +42,7 @@ public class ChunkGenerator {
 	private final int CHUNKS_PER_RUN =10;
 	private int duration;	
 	private List<CoordXZ> storedChunks = new LinkedList<CoordXZ>();
-	
+
 	public void generate(World world, Location center, int radius){
 		this.world = world;
 		this.radius = 16*(Math.round(radius/16));
@@ -56,6 +56,7 @@ public class ChunkGenerator {
 		this.cancel=false;
 		generateMachine();
 	}
+
 	public boolean isGenerating(){
 		return generating;
 	}
@@ -67,12 +68,9 @@ public class ChunkGenerator {
 	private void generateMachine(){
 
 		new BukkitRunnable() {
-
 			@Override
 			public void run() {
-				if(plugin.availableMemoryTooLow()){
-					return;
-				}
+
 				if(duration%30 ==0){
 					world.save();
 				}
@@ -86,36 +84,33 @@ public class ChunkGenerator {
 							x += di;
 							z += dj;
 							++segment_passed;
-							
+
 							if (segment_passed == segment_length) {
 								// done with current segment
 								segment_passed = 0;
-
 								// 'rotate' directions
 								int buffer = di;
 								di = -dj;
 								dj = buffer;
-
 								// increase segment length if necessary
-								if (dj == 0) {
+								if (dj == 0){
 									++segment_length;
 								}
 							}
+
 							world.loadChunk(x, z, true);
 							boolean isXPos= x >= 0;
 							boolean isZPos= z >= 0;
 							int popX = isXPos ? x-16 : x+16;
 							int popZ = isZPos ? z-16 : z+16;
 							world.loadChunk(popX, popZ, false);
-							
 							storedChunks.add(new CoordXZ(x, z));
 							storedChunks.add(new CoordXZ(popX, popZ));
-							
 							while(storedChunks.size()>8){
 								CoordXZ coord = storedChunks.remove(0);
 								world.unloadChunkRequest(coord.x, coord.z);
 							}
-							
+
 							duration++;
 						}
 						else if(k>=((radius/16) * (radius/16) *4)){
@@ -125,12 +120,7 @@ public class ChunkGenerator {
 						}
 					}
 				}
-				
 			}
 		}.runTaskTimer(plugin, 200L, 20L);
 	}
-
-
-
-
 }

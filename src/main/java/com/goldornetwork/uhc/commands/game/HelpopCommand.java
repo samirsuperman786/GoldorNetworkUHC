@@ -2,30 +2,26 @@ package com.goldornetwork.uhc.commands.game;
 
 import java.util.List;
 
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.goldornetwork.uhc.commands.UHCCommand;
-import com.goldornetwork.uhc.managers.TeamManager;
-import com.goldornetwork.uhc.utils.MessageSender;
+import com.goldornetwork.uhc.managers.chat.ChatManager;
 
 public class HelpopCommand extends UHCCommand{
 
-	private TeamManager teamM;
-	public HelpopCommand(TeamManager teamM) {
+	
+	private ChatManager chatM;
+	
+	
+	public HelpopCommand(ChatManager chatM) {
 		super("helpop", "[message]");
-		this.teamM=teamM;
+		this.chatM = chatM;
 	}
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		Player target = (Player) sender;
-		if(!(sender instanceof Player)){
-			MessageSender.noConsole(sender);
-			return true;
-		}
-		else if(args.length==0){
+	public boolean execute(Player sender, String[] args) {
+
+		if(args.length==0){
 			return false;
 		}
 		else{
@@ -34,13 +30,13 @@ public class HelpopCommand extends UHCCommand{
 				str.append(args[i] + " ");
 			}
 			String msg = str.toString();
-			MessageSender.sendToOPS(teamM.getColorOfPlayer(target.getUniqueId()) + target.getName() + ChatColor.WHITE + ": " + msg);
+			chatM.helpop(sender, msg);
 			return true;
 		}
 	}
 
 	@Override
-	public List<String> tabComplete(CommandSender sender, String[] args) {
+	public List<String> tabComplete(Player sender, String[] args) {
 		return null;
 	}
 	

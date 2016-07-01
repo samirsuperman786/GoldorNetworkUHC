@@ -15,18 +15,14 @@ import com.goldornetwork.uhc.utils.MessageSender;
 
 public class Switcheroo extends Gamemode implements Listener{
 
-	//instances
+
 	private TeamManager teamM;
 
+	
 	public Switcheroo(TeamManager teamM) {
-		super("Switcheroo", "Switcheroo", "When a player shoots another player, they switch places");
+		super("Switcheroo", "Switcheroo", "When a player shoots another player, they switch places.");
 		this.teamM=teamM;
 	}
-	@Override
-	public void onEnable() {}
-
-	@Override
-	public void onDisable() {}
 
 	@EventHandler
 	public void on(EntityDamageByEntityEvent e){
@@ -34,6 +30,7 @@ public class Switcheroo extends Gamemode implements Listener{
 			if(e.getEntity() instanceof Player){
 				if(e.getDamager() instanceof Arrow){
 					Arrow arrow = (Arrow) e.getDamager();
+
 					if(arrow.getShooter() instanceof Player){
 						Player target = (Player) e.getEntity();
 						Player shooter = (Player) arrow.getShooter();
@@ -46,16 +43,13 @@ public class Switcheroo extends Gamemode implements Listener{
 		}
 	}
 
-
-
 	private void run(Player target, Player shooter){
 		Location targetLocation = target.getLocation();
 		Location shooterLocation = shooter.getLocation();
 		target.teleport(shooterLocation);
 		shooter.teleport(targetLocation);
-		MessageSender.send(ChatColor.RED, target, "You have switched places with " + teamM.getColorOfPlayer(shooter.getUniqueId())+ shooter.getName());
-		MessageSender.send(ChatColor.RED, shooter, "You have switched places with " + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName());
+		
+		MessageSender.send(target, ChatColor.GOLD + "You have switched places with " + teamM.getColorOfPlayer(shooter.getUniqueId())+ shooter.getName());
+		MessageSender.send(shooter, ChatColor.GOLD + "You have switched places with " + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName());
 	}
-
-
 }
