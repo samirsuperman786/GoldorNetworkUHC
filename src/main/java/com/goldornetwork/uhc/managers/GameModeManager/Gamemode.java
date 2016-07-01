@@ -14,7 +14,6 @@ public abstract class Gamemode{
 	private String properName;
 	private boolean enabled = false;
 	
-	
 	protected Gamemode(String properName, String name, String description){
 		this.description=description;
 		this.name=name;

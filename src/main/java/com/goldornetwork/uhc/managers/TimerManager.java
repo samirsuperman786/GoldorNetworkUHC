@@ -26,7 +26,7 @@ public class TimerManager implements Listener{
 	private VoteManager voteM;
 	private ChatManager chatM;
 	private WorldManager worldM;
-
+	
 	private int timeTillMatchStart;
 	private int timeTillPVPStart;
 	private int timeTillMeetup;
@@ -80,7 +80,7 @@ public class TimerManager implements Listener{
 				if(timeTillVote>=(2*60) && timeTillVote%(2*60) ==0 && voteM.isActive()){
 					voteM.broadcastOptions();
 				}
-				if(timeTillVote==0){
+				else if(timeTillVote==0){
 					voteM.enableOption(voteM.getWinner());
 					MessageSender.broadcast("Option " + (voteM.getWinner()+1) + " has won with " + ChatColor.GRAY + voteM.getWinnerVotes() + ChatColor.GOLD + " votes.");
 					cancel();
@@ -116,10 +116,18 @@ public class TimerManager implements Listener{
 					else if(timeTillMatchStart==1){
 						MessageSender.broadcast(ChatColor.DARK_AQUA + "Match Starting in " + ChatColor.DARK_RED + timeTillMatchStart +ChatColor.DARK_AQUA + " second.");
 					}
-
+					if(timeTillMatchStart>60){
+						double time = timeTillMatchStart;
+						setLvlTimer((int)Math.ceil(time/60.0));
+					}
+					if(timeTillMatchStart <=60 && timeTillMatchStart>0){
+						setLvlTimer(timeTillMatchStart);
+					}
+					
 					timeTillMatchStart--;
 				}
 				else if(timeTillMatchStart == 0){
+					setLvlTimer(0);
 					MessageSender.broadcast("Match has started!");
 					MessageSender.broadcastTitle(ChatColor.GOLD + "Match has started!", ChatColor.GOLD + "Scattering...");
 					State.setState(State.SCATTER);
@@ -152,7 +160,7 @@ public class TimerManager implements Listener{
 			public void run() {
 				if(timeTillPVPStart>0){
 					if(timeTillPVPStart >= (5*60) && timeTillPVPStart % (5*60) == 0){
-						MessageSender.broadcast(ChatColor.DARK_AQUA + "PVP will be enabled in " + ChatColor.DARK_RED + timeTillPVPStart/60 + ChatColor.GOLD + " minutes.");
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "PVP will be enabled in " + ChatColor.DARK_RED + timeTillPVPStart/60 + ChatColor.DARK_AQUA + " minutes.");
 					}
 					else if(timeTillPVPStart<= (4*60) && timeTillPVPStart > (1*60) && timeTillPVPStart % (1*60) ==0){
 						MessageSender.broadcast(ChatColor.DARK_AQUA + "PVP will be enabled in " + ChatColor.DARK_RED + timeTillPVPStart/60 + ChatColor.DARK_AQUA + " minutes.");
@@ -189,7 +197,7 @@ public class TimerManager implements Listener{
 			public void run() {
 				if(timeTillMeetup>0){
 					if(timeTillMeetup >= (5*60) && timeTillMeetup % (5*60) == 0){
-						MessageSender.broadcast(ChatColor.DARK_AQUA + "Meetup is in " + ChatColor.DARK_RED + timeTillMeetup/60 + ChatColor.GOLD + " minutes.");
+						MessageSender.broadcast(ChatColor.DARK_AQUA + "Meetup is in " + ChatColor.DARK_RED + timeTillMeetup/60 + ChatColor.DARK_AQUA + " minutes.");
 					}
 					if(timeTillMeetup== (299)){
 						scatterM.preMeetupSetup();
@@ -227,6 +235,13 @@ public class TimerManager implements Listener{
 			online.setExp(percentage);
 		}
 	}
+	
+	private void setLvlTimer(int lvl){
+		for(Player online : plugin.getServer().getOnlinePlayers()){
+			online.setLevel(lvl);
+		}
+	}
+	
 	public int getTimeTillMatchStart(){
 		return timeTillMatchStart;
 	}

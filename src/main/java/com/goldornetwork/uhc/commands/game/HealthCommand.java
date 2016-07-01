@@ -41,8 +41,10 @@ public class HealthCommand extends UHCCommand {
 			}
 			else{
 				Player target = PlayerUtils.getPlayer(args[0]);
+				double health = target.getHealth();
+				double roundedHealth = .5*(Math.round(health/.5));
 				MessageSender.send(sender, teamM.getColorOfPlayer(target.getUniqueId()) + target.getName()
-				+ ChatColor.WHITE + ": " + ChatColor.RED + target.getHealth() + "\u2665");
+				+ ChatColor.WHITE + ": " + ChatColor.RED + roundedHealth + "\u2665");
 				return true;
 			}
 		}

@@ -83,8 +83,11 @@ public class LookupCommand extends UHCCommand{
 
 			if(Bukkit.getOfflinePlayer(u).isOnline()){
 				Player target = Bukkit.getPlayer(u);
+				double health = target.getHealth();
+				double roundedHealth = .5*(Math.round(health/.5));
+
 				online.add(PlayerUtils.getPrefix(target) + ChatColor.GREEN + "\u25CF" + teamM.getColorOfPlayer(target.getUniqueId())
-				+ target.getName() + ChatColor.WHITE + ": " + ChatColor.RED + target.getHealth() + "\u2665");
+				+ target.getName() + ChatColor.WHITE + ": " + ChatColor.RED + roundedHealth + "\u2665");
 
 			}
 			else{

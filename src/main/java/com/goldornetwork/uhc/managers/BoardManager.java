@@ -31,11 +31,12 @@ import com.goldornetwork.uhc.managers.world.WorldManager;
 import com.goldornetwork.uhc.managers.world.customevents.GameOpenEvent;
 import com.goldornetwork.uhc.managers.world.customevents.GameStartEvent;
 import com.goldornetwork.uhc.managers.world.customevents.PVPEnableEvent;
-import com.goldornetwork.uhc.managers.world.customevents.UHCDeathEvent;
+import com.goldornetwork.uhc.managers.world.customevents.UHCKillEvent;
+import com.goldornetwork.uhc.utils.PlayerUtils;
 
 public class BoardManager implements Listener{
 
-	
+
 	private UHC plugin;
 	private TeamManager teamM;
 	private Scoreboard mainBoard;
@@ -43,14 +44,15 @@ public class BoardManager implements Listener{
 	private WorldManager worldM;
 	private TimerManager timerM;
 
-	private Set<Team> activeTeams = new HashSet<Team>(); 
-	private Map<String, Team> teamScoreBoards = new HashMap<String, Team>();
-	private Map<String, Objective> teamHeaders = new HashMap<String, Objective>();
-	private Map<UUID, String> teamOfPlayer = new HashMap<UUID, String>();
+
+	private Map<String, List<Team>> teamScoreBoards = new HashMap<String, List<Team>>();
+	private Map<UUID, Team> individualScoreboards = new HashMap<UUID, Team>();
+	private Map<UUID, Objective> individualScoreBoardHeaders = new HashMap<UUID, Objective>();
 	private Set<UUID> invisible = new HashSet<UUID>();
 	private Objective header;
 
-	
+	private Map<UUID, Integer> playerKills = new HashMap<UUID, Integer>();
+
 	public BoardManager(UHC plugin) {
 		this.plugin=plugin;
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -100,7 +102,9 @@ public class BoardManager implements Listener{
 			}
 		});
 	}
+
 	private void initializeObserverBoard() {
+
 		header = mainBoard.registerNewObjective("header", "dummy");
 		header.setDisplayName(ChatColor.GOLD + "" + ChatColor.BOLD + "GoldorNetwork");
 		header.setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -111,13 +115,15 @@ public class BoardManager implements Listener{
 
 		initializeInfo(header);
 
-		observerTeam = mainBoard.registerNewTeam("observers");
+		observerTeam = mainBoard.registerNewTeam(ChatColor.AQUA + "Observers");
 		observerTeam.setPrefix(ChatColor.AQUA + "[Observer] ");
+
+		Team otherPlayers = mainBoard.registerNewTeam("others");
+		otherPlayers.setPrefix(ChatColor.RED + "");
+
 	}
 
-
-
-	private Scoreboard initializeTeamBoard(String team){
+	private void initializeBoardForPlayer(Player target, String team){
 		Scoreboard teamBoard = Bukkit.getScoreboardManager().getNewScoreboard();
 		String teamToAdd = teamM.getTeamNameProper(team);
 
@@ -129,6 +135,9 @@ public class BoardManager implements Listener{
 		Team otherPlayers = teamBoard.registerNewTeam("others");
 		otherPlayers.setPrefix(ChatColor.RED + "");
 
+		Team observers = teamBoard.registerNewTeam(ChatColor.AQUA + "Observers");
+		observers.setPrefix(ChatColor.AQUA + "");
+		
 		Objective header = teamBoard.registerNewObjective("header", "dummy");
 		header.setDisplaySlot(DisplaySlot.SIDEBAR);
 		header.setDisplayName(teamM.getColorOfTeam(team) + ChatColor.BOLD + teamToAdd);
@@ -146,11 +155,30 @@ public class BoardManager implements Listener{
 			}
 		});
 
-		teamHeaders.put(team, header);
-		teamScoreBoards.put(team, newTeam);
-		activeTeams.add(newTeam);
+		mainBoard.getTeam("others").addPlayer(target);
+		
+		individualScoreBoardHeaders.put(target.getUniqueId(), header);
+		teamScoreBoards.get(team).add(newTeam);
+		individualScoreboards.put(target.getUniqueId(), newTeam);
+		playerKills.put(target.getUniqueId(), 0);
 
-		return teamBoard;
+		newTeam.addPlayer(target);
+		target.setScoreboard(teamBoard);
+
+		
+		for(UUID players : teamM.getPlayersInGame()){
+			if(teamM.areTeamMates(target.getUniqueId(), players)==false){
+				otherPlayers.addPlayer(PlayerUtils.getOfflinePlayer(players));
+				getScoreboardOfPlayer(players).getTeam("others").addPlayer(target);
+			}
+		}
+		for(UUID u : teamM.getPlayersOnATeam(team)){
+			if(individualScoreboards.get(u).getScoreboard().getTeam("others").hasPlayer(target)){
+				individualScoreBoardHeaders.get(u).getScoreboard().getTeam("others").removePlayer(target);
+			}
+			newTeam.addPlayer(PlayerUtils.getOfflinePlayer(u));
+			individualScoreboards.get(u).addPlayer(target);
+		}
 	}
 
 	private void invisibleChecker(){
@@ -204,30 +232,35 @@ public class BoardManager implements Listener{
 	@SuppressWarnings("deprecation")
 	private void playerIsInvisible(UUID u){
 
-		for(Team team : activeTeams){
-			if(!(team.equals(teamScoreBoards.get(teamM.getTeamOfPlayer(u))))){
-				team.getScoreboard().getTeam("others").removePlayer(Bukkit.getOfflinePlayer(u));
+		for(String team : teamM.getActiveTeams()){
+			if(teamM.getTeamOfPlayer(u)!=team){
+				for(Team teamBoards : teamScoreBoards.get(team)){
+					teamBoards.getScoreboard().getTeam("others").removePlayer(plugin.getServer().getOfflinePlayer(u));
+				}
 			}
 		}
 	}
 
 	@SuppressWarnings("deprecation")
 	private void playerIsVisible(UUID u){
-		for(Team team : activeTeams){
-			if(!(team.equals(teamScoreBoards.get(teamM.getTeamOfPlayer(u))))){
-				team.getScoreboard().getTeam("others").addPlayer(Bukkit.getOfflinePlayer(u));
+		for(String team : teamM.getActiveTeams()){
+			if(teamM.getTeamOfPlayer(u)!=team){
+				for(Team teamBoards : teamScoreBoards.get(team)){
+					teamBoards.getScoreboard().getTeam("others").addPlayer(plugin.getServer().getOfflinePlayer(u));
+				}
 			}
 		}
 	}
 
 	@SuppressWarnings("deprecation")
-	public void addPlayerToObserver(OfflinePlayer p){
-		observerTeam.addPlayer(p);
+	public void addPlayerToObserver(Player target){
+		observerTeam.addPlayer(target);
+		target.setScoreboard(mainBoard);
 
-		if(p.isOnline()){
-			Player target = (Player) p;
-			target.setPlayerListName(ChatColor.AQUA + target.getName());
-			target.setScoreboard(mainBoard);
+		for(String team : teamM.getActiveTeams()){
+			for(Team teamBoards : teamScoreBoards.get(team)){
+				teamBoards.getScoreboard().getTeam(ChatColor.AQUA + "Observers").addPlayer(target);
+			}
 		}
 	}
 
@@ -242,45 +275,40 @@ public class BoardManager implements Listener{
 	}
 
 	public void createTeam(String team){
-		initializeTeamBoard(team);
+		teamScoreBoards.put(team, new ArrayList<Team>());
 	}
 
 	public void removeTeam(String team){
-		activeTeams.remove(teamScoreBoards.get(team));
-		teamScoreBoards.get(team).unregister();
+		for(Team scoreboardTeam : teamScoreBoards.get(team)){
+			scoreboardTeam.unregister();
+		}
 		teamScoreBoards.remove(team);
 	}
 
-	@SuppressWarnings("deprecation")
-	public void addPlayerToTeam(String team, Player p){
-		teamScoreBoards.get(team).addPlayer(p);
-		teamOfPlayer.put(p.getUniqueId(), team.toLowerCase());
-		p.setScoreboard(teamScoreBoards.get(team).getScoreboard());
+	private Scoreboard getScoreboardOfPlayer(UUID u){
+		return individualScoreboards.get(u).getScoreboard();
 	}
+
+	@SuppressWarnings("deprecation")
+	public void addPlayerToTeam(String team, Player target){
+		initializeBoardForPlayer(target, team);
+	}
+	
 	@SuppressWarnings("deprecation")
 	public void removePlayerFromTeam(String team, OfflinePlayer p){
-		teamScoreBoards.get(team).removePlayer(p);
-		teamOfPlayer.remove(p.getUniqueId());
+		for(Team teamBoards : teamScoreBoards.get(team)){
+			teamBoards.removePlayer(p);
+		}
 
+		mainBoard.getTeam("others").removePlayer(p);
+		for(UUID enemies : teamM.getPlayersInGame()){
+			if(teamM.getTeamOfPlayer(enemies)!=team){
+				getScoreboardOfPlayer(enemies).getTeam("others").removePlayer(p);
+			}
+		}
 		if(p.isOnline()){
 			Player target = (Player) p;
 			target.setScoreboard(mainBoard);
-		}
-	}
-	private Scoreboard getScoreboardOfPlayer(UUID u){
-		return teamScoreBoards.get(teamOfPlayer.get(u)).getScoreboard();
-	}
-
-	@SuppressWarnings("deprecation")
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void on(GameStartEvent e){
-
-		for(Team team : activeTeams){
-			for(UUID u : teamM.getPlayersInGame()){
-				if(!(team.getPlayers().contains(Bukkit.getOfflinePlayer(u)))){
-					team.getScoreboard().getTeam("others").addPlayer(Bukkit.getOfflinePlayer(u));
-				}
-			}
 		}
 	}
 
@@ -288,27 +316,11 @@ public class BoardManager implements Listener{
 	public void on(PlayerJoinEvent e){
 		Player p = e.getPlayer();
 
-		if(teamOfPlayer.containsKey(p.getUniqueId())){
+		if(individualScoreboards.containsKey(p.getUniqueId())){
 			p.setScoreboard(getScoreboardOfPlayer(p.getUniqueId()));
 		}
 		else{
 			p.setScoreboard(mainBoard);
-		}
-	}
-
-
-	@SuppressWarnings("deprecation")
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void on(UHCDeathEvent e){
-		OfflinePlayer p = e.getOfflinePlayer();
-
-		if(teamOfPlayer.containsKey(p.getUniqueId())){
-			for(Team team : activeTeams){
-				if(!(team.getPlayers().contains(Bukkit.getOfflinePlayer(p.getUniqueId())))){
-					team.getScoreboard().getTeam("others").removePlayer(p);
-				}
-			}
-			getScoreboardOfPlayer(p.getUniqueId()).getTeam(teamOfPlayer.get(p.getUniqueId())).removePlayer(p);
 		}
 	}
 
@@ -329,6 +341,15 @@ public class BoardManager implements Listener{
 			}
 		});
 	}
+	
+	private void teamGameStartInit(UUID target, Objective header){
+		Score kills = header.getScore(ChatColor.GREEN + "Your kills: ");
+		updater(kills, 20L, new Callable<Integer>() {
+			public Integer call(){
+				return playerKills.get(target);
+			}
+		});
+	}
 
 	private void meetupStartInit(Objective header){
 
@@ -340,6 +361,27 @@ public class BoardManager implements Listener{
 		});
 	}
 
+	@EventHandler
+	public void on(UHCKillEvent e){
+		UUID target = e.getOfflinePlayer().getUniqueId();
+		if(playerKills.containsKey(target)){
+			playerKills.put(target, playerKills.get(target) + 1);
+		}
+	}
+	
+	public void customTimer(String title, Callable<Integer> func){
+		Score observerScore = this.header.getScore(title);
+		updater(observerScore, 20L, 0L, func);
+		
+		for(String team : teamM.getActiveTeams()){
+			for(UUID u : teamM.getPlayersOnATeam(team)){
+				Objective header = individualScoreBoardHeaders.get(u);
+				Score playerScore = header.getScore(title);
+				updater(playerScore, 20L, 0L, func);
+			}
+		}
+	}
+	
 	//updaters
 
 	private void updater(Score score, long frequency, Callable<Integer> func){
@@ -359,6 +401,7 @@ public class BoardManager implements Listener{
 			}
 		}.runTaskTimer(plugin, 0L, frequency);
 	}
+	
 	private void updater(Score score, long frequency, long delay, Callable<Integer> expiration){
 		try {
 
@@ -406,8 +449,11 @@ public class BoardManager implements Listener{
 		gameStartInit(this.header);
 
 		for(String team : teamM.getActiveTeams()){
-			Objective header = teamHeaders.get(team);
-			gameStartInit(header);
+			for(UUID u : teamM.getPlayersOnATeam(team)){
+				Objective header = individualScoreBoardHeaders.get(u);
+				gameStartInit(header);
+				teamGameStartInit(u, header);
+			}
 		}
 	}
 
@@ -427,8 +473,10 @@ public class BoardManager implements Listener{
 		meetupStartInit(this.header);
 
 		for(String team : teamM.getActiveTeams()){
-			Objective header = teamHeaders.get(team);
-			meetupStartInit(header);
+			for(UUID u : teamM.getPlayersOnATeam(team)){
+				Objective header = individualScoreBoardHeaders.get(u);
+				meetupStartInit(header);
+			}
 		}
 	}
 }

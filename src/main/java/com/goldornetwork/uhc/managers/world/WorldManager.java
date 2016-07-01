@@ -13,6 +13,7 @@ import org.bukkit.Difficulty;
 import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
@@ -24,10 +25,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -128,7 +133,7 @@ public class WorldManager implements Listener{
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				plugin.getServer().setIdleTimeout(4);
+				plugin.getServer().setIdleTimeout(5);
 			}
 		}.runTaskLater(plugin, 1200L);
 	}
@@ -167,6 +172,13 @@ public class WorldManager implements Listener{
 	@EventHandler(priority = EventPriority.LOW)
 	public void on(FoodLevelChangeEvent e){
 		if(!(State.getState().equals(State.INGAME))){
+			e.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void on(PlayerDropItemEvent e){
+		if(State.getState().equals(State.OPEN) || State.getState().equals(State.NOT_RUNNING)){
 			e.setCancelled(true);
 		}
 	}
@@ -220,6 +232,9 @@ public class WorldManager implements Listener{
 					toReturn.add(msg);
 					MessageSender.broadcast(toReturn);
 					MessageSender.broadcastTitle(ChatColor.GOLD + "Game Over!", msg);
+				}
+				else{
+					MessageSender.broadcastBigTitle(ChatColor.GOLD + "Game Over!");
 				}
 			}
 		}.runTaskLater(plugin, 10L);
@@ -291,7 +306,6 @@ public class WorldManager implements Listener{
 			if(pLoc.getBlockY()<=0){
 				Location lobby = getLobby().getSpawnLocation();
 				Location toTeleport = lobby.clone().add(random.nextInt(1), 0, random.nextInt(1));
-				toTeleport.setYaw(90);
 				e.getPlayer().teleport(toTeleport);
 			}
 		}
@@ -339,7 +353,26 @@ public class WorldManager implements Listener{
 	public Location getCenter(){
 		return uhcWorld.getSpawnLocation();
 	}
+	
+	@EventHandler
+	public void on(BlockFromToEvent e){
+		
+		if(e.getBlock().getLocation().getBlockY()>100){
+			if(e.getBlock().getType().equals(Material.STATIONARY_WATER)|| e.getBlock().getType().equals(Material.STATIONARY_LAVA)){
+				e.setCancelled(true);
+			}
+		}
+	}
 
+	@EventHandler
+	public void on(PlayerInteractEvent e){
+		if(State.getState().equals(State.INGAME)==false){
+				if(e.getAction() == Action.PHYSICAL && e.getClickedBlock().getType() == Material.SOIL){
+			        e.setCancelled(true);
+			    }
+		}
+	}
+	
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(EntityDamageByEntityEvent e){
 		if(State.getState().equals(State.INGAME)){

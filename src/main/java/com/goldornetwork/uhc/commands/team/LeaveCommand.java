@@ -38,14 +38,17 @@ public class LeaveCommand extends UHCCommand{
 			else if(State.getState().equals(State.OPEN)){
 				if(teamM.isTeamsEnabled()){
 					if(teamM.isPlayerOwner(teamM.getTeamOfPlayer(sender.getUniqueId()), sender.getUniqueId())){
-						teamM.removePlayerFromOwner(teamM.getTeamOfPlayer(sender.getUniqueId()), sender.getUniqueId());
-						teamM.disbandTeam(teamM.getTeamOfPlayer(sender.getUniqueId()));
-						
-						for(UUID u : teamM.getPlayersOnATeam(teamM.getTeamOfPlayer(sender.getUniqueId()))){
+						String team = teamM.getTeamOfPlayer(sender.getUniqueId());
+						teamM.removePlayerFromOwner(team, sender.getUniqueId());
+
+						for(UUID u : teamM.getPlayersOnATeam(team)){
 							if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
 								MessageSender.alertMessage(Bukkit.getServer().getPlayer(u), ChatColor.RED + "Your team has been disbanded by " + sender.getName());
 							}
 						}
+						
+						teamM.disbandTeam(team);
+						
 					}
 					else{
 						for(UUID u : teamM.getPlayersOnATeam(teamM.getTeamOfPlayer(sender.getUniqueId()))){

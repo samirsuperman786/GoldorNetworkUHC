@@ -22,12 +22,15 @@ import com.goldornetwork.uhc.commands.game.LookupCommand;
 import com.goldornetwork.uhc.commands.game.PMCommand;
 import com.goldornetwork.uhc.commands.game.ReplyCommand;
 import com.goldornetwork.uhc.commands.game.ReportCommand;
+import com.goldornetwork.uhc.commands.game.TeleportCommand;
 import com.goldornetwork.uhc.commands.game.VoteCommand;
+import com.goldornetwork.uhc.commands.staff.FreezeCommand;
 import com.goldornetwork.uhc.commands.staff.StartCommand;
 import com.goldornetwork.uhc.commands.staff.UHCBanCommand;
 import com.goldornetwork.uhc.commands.staff.UHCMuteCommand;
 import com.goldornetwork.uhc.commands.staff.UHCUnMuteCommand;
 import com.goldornetwork.uhc.commands.staff.UHCWarnCommand;
+import com.goldornetwork.uhc.commands.staff.UHCWhitelistCommand;
 import com.goldornetwork.uhc.commands.team.CreateCommand;
 import com.goldornetwork.uhc.commands.team.InvitePlayerCommand;
 import com.goldornetwork.uhc.commands.team.JoinCommand;
@@ -46,6 +49,8 @@ import com.goldornetwork.uhc.managers.chat.TeamInteraction;
 import com.goldornetwork.uhc.managers.world.ChunkGenerator;
 import com.goldornetwork.uhc.managers.world.UHCBan;
 import com.goldornetwork.uhc.managers.world.UHCWarn;
+import com.goldornetwork.uhc.managers.world.UHCWhitelist;
+import com.goldornetwork.uhc.managers.world.listeners.MoveListener;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class CommandHandler implements CommandExecutor, TabCompleter {
@@ -62,22 +67,21 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		UHCCommand command = getCommand(cmd.getName());
-
+		Player messenger;
+		
 		if(command == null){
 			return true;
 		}
-
 		else if(!(sender instanceof Player)){
 			MessageSender.noConsole(sender);
+			return true;
 		}
-
 		else if(!(sender.hasPermission(command.getPermission()))){
 			MessageSender.noPerms(sender);
 			return true;
 		}
-
-		Player messenger = (Player) sender;
-
+		messenger = (Player) sender;
+		
 		try{
 			if(!(command.execute(messenger, args))){
 				MessageSender.usageMessage(sender, command.getUsage());
@@ -167,13 +171,15 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
 
 	public void registerCommands(TeamManager teamM, TimerManager timerM, GameModeManager gamemodeM,
 			ChunkGenerator chunkG, VoteManager voteM, TeamInteraction teamI, UHCBan uhcB, UHCWarn uhcWarn,
-			ChatManager chatM){
+			ChatManager chatM, UHCWhitelist uhcWhitelist, MoveListener moveL){
 		// staff
 		cmds.add(new StartCommand(timerM, teamM));
 		cmds.add(new UHCBanCommand(uhcB));
 		cmds.add(new UHCWarnCommand(uhcWarn));
 		cmds.add(new UHCMuteCommand(chatM));
 		cmds.add(new UHCUnMuteCommand(chatM, teamM));
+		cmds.add(new UHCWhitelistCommand(uhcWhitelist));
+		cmds.add(new FreezeCommand(moveL));
 
 		// team
 		cmds.add(new CreateCommand(teamM));
@@ -184,7 +190,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
 		cmds.add(new PMCoordsCommand(teamM, teamI));
 		cmds.add(new TeamChatCommand(teamM, teamI));
 		cmds.add(new KickCommand(teamM));
-		cmds.add(new RequestCommand(teamM));
+		cmds.add(new RequestCommand(teamM, uhcWhitelist));
 		
 		// game
 		cmds.add(new HelpopCommand(chatM));
@@ -196,7 +202,8 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
 		cmds.add(new PMCommand(chatM));
 		cmds.add(new ReplyCommand(chatM));
 		cmds.add(new ReportCommand(chatM));
-
+		cmds.add(new TeleportCommand(teamM));
+		
 		for(UHCCommand cmd : cmds){
 			PluginCommand pCmd = plugin.getCommand(cmd.getName());
 

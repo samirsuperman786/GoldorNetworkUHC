@@ -7,24 +7,28 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
+import com.goldornetwork.uhc.managers.world.ubl.UBL;
 
 public class UHCServer implements Listener{
 
 
 	private UHC plugin;
 	private TeamManager teamM;
-
+	private UBL ubl;
+	
 	private int FAKE_PLAYER_SLOTS;
 	private int BUFFER_PLAYER_SLOTS;
+	private boolean canJoin = false;
 
-
-	public UHCServer(UHC plugin, TeamManager teamM) {
+	public UHCServer(UHC plugin, TeamManager teamM, UBL ubl) {
 		this.plugin=plugin;
 		this.teamM=teamM;
+		this.ubl=ubl;
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
@@ -34,13 +38,26 @@ public class UHCServer implements Listener{
 		plugin.saveConfig();
 		this.FAKE_PLAYER_SLOTS=plugin.getConfig().getInt("Fake-Player-Slots");
 		this.BUFFER_PLAYER_SLOTS=plugin.getConfig().getInt("BUFFER-PLAYER-SLOTS");
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				canJoin=true;
+			}
+		}.runTaskLater(plugin, 20L);
+		
 	}
 
 	@EventHandler
 	public void on(PlayerLoginEvent e){
 		Player target = e.getPlayer();
-
-		if(target.isBanned()){
+		if(canJoin==false){
+			e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.RED + "Server is being set up.");
+		}
+		else if(ubl.isBanned(target.getUniqueId())){
+			e.disallow(PlayerLoginEvent.Result.KICK_BANNED, ubl.getBanMessage(target.getUniqueId()));
+		}
+		else if(target.isBanned()){
 			e.disallow(PlayerLoginEvent.Result.KICK_BANNED, 
 					ChatColor.RED + "\nPermanently Banned" + ChatColor.GOLD + "\u27A0" + ChatColor.AQUA
 					+ Bukkit.getServer().getBanList(BanList.Type.NAME).getBanEntry(target.getName()).getReason()

@@ -14,31 +14,40 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.goldornetwork.uhc.commands.CommandHandler;
 import com.goldornetwork.uhc.managers.BoardManager;
 import com.goldornetwork.uhc.managers.ScatterManager;
+import com.goldornetwork.uhc.managers.TabManager;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.TimerManager;
 import com.goldornetwork.uhc.managers.VoteManager;
 import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
 import com.goldornetwork.uhc.managers.chat.ChatManager;
 import com.goldornetwork.uhc.managers.chat.TeamInteraction;
+import com.goldornetwork.uhc.managers.world.Announcer;
 import com.goldornetwork.uhc.managers.world.ChunkGenerator;
+import com.goldornetwork.uhc.managers.world.Disguiser;
+import com.goldornetwork.uhc.managers.world.InventoryView;
 import com.goldornetwork.uhc.managers.world.SpectatorRegion;
 import com.goldornetwork.uhc.managers.world.UHCBan;
 import com.goldornetwork.uhc.managers.world.UHCServer;
 import com.goldornetwork.uhc.managers.world.UHCWarn;
+import com.goldornetwork.uhc.managers.world.UHCWhitelist;
 import com.goldornetwork.uhc.managers.world.WorldFactory;
 import com.goldornetwork.uhc.managers.world.WorldManager;
+import com.goldornetwork.uhc.managers.world.listeners.CraftingListener;
 import com.goldornetwork.uhc.managers.world.listeners.DeathListener;
 import com.goldornetwork.uhc.managers.world.listeners.JoinListener;
 import com.goldornetwork.uhc.managers.world.listeners.MoveListener;
 import com.goldornetwork.uhc.managers.world.listeners.WeatherChangeListener;
+import com.goldornetwork.uhc.managers.world.ubl.UBL;
 import com.goldornetwork.uhc.utils.AntiXray;
 import com.goldornetwork.uhc.utils.Medic;
 
 public class UHC extends JavaPlugin {
 
 	
-	private File configf, teamf;
-	private FileConfiguration config, team;
+	private File configf;
+	private File teamf;
+	private FileConfiguration config;
+	private FileConfiguration team;
 
 	private static UHC plugin;
 	private GameModeManager gameModeM;
@@ -49,7 +58,7 @@ public class UHC extends JavaPlugin {
 	private ChunkGenerator chunkG;
 	private ScatterManager scatterM;
 	private CommandHandler cmd;
-	private MoveListener moveE;
+	private MoveListener moveL;
 	private VoteManager voteM;
 	private WorldManager worldM;
 	private ChatManager chatM;
@@ -57,47 +66,54 @@ public class UHC extends JavaPlugin {
 	private UHCBan uhcB;
 	private UHCWarn uhcWarn;
 	private UHCServer uhcServer;
+	private UHCWhitelist uhcWhitelist;
 	private SpectatorRegion spectM;
-
+	private Announcer annnouncer;
+	private UBL ubl;
 	
 	public void instances(){
 
-		worldF= new WorldFactory(plugin);
-
-		gameModeM= new GameModeManager(plugin);
+		worldF = new WorldFactory(plugin);
+		
+		ubl = new UBL(plugin);
+		
+		gameModeM = new GameModeManager(plugin);
 
 		boardM = new BoardManager(plugin);
 
-		chunkG= new ChunkGenerator(plugin);
+		chunkG = new ChunkGenerator(plugin);
 
-		teamM= new TeamManager(plugin, boardM);
+		teamM = new TeamManager(plugin, boardM);
 
 		chatM = new ChatManager(plugin, teamM);
 
-		moveE= new MoveListener(plugin, teamM);
+		moveL = new MoveListener(plugin, teamM);
 
 		worldM = new WorldManager(plugin, teamM, worldF, chunkG);
 
-		scatterM= new ScatterManager(plugin, teamM, moveE, chatM, chunkG, worldM);
+		scatterM = new ScatterManager(plugin, teamM, moveL, chatM, chunkG, worldM);
 
 		voteM = new VoteManager(plugin, gameModeM);
 
+		uhcWhitelist = new UHCWhitelist(plugin, teamM);
+		
 		timerM = new TimerManager(plugin, scatterM, teamM, voteM, chatM, worldM);
 
 		spectM = new SpectatorRegion(plugin, teamM, worldM);
 
-		uhcServer=new UHCServer(plugin, teamM);
+		uhcServer = new UHCServer(plugin, teamM, ubl);
 
 		teamI = new TeamInteraction(teamM);
 
-		uhcWarn= new UHCWarn();
+		uhcWarn = new UHCWarn();
 
 		uhcB = new UHCBan(teamM);
 		
+		annnouncer= new Announcer(plugin);
 		
 		cmd = new CommandHandler(plugin);
 
-		cmd.registerCommands(teamM, timerM, gameModeM, chunkG, voteM, teamI, uhcB, uhcWarn, chatM);
+		cmd.registerCommands(teamM, timerM, gameModeM, chunkG, voteM, teamI, uhcB, uhcWarn, chatM, uhcWhitelist, moveL);
 
 
 		new Medic(plugin, teamM);
@@ -106,19 +122,25 @@ public class UHC extends JavaPlugin {
 		new JoinListener(plugin, teamM, worldM);
 		new WeatherChangeListener(plugin);
 		new AntiXray(plugin);
+		new Disguiser(plugin, teamM);
+		new TabManager(plugin, gameModeM);
+		new CraftingListener(plugin);
+		new InventoryView(plugin, teamM);
 	}
 
 	private void setup(){
+		ubl.reload();
 		teamM.setup();
 		timerM.setup();
-		moveE.setup();
+		moveL.setup();
 		voteM.setup();
 		worldM.setup();
-		gameModeM.setupGamemodes(teamM, worldM);
+		gameModeM.setupGamemodes(teamM, worldM, boardM);
 		scatterM.setup();
 		spectM.setup();
 		boardM.setup(teamM, worldM, timerM);
 		uhcServer.setup();
+		annnouncer.setup();
 	}
 
 	private void createConfig() {
@@ -126,11 +148,19 @@ public class UHC extends JavaPlugin {
 		configf= new File(getDataFolder(), "config.yml");
 
 		if(!configf.exists()) {
-			configf.getParentFile().mkdirs();
+			try {
+				configf.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			saveResource("config.yml", false);
 		} 
 		if(!teamf.exists()) {
-			teamf.getParentFile().mkdirs();
+			try {
+				teamf.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			saveResource("teams.yml", false);
 		}
 		config = new YamlConfiguration();

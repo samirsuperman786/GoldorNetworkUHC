@@ -39,28 +39,32 @@ public class Weaklings extends Gamemode implements Listener{
 
 	private void runChecker(){
 		new BukkitRunnable() {
-			double searchHealth = 0.5;
+			double searchHealth = 0.0;
 			double exactLowestHealth = 0.0;
 			boolean foundLowest = false;
 			@Override
 			public void run() {
+				
+				healthCheck:
 				while(foundLowest==false){
-
+					searchHealth+=.5;
 					checkLoop:
 						for(UUID u : teamM.getPlayersInGame()){
 							if(plugin.getServer().getOfflinePlayer(u).isOnline()){
 								Player target = plugin.getServer().getPlayer(u);
-								if(target.getHealth()==searchHealth){
-									exactLowestHealth=searchHealth;
+								double health = target.getHealth();
+								double roundedHealth = .5*(Math.round(health/.5));
+								
+								if(roundedHealth<=searchHealth){
 									foundLowest=true;
 									break checkLoop;
 								}
 							}
 						}
-
-				if(foundLowest==false){
-					searchHealth+=.5;
-				}
+					if(foundLowest==true){
+						exactLowestHealth=searchHealth;
+						break healthCheck;
+					}
 				}
 				if(foundLowest==true){
 					MessageSender.broadcast(exactLowestHealth + "");

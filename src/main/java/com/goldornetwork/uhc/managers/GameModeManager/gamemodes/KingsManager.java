@@ -42,7 +42,7 @@ public class KingsManager extends Gamemode implements Listener{
 
 
 	public KingsManager(TeamManager teamM) {
-		super("Kings", "Kings", "A random player on a team will receive special powers, and when that player dies, all his teamates shall suffer.");
+		super("Kings", "Kings", "A random player on a team will receive special powers, and when that player dies, all his teammates shall suffer.");
 		this.teamM=teamM;
 	}
 

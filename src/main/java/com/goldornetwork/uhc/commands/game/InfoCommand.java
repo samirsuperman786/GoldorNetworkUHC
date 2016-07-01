@@ -59,7 +59,7 @@ public class InfoCommand extends UHCCommand{
 			for(Gamemode game : gamemodeM.getEnabledGamemodes()){
 				toReturn.add(ChatColor.AQUA + game.getProperName() + ": " + ChatColor.DARK_AQUA + game.getDescription());
 			}
-			toReturn.add(ChatColor.GOLD + "For a specific gamemode -> " + ChatColor.GOLD + "/info " + ChatColor.AQUA + "[gamemode]");
+			//toReturn.add(ChatColor.GOLD + "For a specific gamemode -> " + ChatColor.GOLD + "/info " + ChatColor.AQUA + "[gamemode]");
 		}
 		else if(gamemodeM.getEnabledGamemodes().isEmpty()){
 			return null;

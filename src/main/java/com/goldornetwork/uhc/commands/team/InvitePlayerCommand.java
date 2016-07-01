@@ -13,6 +13,11 @@ import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.utils.MessageSender;
 import com.goldornetwork.uhc.utils.PlayerUtils;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+
 public class InvitePlayerCommand extends UHCCommand{
 
 
@@ -54,13 +59,24 @@ public class InvitePlayerCommand extends UHCCommand{
 		}
 		else{
 			Player target = PlayerUtils.getPlayer(args[0]);
+			String name = target.getName();
+			String team = teamM.getTeamOfPlayer(sender.getUniqueId());
+			
 			teamM.invitePlayer(teamM.getTeamOfPlayer(sender.getUniqueId()), target.getUniqueId());
 			
-			MessageSender.alertMessage(target, ChatColor.GREEN + "You have been invited to team " + teamM.getColorOfPlayer(sender.getUniqueId())
-			+ teamM.getTeamNameProper(teamM.getTeamOfPlayer(sender.getUniqueId())) + ChatColor.GREEN + " by " + teamM.getColorOfPlayer(sender.getUniqueId())
+			TextComponent targetMessage = new TextComponent(ChatColor.GREEN + "You have been invited to team " + teamM.getColorOfPlayer(sender.getUniqueId())
+			+ teamM.getTeamNameProper(team) + ChatColor.GREEN + " by " + teamM.getColorOfPlayer(sender.getUniqueId())
 			+ sender.getName());
 			
-			MessageSender.alertMessage(sender, ChatColor.GREEN + "You have invited player " + target.getName());
+			targetMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/join " + team));
+			targetMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.AQUA + "Click to join.").create()));
+			MessageSender.send(target, targetMessage);
+			
+			
+			TextComponent senderMessage = new TextComponent(ChatColor.GREEN + "You have invited player " + name);
+			senderMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/uninvite " + name));
+			senderMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.AQUA + "Click to revoke.").create()));
+			MessageSender.send(sender, senderMessage);
 			return true;
 		}
 	}

@@ -19,7 +19,7 @@ public class UHCWarnCommand extends UHCCommand{
 	
 	
 	public UHCWarnCommand(UHCWarn uhcWarn) {
-		super("warn", "player");
+		super("warn", "[player] [reason]");
 		this.uhcWarn=uhcWarn;
 	}
 
@@ -44,7 +44,7 @@ public class UHCWarnCommand extends UHCCommand{
 				str.append(args[i] + " ");
 			}
 			String msg = str.toString();
-			uhcWarn.warnPlayer(target, msg);
+			uhcWarn.warnPlayer(sender, target, msg);
 			return true;
 		}
 	}

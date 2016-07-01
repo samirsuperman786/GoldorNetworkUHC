@@ -58,7 +58,7 @@ public class ScatterManager implements Listener{
 
 	private UHC plugin;
 	private TeamManager teamM;
-	private MoveListener moveE;
+	private MoveListener moveL;
 	private ChatManager chatM;
 	private ChunkGenerator chunkG;
 	private WorldManager worldM;
@@ -84,10 +84,10 @@ public class ScatterManager implements Listener{
 	private Set<UUID> lateSafeCheck = new HashSet<UUID>();
 
 
-	public ScatterManager(UHC plugin, TeamManager teamM, MoveListener moveE, ChatManager chatM, ChunkGenerator chunkG, WorldManager worldM) {
+	public ScatterManager(UHC plugin, TeamManager teamM, MoveListener moveL, ChatManager chatM, ChunkGenerator chunkG, WorldManager worldM) {
 		this.plugin=plugin;
 		this.teamM=teamM;
-		this.moveE=moveE;
+		this.moveL=moveL;
 		this.chatM=chatM;
 		this.chunkG=chunkG;
 		this.worldM=worldM;
@@ -293,7 +293,7 @@ public class ScatterManager implements Listener{
 	private void scatterTeams(){
 		timer=0;
 		MessageSender.broadcast("Scattering teams...");
-		moveE.freezePlayers();
+		moveL.freezePlayers();
 		Bukkit.getPluginManager().callEvent(new TeleportTeamEvent());
 	}
 
@@ -467,6 +467,7 @@ public class ScatterManager implements Listener{
 		p.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 6200, 0));
 		p.setExp(0);
 		p.setLevel(0);
+		p.setFireTicks(0);
 	}
 
 	private void removePlayerFromLateScatters(Player p){
@@ -494,7 +495,7 @@ public class ScatterManager implements Listener{
 			public void run() {
 				Bukkit.getPluginManager().callEvent(new GameStartEvent());
 				State.setState(State.INGAME);
-				moveE.unfreezePlayers();
+				moveL.unfreezePlayers();
 				MessageSender.broadcast("Scattering complete.");
 				
 				for(Player online: Bukkit.getServer().getOnlinePlayers()){

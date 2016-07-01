@@ -26,6 +26,11 @@
 			<id>spigot-repo</id>
 			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
+
+		<repository>
+			<id>inventive-repo</id>
+			<url>https://repo.inventivetalent.org/content/groups/public/</url>
+		</repository>
 	</repositories>
 
 
@@ -44,6 +49,12 @@
 			<version>1.8.8-R0.1-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.inventivetalent</groupId>
+			<artifactId>tabapi</artifactId>
+			<version>1.1.1</version>
 		</dependency>
 
 	</dependencies>

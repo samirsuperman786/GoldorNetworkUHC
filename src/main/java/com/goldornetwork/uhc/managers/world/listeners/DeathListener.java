@@ -27,6 +27,7 @@ import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.managers.world.customevents.GameEndEvent;
 import com.goldornetwork.uhc.managers.world.customevents.UHCDeathEvent;
+import com.goldornetwork.uhc.managers.world.customevents.UHCKillEvent;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 
@@ -75,6 +76,9 @@ public class DeathListener implements Listener {
 				if(teamM.getActiveTeams().size()==1){
 					String winner = teamM.getActiveTeams().iterator().next();
 					plugin.getServer().getPluginManager().callEvent(new GameEndEvent(teamM.getPlayersOnATeam(winner)));
+				}
+				else if(teamM.getActiveTeams().size()==1){
+					plugin.getServer().getPluginManager().callEvent(new GameEndEvent(null));
 				}
 			}
 		}
@@ -139,7 +143,13 @@ public class DeathListener implements Listener {
 		Location loc = p.getLocation();
 		teamM.addPlayerToObservers(p);
 		p.setHealth(20);
-
+		
+		if(teamM.isPlayerInGame(p.getUniqueId()) && p.getKiller() instanceof Player){
+			Player killer = p.getKiller();
+			if(teamM.isPlayerInGame(killer.getUniqueId())){
+				plugin.getServer().getPluginManager().callEvent(new UHCKillEvent(killer));
+			}
+		}
 		if(teamM.isPlayerInGame(p.getUniqueId())){
 			if(State.getState().equals(State.INGAME) || State.getState().equals(State.SCATTER)){
 				plugin.getServer().getPluginManager().callEvent(new UHCDeathEvent(p));

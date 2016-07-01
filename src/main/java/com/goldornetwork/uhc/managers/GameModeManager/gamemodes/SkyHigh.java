@@ -33,7 +33,7 @@ public class SkyHigh extends Gamemode implements Listener{
 	private Map<UUID, BukkitTask> playersToDamage= new HashMap<UUID, BukkitTask>();
 	private Set<UUID> lateSkyHigh = new HashSet<UUID>();
 	private UHC plugin;
-
+	
 	
 	public SkyHigh(UHC plugin, TeamManager teamM) {
 		super("Sky High", "SkyHigh", "At meetup, players who are not above y=100 will take a heart of damage every 30 seconds.");
@@ -91,7 +91,7 @@ public class SkyHigh extends Gamemode implements Listener{
 				if(Bukkit.getServer().getPlayer(u).getLocation().getBlockY()<=100){
 					if(playersToDamage.containsKey(u)==false){
 						if(teamM.isPlayerInGame(u)){
-							MessageSender.send(Bukkit.getServer().getPlayer(u), ChatColor.RED + "You are below Y: 101");
+							MessageSender.send(Bukkit.getServer().getPlayer(u), ChatColor.RED + "You are below Y: 100");
 						}
 						
 						BukkitTask task = new BukkitRunnable(){
@@ -100,6 +100,7 @@ public class SkyHigh extends Gamemode implements Listener{
 							public void run() {
 								if(teamM.isPlayerInGame(u)){
 									if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
+										MessageSender.send(Bukkit.getServer().getPlayer(u), ChatColor.RED + "You are below Y: 100");
 										Bukkit.getServer().getPlayer(u).damage(2);
 									}
 								}

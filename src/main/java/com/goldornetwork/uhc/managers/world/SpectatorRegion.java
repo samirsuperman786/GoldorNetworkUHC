@@ -8,11 +8,14 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
+import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.managers.world.customevents.GameStartEvent;
 
 public class SpectatorRegion implements Listener {
@@ -71,4 +74,14 @@ public class SpectatorRegion implements Listener {
 			}
 		}
 	}
+	
+	@EventHandler
+	public void on(PlayerTeleportEvent e){
+		if(e.getCause().equals(TeleportCause.SPECTATE)){
+			if(!(State.getState().equals(State.INGAME))){
+				e.setCancelled(true);
+			}
+		}
+	}
+	
 }

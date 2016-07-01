@@ -27,8 +27,23 @@ public class StartCommand extends UHCCommand{
 
 	@Override
 	public boolean execute(Player sender, String[] args) {
-		if(!State.getState().equals(State.NOT_RUNNING)){
-			MessageSender.send(sender, ChatColor.RED + "Match has already started.");
+		if(State.getState().equals(State.OPEN)){
+			if(args.length==1){
+				if(Parser.isInt(args[0])){
+					teamM.setTeamSize(Integer.valueOf(args[0]));
+					MessageSender.send(sender, ChatColor.GREEN + "Changed team size to " + ChatColor.GRAY + args[0]);
+					return true;
+				}
+				else{
+					return false;
+				}
+			}
+			else{
+				return false;
+			}
+		}
+		else if(!State.getState().equals(State.NOT_RUNNING)){
+			MessageSender.send(sender, ChatColor.RED + "Can only start the match when the match is not running.");
 			return true;
 		}
 		else if(args.length==1){

@@ -2,14 +2,18 @@ package com.goldornetwork.uhc.managers.world.listeners;
 
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 import com.goldornetwork.uhc.UHC;
@@ -36,7 +40,7 @@ public class JoinListener implements Listener{
 		this.plugin=plugin;
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void on(PlayerJoinEvent e){
 		Player p = e.getPlayer();
 
@@ -60,7 +64,6 @@ public class JoinListener implements Listener{
 			p.getInventory().setArmorContents(null);
 			Location lobby = worldM.getLobby().getSpawnLocation();
 			Location toTeleport = lobby.clone().add(random.nextInt(1), 0, random.nextInt(1));
-			toTeleport.setYaw(90);
 			p.teleport(toTeleport);
 			Medic.heal(p);
 		}
@@ -70,4 +73,6 @@ public class JoinListener implements Listener{
 			}
 		}
 	}
+
+	
 }

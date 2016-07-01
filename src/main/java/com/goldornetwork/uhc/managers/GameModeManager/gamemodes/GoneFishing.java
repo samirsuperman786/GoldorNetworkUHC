@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -31,7 +32,7 @@ public class GoneFishing extends Gamemode implements Listener {
 
 	public GoneFishing(TeamManager teamM) {
 		super("Gone Fishing", "GoneFishing", "Players spawn with infinite levels, 20 anvils, a fishing rod with:"
-				+ " Luck of the Sea 250, Lure 250, and Unbreaking 150. Caution: Enchantment tables are disabled.");
+				+ " Luck of the Sea 100, Lure 100, and Unbreaking 100. Caution: Enchantment tables are disabled.");
 		this.teamM=teamM;
 	}
 
@@ -47,7 +48,7 @@ public class GoneFishing extends Gamemode implements Listener {
 
 	@EventHandler
 	public void on(PrepareItemCraftEvent e){
-		if(State.getState().equals(State.INGAME)){
+		if(State.getState().equals(State.INGAME) || State.getState().equals(State.SCATTER)){
 			Material item = e.getRecipe().getResult().getType();
 			if(item.equals(Material.ENCHANTMENT_TABLE)){
 				e.getInventory().setResult(new ItemStack(Material.AIR));
@@ -72,13 +73,14 @@ public class GoneFishing extends Gamemode implements Listener {
 	private void giveAPlayerGoneFishingItems(Player p){
 		ItemStack given = new ItemStack(Material.FISHING_ROD, 1);
 		ItemMeta im = given.getItemMeta();
-		im.addEnchant(Enchantment.LUCK, 250, true);
-		im.addEnchant(Enchantment.LURE, 250, true);
-		im.addEnchant(Enchantment.DURABILITY, 150, true);
+		im.addEnchant(Enchantment.LUCK, 100, true);
+		im.addEnchant(Enchantment.LURE, 100, true);
+		im.addEnchant(Enchantment.DURABILITY, 100, true);
+		im.setDisplayName(ChatColor.AQUA + "Fish Slapper 100");
 		given.setItemMeta(im);
 		p.getInventory().addItem(new ItemStack(Material.ANVIL, 20));
 		p.getInventory().addItem(given);
-		p.setExp(Integer.MAX_VALUE);
+		p.setLevel(Integer.MAX_VALUE);
 	}
 	private void distributeItems(){
 

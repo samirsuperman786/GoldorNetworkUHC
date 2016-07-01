@@ -18,7 +18,7 @@ import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.world.customevents.MeetupEvent;
 import com.goldornetwork.uhc.utils.MessageSender;
 
-public class LandIsBad extends Gamemode implements Listener{
+public class WetCombat extends Gamemode implements Listener{
 
 
 	private TeamManager teamM;
@@ -27,8 +27,8 @@ public class LandIsBad extends Gamemode implements Listener{
 	private Map<UUID, BukkitTask> playersToDamage= new HashMap<UUID, BukkitTask>();
 
 	
-	public LandIsBad(UHC plugin, TeamManager teamM){
-		super("Land is Bad", "LandIsBad", "At meetup, players who are not underwater will take a heart of damage every ten seconds.");
+	public WetCombat(UHC plugin, TeamManager teamM){
+		super("Wet Combat", "WetCombat", "At meetup, players who are not underwater will take a heart of damage every thirty seconds.");
 		this.plugin=plugin;
 		this.teamM=teamM;
 	}
@@ -67,7 +67,10 @@ public class LandIsBad extends Gamemode implements Listener{
 				else{
 					if(playersToDamage.containsKey(u)==false){
 						if(teamM.isPlayerInGame(u)){
-
+							if(Bukkit.getServer().getOfflinePlayer(u).isOnline()){
+								MessageSender.send(Bukkit.getServer().getPlayer(u), ChatColor.RED + "Get to water.");
+							}
+							
 							BukkitTask task = new BukkitRunnable(){
 								@Override
 								public void run(){
@@ -82,7 +85,7 @@ public class LandIsBad extends Gamemode implements Listener{
 										playersToDamage.remove(u);
 									}
 								}
-							}.runTaskTimer(plugin, 200L, 200L);
+							}.runTaskTimer(plugin, 600L, 600L);
 
 							playersToDamage.put(u, task);
 						}

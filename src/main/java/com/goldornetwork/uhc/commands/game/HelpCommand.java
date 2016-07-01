@@ -34,7 +34,7 @@ public class HelpCommand extends UHCCommand{
 				toReturn.add(ChatColor.GOLD + "Team Commands: ");
 				toReturn.add(formatCommand("/create", "Use this to create a team."));
 				toReturn.add(formatCommand("/invite [player]", "Use this to invite a player to your team."));
-				toReturn.add(formatCommand("/uninvite [player]", "Use this to un-invite a player from your team."));
+				toReturn.add(formatCommand("/uninvite [player]", "Use this to revoke an invite."));
 				toReturn.add(formatCommand("/join [team]", "Use this to join a team."));
 				toReturn.add(formatCommand("/leave", "Use this to leave a team."));
 				toReturn.add(formatCommand("/kick [player]", "Use this to kick a player from your team."));
@@ -54,16 +54,19 @@ public class HelpCommand extends UHCCommand{
 				toReturn.add(formatCommand("/report [player] [reason]", "Use this to report a player."));
 				toReturn.add(formatCommand("/pm [player] [message]", "Use this to message a player."));
 				toReturn.add(formatCommand("/reply [message]", "Use this to reply to a player."));
+				toReturn.add(formatCommand("/tp [player]", "Teleport to a player."));
 				MessageSender.send(sender, toReturn);
 				return true;
 			}
 			else if(args[0].equalsIgnoreCase("staff")){
 				toReturn.add(ChatColor.GOLD + "Staff Commands: ");
 				toReturn.add(formatCommand("/start [teamsize]", "Use this to start a match."));
-				toReturn.add(formatCommand("/playerban [player] [reason]", "Use this to permanently ban a player."));
 				toReturn.add(formatCommand("/warn [player] [reason]", "Use to warn a player."));
 				toReturn.add(formatCommand("/mute [player] [reason]", "Use this to mute a player."));
 				toReturn.add(formatCommand("/unmute [player]", "Use this to unmute a player."));
+				toReturn.add(formatCommand("/playerban [player] [reason]", "Use this to permanently ban a player."));
+				toReturn.add(formatCommand("/freeze [player]", "Use this to freeze a player."));
+				
 				MessageSender.send(sender, toReturn);
 				return true;
 			}

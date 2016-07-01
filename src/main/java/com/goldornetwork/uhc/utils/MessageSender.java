@@ -48,6 +48,10 @@ public class MessageSender {
 
 		sender.sendMessage(toSend);
 	}
+	
+	public static void send(Player target, TextComponent msg){
+		target.spigot().sendMessage(msg);
+	}
 
 
 	public static void noPerms(Player p){
@@ -67,7 +71,7 @@ public class MessageSender {
 	}
 
 	public static void alertMessage(Player p, String msg){
-		p.sendMessage(getPrefix() + ChatColor.MAGIC + "G" + ChatColor.GOLD + msg + ChatColor.MAGIC + "G");
+		p.sendMessage(getPrefix() + ChatColor.MAGIC + "G" + msg + ChatColor.GOLD + ChatColor.MAGIC + "G");
 	}
 
 	public static void sendToOPS(String msg){
@@ -75,7 +79,6 @@ public class MessageSender {
 	}
 	
 	public static void sendToOPS(TextComponent msg){
-		//Bukkit.broadcast(ChatColor.GOLD + "[OPS] " + msg, "uhc.broadcast.mod");
 		for(Player online : Bukkit.getOnlinePlayers()){
 			if(online.hasPermission("uhc.broadcast.mod")){
 				Player target = online;
@@ -104,6 +107,11 @@ public class MessageSender {
 		}
 	}
 
+	public static void broadcastNoPrefix(String msg){
+		for(Player online: Bukkit.getOnlinePlayers()){
+			online.sendMessage(msg);
+		}
+	}
 	@SuppressWarnings("deprecation")
 	public static void broadcastTitle(String title, String subtitle){
 		for(Player online: Bukkit.getOnlinePlayers()){

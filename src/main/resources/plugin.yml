@@ -83,3 +83,14 @@ commands:
    report:
       description: Use this to report a player. 
       usage: /<command> [player] [reason]
+   whitelist:
+      description: Use this to whitelist a player. 
+      usage: /<command> [add/on/off] [player]
+   teleport:
+      description: Use this to teleport to a player. 
+      usage: /<command> [player]
+      aliases: [tp]
+   freeze:
+      description: Use this to freeze a player. 
+      usage: /<command> [player]
+      aliases: [f]

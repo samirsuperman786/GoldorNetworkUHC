@@ -19,16 +19,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.world.customevents.GameStartEvent;
 import com.goldornetwork.uhc.utils.MessageSender;
-
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 
 
 public class TeamManager implements Listener{
@@ -45,7 +39,6 @@ public class TeamManager implements Listener{
 	private Set<UUID> playersInGame = new HashSet<UUID>();
 	private Set<UUID> observers = new HashSet<UUID>();
 	private Set<String> listOfActiveTeams = new HashSet<String>();
-	private List<String> cooldownForWhitelist = new ArrayList<String>();
 	
 	private Map<UUID, String> teamOfPlayer = new HashMap<UUID, String>();
 	private Map<String, String> colorOfTeam = new HashMap<String, String>();
@@ -116,6 +109,10 @@ public class TeamManager implements Listener{
 	public int getTeamSize(){
 		return this.playersPerTeam;
 	}
+	
+	public void setTeamSize(int val){
+		this.playersPerTeam=val;
+	}
 
 	public boolean isTeamsEnabled(){
 		return isTeamsEnabled;
@@ -167,14 +164,15 @@ public class TeamManager implements Listener{
 		return ownerOfTeam.get(team);
 	}
 
-	public boolean createRandomTeam(Player p){
+	public boolean createRandomTeam(Player target){
 		boolean foundTeam = false;
 		for(Map.Entry<String, Integer> entry : playersOnCurrentTeam.entrySet()){
 			if(entry.getValue()==0){
-				listOfActiveTeams.add(entry.getKey());
-				boardM.createTeam(entry.getKey());
-				addPlayerToTeam(p, entry.getKey());
-				ownerOfTeam.put(entry.getKey(), p.getUniqueId());
+				String team = entry.getKey();
+				listOfActiveTeams.add(team);
+				boardM.createTeam(team);
+				addPlayerToTeam(target, team);
+				ownerOfTeam.put(team, target.getUniqueId());
 				foundTeam= true;
 				break;
 			}
@@ -195,11 +193,11 @@ public class TeamManager implements Listener{
 			}
 		}
 
-		boardM.addPlayerToTeam(team, p);
+		
 		playersInGame.add(p.getUniqueId());
 		teamOfPlayer.put(p.getUniqueId(), team);
 		increaseTeamCount(team, 1);
-
+		boardM.addPlayerToTeam(team, p);
 		if(invitedPlayers.containsKey(team)){
 			if(invitedPlayers.get(team).contains(p.getUniqueId())){
 				invitedPlayers.get(team).remove(p.getUniqueId());
@@ -252,26 +250,6 @@ public class TeamManager implements Listener{
 		return false;
 	}
 	
-	public void requestWhitelist(Player sender, String team, String target){
-		if(cooldownForWhitelist.contains(team)){
-			MessageSender.send(sender, ChatColor.RED + "You are cooldown for that command.");
-		}
-		else{
-			MessageSender.send(sender, ChatColor.GREEN + "Requested " + target + " to be whitelisted.");
-			TextComponent message = new TextComponent(ChatColor.GOLD + "[REQUEST] " + getColorOfTeam(team) + getTeamNameProper(team) + ChatColor.GRAY + " requests to whitelist " + target);
-			message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/whitelist add " + target));
-			message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to whitelist.").create()));
-			MessageSender.sendToOPS(message);
-			cooldownForWhitelist.add(team);
-			
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					cooldownForWhitelist.remove(team);
-				}
-			}.runTaskLater(plugin, 160L);
-		}
-	}
 
 	public boolean isPlayerOwner(String team, UUID u){
 		return ownerOfTeam.get(team).equals(u);
@@ -284,7 +262,7 @@ public class TeamManager implements Listener{
 		for(PotionEffect effect : p.getActivePotionEffects()){
 			p.removePotionEffect(effect.getType());
 		}
-		p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1, false, false));
+		p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false, false));
 		p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0));
 		MessageSender.send(p, ChatColor.AQUA + "You are now spectating.");
 		boardM.addPlayerToObserver(p);
@@ -357,8 +335,8 @@ public class TeamManager implements Listener{
 		boardM.removeTeam(team);
 	}
 
-	public boolean areTeamMates(Player first, Player second){
-		return getPlayersOnATeam(getTeamOfPlayer(first.getUniqueId())).contains(second.getUniqueId());
+	public boolean areTeamMates(UUID first, UUID second){
+		return getPlayersOnATeam(getTeamOfPlayer(first)).contains(second);
 	}
 
 	public String getTeamNameProper(String team){

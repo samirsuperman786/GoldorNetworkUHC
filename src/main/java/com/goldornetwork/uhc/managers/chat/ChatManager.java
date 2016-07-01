@@ -20,6 +20,11 @@ import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.utils.MessageSender;
 import com.goldornetwork.uhc.utils.PlayerUtils;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+
 public class ChatManager implements Listener{
 
 
@@ -71,8 +76,11 @@ public class ChatManager implements Listener{
 			target.sendMessage(ChatColor.RED + "You are on cooldown for that command.");
 		}
 		else{
-			MessageSender.sendToOPS(teamM.getColorOfPlayer(target.getUniqueId()) + target.getName() + ChatColor.WHITE + ": " + msg);
-			target.sendMessage(ChatColor.GOLD + "[HELPOP] " + ChatColor.GREEN + "me" + ChatColor.GOLD + "\u279COPS\u279C" + ChatColor.WHITE + msg);
+			TextComponent message = new TextComponent(ChatColor.GOLD + "[HELPOP] " + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName() + ChatColor.GRAY + ": " + msg);
+			message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/pm " + target.getName() + " "));
+			message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.AQUA + "Click to message.").create()));
+			MessageSender.sendToOPS(message);
+
 			helpopCooldown.add(target.getUniqueId());
 
 			new BukkitRunnable() {
@@ -80,7 +88,7 @@ public class ChatManager implements Listener{
 				public void run() {
 					helpopCooldown.remove(target.getUniqueId());
 				}
-			}.runTaskLater(plugin, 300L);
+			}.runTaskLater(plugin, 600L);
 		}
 	}
 
@@ -92,9 +100,12 @@ public class ChatManager implements Listener{
 			messenger.sendMessage(ChatColor.RED + "You are on cooldown for that command.");
 		}
 		else{
-			MessageSender.sendToOPS(teamM.getColorOfPlayer(messenger.getUniqueId()) + messenger.getName() + ChatColor.GOLD
+			TextComponent message = new TextComponent(teamM.getColorOfPlayer(messenger.getUniqueId()) + messenger.getName() + ChatColor.GOLD
 					+ "\u27B5reports\u27B5" + teamM.getColorOfPlayer(target.getUniqueId())+ target.getName() + ChatColor.GOLD
 					+ "\u27B5" + msg);
+			message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + target.getName()));
+			message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.AQUA + "Click to teleport.").create()));
+			MessageSender.sendToOPS(message);
 
 			messenger.sendMessage(ChatColor.GREEN + "Reported player " + target.getName());
 			reportCooldown.add(messenger.getUniqueId());
@@ -140,7 +151,7 @@ public class ChatManager implements Listener{
 		String mePrefix = ChatColor.GREEN.toString();
 
 		if(teamM.isPlayerInGame(sender.getUniqueId()) && teamM.isPlayerInGame(target.getUniqueId())){
-			if(teamM.areTeamMates(sender, target)){
+			if(teamM.areTeamMates(sender.getUniqueId(), target.getUniqueId())){
 				prefixTarget = ChatColor.GREEN.toString();
 				prefixSender = ChatColor.GREEN.toString();
 			}

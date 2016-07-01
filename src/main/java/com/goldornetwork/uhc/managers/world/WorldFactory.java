@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
@@ -79,13 +80,14 @@ public class WorldFactory implements Listener{
 	public World getLobby(){
 		if(!(plugin.getServer().getWorlds().contains(Lobby))){
 			Lobby = plugin.getServer().createWorld(new WorldCreator("Lobby"));
-			Lobby.setSpawnLocation(0, Lobby.getHighestBlockYAt(0, 0), 0);
+			Lobby.setSpawnLocation(0, 32, 0);
 			Lobby.setGameRuleValue("doMobSpawning", "false");
 			Lobby.setGameRuleValue("doDaylightCycle", "false");
 			Lobby.setTime(60);
 			Lobby.setThundering(false);
 			Lobby.setStorm(false);
 			Lobby.setSpawnFlags(false, false);
+			
 			for(Entity entity : Lobby.getEntities()){
 				if(!(entity instanceof Player)){
 					entity.remove();

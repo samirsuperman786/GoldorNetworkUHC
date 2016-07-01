@@ -41,7 +41,7 @@ public class KickCommand extends UHCCommand{
 							MessageSender.send(sender, ChatColor.RED + "You can not kick yourself from your team.");
 							return true;
 						}
-						else if(teamM.areTeamMates(sender, target)){
+						else if(teamM.areTeamMates(sender.getUniqueId(), target.getUniqueId())){
 							teamM.removePlayerFromTeam(target.getUniqueId());
 
 							MessageSender.alertMessage(target, ChatColor.RED + "You have been kicked from team "

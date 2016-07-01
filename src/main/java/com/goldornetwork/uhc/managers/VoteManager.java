@@ -21,6 +21,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
+import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.SkyHigh;
+import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.WetCombat;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class VoteManager implements Listener{
@@ -58,7 +60,6 @@ public class VoteManager implements Listener{
 		if(option> 0 && option <=NUMBEROFOPTIONS){
 			return true;
 		}
-
 		return false;
 	}
 
@@ -85,7 +86,7 @@ public class VoteManager implements Listener{
 				String message = ChatColor.AQUA + game.getProperName();
 				String properMessage;
 				if(comma<getOptions().get(i).size()){
-					properMessage = message + ", ";
+					properMessage = message + ChatColor.GRAY + " + ";
 				}
 				else{
 					properMessage=message;
@@ -116,7 +117,7 @@ public class VoteManager implements Listener{
 					index = random.nextInt(gamemodeM.getNumberOfGamemodes()) ;
 					game = gamemodeM.getGameMode(gamemodeM.getGamemodes().get(index).getClass());
 
-					while(isValid(game)==false){
+					while(isValid(toAdd, game)==false){
 						index = random.nextInt(gamemodeM.getNumberOfGamemodes());
 						game = gamemodeM.getGameMode(gamemodeM.getGamemodes().get(index).getClass());
 					}
@@ -135,8 +136,15 @@ public class VoteManager implements Listener{
 		}
 	}
 
-	private boolean isValid(Gamemode game){
+	private boolean isValid(List<Gamemode> gamemodes, Gamemode game){
 		boolean valid = true;
+		List<Gamemode> combined = new ArrayList<Gamemode>();
+		combined.addAll(gamemodes);
+		combined.add(game);
+		if(combined.contains(gamemodeM.getGameMode(SkyHigh.class)) && combined.contains(WetCombat.class)){
+			valid=false;
+		}
+		
 		return valid;
 	}
 
@@ -147,26 +155,13 @@ public class VoteManager implements Listener{
 	public void enableOption(int choice){
 		voteActive=false;
 		List<String> toBroadcast = new LinkedList<String>();
-		StringBuilder str = new StringBuilder();
-		int comma=0;
 
 		for(Gamemode game : options.get(choice)){
 			game.enable(plugin);
 			toBroadcast.add(ChatColor.AQUA + game.getProperName() + " has been enabled.");
-			comma++;
-			String message = ChatColor.AQUA + game.getProperName();
-			String properMessage;
-			if(comma<getOptions().get(choice).size()){
-				properMessage = message + ", ";
-			}
-			else{
-				properMessage= "and " + message;
-			}
-
-			str.append(properMessage);
 		}
-		String msg = str.toString();
-		MessageSender.broadcastSmallTitle(msg + " have been enabled.");
+		
+		MessageSender.broadcastTitle(ChatColor.AQUA + "Gamemodes have been enabled.", ChatColor.GOLD + "Use" + ChatColor.RED + " /info " + ChatColor.GOLD + "to learn them!");
 		MessageSender.broadcast(toBroadcast);
 	}
 
