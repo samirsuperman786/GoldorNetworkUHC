@@ -36,13 +36,16 @@ public class VoteCommand extends UHCCommand{
 					int input = Integer.valueOf(args[0]);
 					if(voteM.isValidOption(input)){
 						
-						if(voteM.hasVoted(sender)){
-							MessageSender.send(sender, ChatColor.RED + "You have already voted.");
+						if(voteM.hasVoted(sender.getUniqueId())){
+							voteM.changeVote(sender.getUniqueId(), input);
+							MessageSender.send(sender, ChatColor.GREEN + "Changed vote to option " + ChatColor.GOLD + input);
 							return true;
 						}
-						voteM.addVote(sender, input);
-						MessageSender.send(sender, ChatColor.GREEN + "You have voted for option " + ChatColor.GOLD + input);
-						return true;
+						else{
+							voteM.addVote(sender.getUniqueId(), input);
+							MessageSender.send(sender, ChatColor.GREEN + "You have voted for option " + ChatColor.GOLD + input);
+							return true;
+						}
 					}
 					else{
 						MessageSender.send(sender, ChatColor.RED + args[0] + " is not a valid option.");
@@ -68,8 +71,8 @@ public class VoteCommand extends UHCCommand{
 	public List<String> tabComplete(Player sender, String[] args) {
 		List<String> toReturn = new LinkedList<String>();
 		
-		for(int i = 0; i<voteM.getNumberOfOptions(); i++){
-			toReturn.add((i + 1) + "");
+		for(int i = 1; i<(voteM.getNumberOfOptions()+1); i++){
+			toReturn.add(i + "");
 		}
 		return toReturn;
 	}

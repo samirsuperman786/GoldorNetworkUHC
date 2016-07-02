@@ -82,7 +82,7 @@ public class TimerManager implements Listener{
 				}
 				else if(timeTillVote==0){
 					voteM.enableOption(voteM.getWinner());
-					MessageSender.broadcast("Option " + (voteM.getWinner()+1) + " has won with " + ChatColor.GRAY + voteM.getWinnerVotes() + ChatColor.GOLD + " votes.");
+					MessageSender.broadcast("Option " + (voteM.getWinner()) + " has won with " + ChatColor.GRAY + voteM.getVotes(voteM.getWinner()) + ChatColor.GOLD + " votes.");
 					cancel();
 				}
 			}
