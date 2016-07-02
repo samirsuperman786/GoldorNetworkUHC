@@ -50,6 +50,7 @@ import com.goldornetwork.uhc.managers.world.customevents.MeetupEvent;
 import com.goldornetwork.uhc.managers.world.customevents.PVPEnableEvent;
 import com.goldornetwork.uhc.utils.Medic;
 import com.goldornetwork.uhc.utils.MessageSender;
+import com.goldornetwork.uhc.utils.PlayerUtils;
 
 import net.minecraft.server.v1_8_R3.MinecraftServer;
 
@@ -151,7 +152,7 @@ public class WorldManager implements Listener{
 	@EventHandler
 	public void on(PlayerJoinEvent e){
 		Player target = e.getPlayer();
-		e.setJoinMessage(ChatColor.GREEN + "\u2713" + teamM.getColorOfPlayer(target.getUniqueId()) +  target.getName());
+		e.setJoinMessage(ChatColor.GREEN + "\u2713" + PlayerUtils.getPrefix(target) + teamM.getColorOfPlayer(target.getUniqueId()) +  target.getName());
 		target.setHealth(target.getHealth());
 		for(Player online : Bukkit.getOnlinePlayers()){
 			online.hidePlayer(target);
@@ -162,7 +163,7 @@ public class WorldManager implements Listener{
 	@EventHandler
 	public void on(PlayerQuitEvent e){
 		Player target = e.getPlayer();
-		e.setQuitMessage(ChatColor.RED + "\u2717" + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName());
+		e.setQuitMessage(ChatColor.RED + "\u2717" + PlayerUtils.getPrefix(target) + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName());
 		
 		if(teamM.isPlayerAnObserver(target.getUniqueId())){
 			teamM.removePlayerFromObservers(target);

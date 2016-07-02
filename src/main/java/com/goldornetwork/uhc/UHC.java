@@ -12,6 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.goldornetwork.uhc.commands.CommandHandler;
+import com.goldornetwork.uhc.commands.console.Console;
 import com.goldornetwork.uhc.managers.BoardManager;
 import com.goldornetwork.uhc.managers.ScatterManager;
 import com.goldornetwork.uhc.managers.TabManager;
@@ -100,14 +101,15 @@ public class UHC extends JavaPlugin {
 		timerM = new TimerManager(plugin, scatterM, teamM, voteM, chatM, worldM);
 
 		spectM = new SpectatorRegion(plugin, teamM, worldM);
+		
+		uhcB = new UHCBan(plugin, teamM);
 
-		uhcServer = new UHCServer(plugin, teamM, ubl);
+		uhcServer = new UHCServer(plugin, teamM, ubl, uhcB);
 
 		teamI = new TeamInteraction(teamM);
 
 		uhcWarn = new UHCWarn();
 
-		uhcB = new UHCBan(teamM);
 		
 		annnouncer= new Announcer(plugin);
 		
@@ -126,6 +128,8 @@ public class UHC extends JavaPlugin {
 		new TabManager(plugin, gameModeM);
 		new CraftingListener(plugin);
 		new InventoryView(plugin, teamM);
+		
+		new Console(plugin, uhcB);
 	}
 
 	private void setup(){
@@ -140,6 +144,7 @@ public class UHC extends JavaPlugin {
 		spectM.setup();
 		boardM.setup(teamM, worldM, timerM);
 		uhcServer.setup();
+		uhcB.setup();
 		annnouncer.setup();
 	}
 
