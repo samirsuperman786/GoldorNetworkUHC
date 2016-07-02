@@ -217,7 +217,7 @@ public class WorldManager implements Listener{
 						String message = teamM.getColorOfPlayer(u) + Bukkit.getOfflinePlayer(u).getName();
 						String properMessage;
 						if(comma<winners.size()){
-							properMessage = message + ", ";
+							properMessage = message + ChatColor.GRAY + " + ";
 						}
 						else{
 							properMessage=message;

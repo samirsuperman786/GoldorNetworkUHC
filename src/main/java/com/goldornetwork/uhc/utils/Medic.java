@@ -26,7 +26,7 @@ public class Medic implements Listener {
 		this.plugin=plugin;
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.teamM=teamM;
-		timeTillHeal=15;
+		timeTillHeal=20;
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)

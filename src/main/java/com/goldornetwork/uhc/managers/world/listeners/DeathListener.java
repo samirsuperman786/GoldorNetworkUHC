@@ -75,7 +75,7 @@ public class DeathListener implements Listener {
 
 				if(teamM.getActiveTeams().size()==1){
 					String winner = teamM.getActiveTeams().iterator().next();
-					plugin.getServer().getPluginManager().callEvent(new GameEndEvent(teamM.getPlayersOnATeam(winner)));
+					plugin.getServer().getPluginManager().callEvent(new GameEndEvent(teamM.getLoggedTeamPlayers(winner)));
 				}
 				else if(teamM.getActiveTeams().size()==1){
 					plugin.getServer().getPluginManager().callEvent(new GameEndEvent(null));

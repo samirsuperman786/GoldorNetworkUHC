@@ -55,7 +55,6 @@ import net.minecraft.server.v1_8_R3.MinecraftServer;
 
 public class ScatterManager implements Listener{
 
-
 	private UHC plugin;
 	private TeamManager teamM;
 	private MoveListener moveL;
