@@ -118,7 +118,7 @@ public class BoardManager implements Listener{
 		observerTeam = mainBoard.registerNewTeam(ChatColor.AQUA + "Observers");
 		observerTeam.setPrefix(ChatColor.AQUA + "[Observer] ");
 
-		Team otherPlayers = mainBoard.registerNewTeam("others");
+		Team otherPlayers = mainBoard.registerNewTeam(ChatColor.RED + "Enemies");
 		otherPlayers.setPrefix(ChatColor.RED + "");
 
 	}
@@ -132,7 +132,7 @@ public class BoardManager implements Listener{
 		newTeam.setAllowFriendlyFire(false);
 		newTeam.setPrefix(ChatColor.GREEN + "");
 
-		Team otherPlayers = teamBoard.registerNewTeam("others");
+		Team otherPlayers = teamBoard.registerNewTeam(ChatColor.RED + "Enemies");
 		otherPlayers.setPrefix(ChatColor.RED + "");
 
 		Team observers = teamBoard.registerNewTeam(ChatColor.AQUA + "Observers");
@@ -155,7 +155,7 @@ public class BoardManager implements Listener{
 			}
 		});
 
-		mainBoard.getTeam("others").addPlayer(target);
+		mainBoard.getTeam(ChatColor.RED + "Enemies").addPlayer(target);
 		
 		individualScoreBoardHeaders.put(target.getUniqueId(), header);
 		teamScoreBoards.get(team).add(newTeam);
@@ -169,12 +169,12 @@ public class BoardManager implements Listener{
 		for(UUID players : teamM.getPlayersInGame()){
 			if(teamM.areTeamMates(target.getUniqueId(), players)==false){
 				otherPlayers.addPlayer(PlayerUtils.getOfflinePlayer(players));
-				getScoreboardOfPlayer(players).getTeam("others").addPlayer(target);
+				getScoreboardOfPlayer(players).getTeam(ChatColor.RED + "Enemies").addPlayer(target);
 			}
 		}
 		for(UUID u : teamM.getPlayersOnATeam(team)){
-			if(individualScoreboards.get(u).getScoreboard().getTeam("others").hasPlayer(target)){
-				individualScoreBoardHeaders.get(u).getScoreboard().getTeam("others").removePlayer(target);
+			if(individualScoreboards.get(u).getScoreboard().getTeam(ChatColor.RED + "Enemies").hasPlayer(target)){
+				individualScoreBoardHeaders.get(u).getScoreboard().getTeam(ChatColor.RED + "Enemies").removePlayer(target);
 			}
 			newTeam.addPlayer(PlayerUtils.getOfflinePlayer(u));
 			individualScoreboards.get(u).addPlayer(target);
@@ -235,7 +235,7 @@ public class BoardManager implements Listener{
 		for(String team : teamM.getActiveTeams()){
 			if(teamM.getTeamOfPlayer(u)!=team){
 				for(Team teamBoards : teamScoreBoards.get(team)){
-					teamBoards.getScoreboard().getTeam("others").removePlayer(plugin.getServer().getOfflinePlayer(u));
+					teamBoards.getScoreboard().getTeam(ChatColor.RED + "Enemies").removePlayer(plugin.getServer().getOfflinePlayer(u));
 				}
 			}
 		}
@@ -246,7 +246,7 @@ public class BoardManager implements Listener{
 		for(String team : teamM.getActiveTeams()){
 			if(teamM.getTeamOfPlayer(u)!=team){
 				for(Team teamBoards : teamScoreBoards.get(team)){
-					teamBoards.getScoreboard().getTeam("others").addPlayer(plugin.getServer().getOfflinePlayer(u));
+					teamBoards.getScoreboard().getTeam(ChatColor.RED + "Enemies").addPlayer(plugin.getServer().getOfflinePlayer(u));
 				}
 			}
 		}
@@ -300,10 +300,10 @@ public class BoardManager implements Listener{
 			teamBoards.removePlayer(p);
 		}
 
-		mainBoard.getTeam("others").removePlayer(p);
+		mainBoard.getTeam(ChatColor.RED + "Enemies").removePlayer(p);
 		for(UUID enemies : teamM.getPlayersInGame()){
 			if(teamM.getTeamOfPlayer(enemies)!=team){
-				getScoreboardOfPlayer(enemies).getTeam("others").removePlayer(p);
+				getScoreboardOfPlayer(enemies).getTeam(ChatColor.RED + "Enemies").removePlayer(p);
 			}
 		}
 		if(p.isOnline()){

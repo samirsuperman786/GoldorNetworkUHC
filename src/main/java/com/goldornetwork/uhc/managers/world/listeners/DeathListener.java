@@ -65,7 +65,7 @@ public class DeathListener implements Listener {
 
 					if(newOwner.isOnline()){
 						Player onlineNewOwner = (Player) newOwner;
-						MessageSender.alertMessage(onlineNewOwner, "You have been granted ownership of team " + teamM.getColorOfTeam(team) + teamM.getTeamNameProper(team));
+						MessageSender.alertMessage(onlineNewOwner, ChatColor.GREEN + "You have been granted ownership of team " + teamM.getColorOfTeam(team) + teamM.getTeamNameProper(team));
 					}
 				}
 			}
@@ -75,7 +75,7 @@ public class DeathListener implements Listener {
 
 				if(teamM.getActiveTeams().size()==1){
 					String winner = teamM.getActiveTeams().iterator().next();
-					plugin.getServer().getPluginManager().callEvent(new GameEndEvent(teamM.getPlayersOnATeam(winner)));
+					plugin.getServer().getPluginManager().callEvent(new GameEndEvent(teamM.getLoggedTeamPlayers(winner)));
 				}
 				else if(teamM.getActiveTeams().size()==1){
 					plugin.getServer().getPluginManager().callEvent(new GameEndEvent(null));
@@ -95,7 +95,7 @@ public class DeathListener implements Listener {
 		}
 		if(toKill.contains(target.getUniqueId())){
 			toKill.remove(target.getUniqueId());
-			MessageSender.alertMessage(target, "You were gone for more than " + ChatColor.GRAY + afkTimeTillKill + ChatColor.GOLD + " minutes so you were removed.");
+			MessageSender.alertMessage(target, ChatColor.GOLD + "You were gone for more than " + ChatColor.GRAY + afkTimeTillKill + ChatColor.GOLD + " minutes so you were removed.");
 		}
 	}
 

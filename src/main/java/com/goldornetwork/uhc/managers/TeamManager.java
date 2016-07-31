@@ -46,6 +46,7 @@ public class TeamManager implements Listener{
 	private Map<String, UUID> ownerOfTeam = new HashMap<String, UUID>();
 	private Map<String, Set<UUID>> invitedPlayers = new HashMap<String, Set<UUID>>();
 	
+	private Map<String, List<UUID>> loggedTeams = new HashMap<String, List<UUID>>();
 
 	public TeamManager(UHC plugin, BoardManager boardM) {
 		this.plugin=plugin;
@@ -305,6 +306,10 @@ public class TeamManager implements Listener{
 		}
 		return players;
 	}
+	
+	public List<UUID> getLoggedTeamPlayers(String team){
+		return this.loggedTeams.get(team);
+	}
 
 	public Set<String> getActiveTeams(){
 		return listOfActiveTeams;
@@ -355,5 +360,8 @@ public class TeamManager implements Listener{
 	@EventHandler
 	public void on(GameStartEvent e){
 		invitedPlayers.clear();
+		for(String team : getActiveTeams()){
+			this.loggedTeams.put(team, getPlayersOnATeam(team));
+		}
 	}
 }

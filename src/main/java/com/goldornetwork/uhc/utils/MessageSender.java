@@ -71,7 +71,7 @@ public class MessageSender {
 	}
 
 	public static void alertMessage(Player p, String msg){
-		p.sendMessage(getPrefix() + ChatColor.MAGIC + "G" + msg + ChatColor.GOLD + ChatColor.MAGIC + "G");
+		p.sendMessage(getPrefix() + ChatColor.MAGIC + "G" + ChatColor.WHITE + msg + ChatColor.GOLD + ChatColor.MAGIC + "G");
 	}
 
 	public static void sendToOPS(String msg){

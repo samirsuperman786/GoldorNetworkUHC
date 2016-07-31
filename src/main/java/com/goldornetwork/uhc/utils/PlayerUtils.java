@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 
 public class PlayerUtils {
 
@@ -58,6 +59,13 @@ public class PlayerUtils {
 	
 	public static Player getPlayer(UUID u){
 		return Bukkit.getServer().getPlayer(u);
+	}
+	
+	public static boolean arePotionsSimilar(PotionEffect one, PotionEffect two){
+		boolean same = false;
+		same = one.getType().equals(two.getType());
+		same = one.getAmplifier()==two.getAmplifier();
+		return same;
 	}
 	
 }

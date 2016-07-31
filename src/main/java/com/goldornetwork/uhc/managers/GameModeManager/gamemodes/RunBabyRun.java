@@ -16,6 +16,7 @@ import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.world.customevents.GameStartEvent;
+import com.goldornetwork.uhc.utils.PlayerUtils;
 
 public class RunBabyRun extends Gamemode implements Listener{
 
@@ -65,10 +66,14 @@ public class RunBabyRun extends Gamemode implements Listener{
 	}
 
 	public void addBuffs(Player p){
-		p.addPotionEffect(speedBuff);
+		p.addPotionEffect(speedBuff, true);
 	}
 
 	public void removeBuffs(Player p){
-		p.removePotionEffect(speedBuff.getType());
+		for(PotionEffect playerEffects : p.getActivePotionEffects()){
+			if(PlayerUtils.arePotionsSimilar(playerEffects, speedBuff)){
+				p.removePotionEffect(speedBuff.getType());
+			}
+		}
 	}
 }

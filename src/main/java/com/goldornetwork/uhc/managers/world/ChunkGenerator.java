@@ -74,7 +74,7 @@ public class ChunkGenerator {
 				if(duration%30 ==0){
 					world.save();
 				}
-				if(cancel){
+				else if(cancel){
 					cancel();
 				}
 				else{

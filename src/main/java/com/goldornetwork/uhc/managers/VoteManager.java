@@ -3,12 +3,10 @@ package com.goldornetwork.uhc.managers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
@@ -21,8 +19,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
-import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.SkyHigh;
-import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.WetCombat;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class VoteManager implements Listener{
@@ -35,7 +31,7 @@ public class VoteManager implements Listener{
 	private final int AMOUNTTOENABLE = 3;
 	private List<List<Gamemode>> options= new LinkedList<List<Gamemode>>();
 	private Map<Integer, Integer> mostPopularVote = new HashMap<Integer, Integer>();
-	private Set<UUID> haveVoted = new HashSet<UUID>();
+	private Map<UUID, Integer> playerVotes = new HashMap<UUID, Integer>();
 	private boolean voteActive;
 
 	
@@ -47,7 +43,7 @@ public class VoteManager implements Listener{
 
 	public void setup(){
 		mostPopularVote.clear();
-		haveVoted.clear();
+		playerVotes.clear();
 		options.clear();
 		voteActive=false;
 	}
@@ -57,10 +53,7 @@ public class VoteManager implements Listener{
 	}
 
 	public boolean isValidOption(int option){
-		if(option> 0 && option <=NUMBEROFOPTIONS){
-			return true;
-		}
-		return false;
+		return (option> 0 && option <=NUMBEROFOPTIONS);
 	}
 
 	public void broadcastOptions(){
@@ -75,7 +68,7 @@ public class VoteManager implements Listener{
 
 	private List<String> getMessage(){
 		List<String> toBroadcast = new LinkedList<String>();
-		toBroadcast.add("[Options] Please use /vote [option], also /info [gamemode]");
+		toBroadcast.add("[Options] Please use /vote [option], also /info [scenario]");
 
 		for(int i = 0; i<getNumberOfOptions(); i++){
 			int comma = 0;
@@ -95,7 +88,7 @@ public class VoteManager implements Listener{
 				str.append(properMessage);
 			}
 			String msg = str.toString();
-			toBroadcast.add("Option " + (i + 1) + ": " + msg);
+			toBroadcast.add("Option " + (i + 1) + ": " + msg + ChatColor.GRAY + " (" + getVotes(i+1) + ")");
 		}
 
 		return toBroadcast;
@@ -104,7 +97,7 @@ public class VoteManager implements Listener{
 	public void generateOptions(){
 		voteActive=true;
 
-		for(int k = 0; k<NUMBEROFOPTIONS; k++){
+		for(int k = 1; k<(NUMBEROFOPTIONS + 1); k++){
 			List<Gamemode> toAdd = new ArrayList<Gamemode>();
 			toAdd.clear();
 
@@ -137,14 +130,8 @@ public class VoteManager implements Listener{
 	}
 
 	private boolean isValid(List<Gamemode> gamemodes, Gamemode game){
+		//TODO validate
 		boolean valid = true;
-		List<Gamemode> combined = new ArrayList<Gamemode>();
-		combined.addAll(gamemodes);
-		combined.add(game);
-		if(combined.contains(gamemodeM.getGameMode(SkyHigh.class)) && combined.contains(WetCombat.class)){
-			valid=false;
-		}
-		
 		return valid;
 	}
 
@@ -156,26 +143,35 @@ public class VoteManager implements Listener{
 		voteActive=false;
 		List<String> toBroadcast = new LinkedList<String>();
 
-		for(Gamemode game : options.get(choice)){
+		for(Gamemode game : options.get((choice-1))){
 			game.enable(plugin);
 			toBroadcast.add(ChatColor.AQUA + game.getProperName() + " has been enabled.");
 		}
 		
-		MessageSender.broadcastTitle(ChatColor.AQUA + "Gamemodes have been enabled.", ChatColor.GOLD + "Use" + ChatColor.RED + " /info " + ChatColor.GOLD + "to learn them!");
+		MessageSender.broadcastTitle(ChatColor.AQUA + "Scenarios have been enabled.", ChatColor.GOLD + "Use" + ChatColor.RED + " /info " + ChatColor.GOLD + "to learn them!");
 		MessageSender.broadcast(toBroadcast);
 	}
 
-	public boolean hasVoted(Player p){
-		if(haveVoted.contains(p.getUniqueId())){
-			return true;
-		}
-		else{
-			return false;
-		}
+	public boolean hasVoted(UUID target){
+		return playerVotes.containsKey(target);
 	}
-	public void addVote(Player p, int choice){
-		haveVoted.add(p.getUniqueId());
-		mostPopularVote.replace(choice-1, (mostPopularVote.get(choice-1) + 1));
+	
+	public void changeVote(UUID target, int newChoice){
+		int oldChoice = playerVotes.remove(target);
+		subtractVote(target, oldChoice);
+		
+		playerVotes.put(target, newChoice);
+		addVote(target, newChoice);
+	}
+	
+	public void addVote(UUID target, int choice){
+		playerVotes.put(target, choice);
+		mostPopularVote.replace(choice, (mostPopularVote.get(choice) + 1));
+	}
+	
+	private void subtractVote(UUID target, int choice){
+		playerVotes.remove(target);
+		mostPopularVote.replace(choice, (mostPopularVote.get(choice) - 1));
 	}
 
 	public int getWinner(){
@@ -189,9 +185,9 @@ public class VoteManager implements Listener{
 
 		return currentWinner;
 	}
-
-	public int getWinnerVotes(){
-		return (Collections.max(mostPopularVote.values()));
+	
+	public int getVotes(int choice){
+		return mostPopularVote.get(choice);
 	}
 
 	public boolean isActive(){
