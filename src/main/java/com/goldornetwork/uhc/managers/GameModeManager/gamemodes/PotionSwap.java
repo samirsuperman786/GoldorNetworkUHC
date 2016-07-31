@@ -1,8 +1,10 @@
 package com.goldornetwork.uhc.managers.GameModeManager.gamemodes;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -28,6 +30,7 @@ import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.managers.world.customevents.GameStartEvent;
 import com.goldornetwork.uhc.managers.world.customevents.UHCJoinEvent;
+import com.goldornetwork.uhc.utils.PlayerUtils;
 import com.google.common.collect.ImmutableSet;
 
 public class PotionSwap extends Gamemode implements Listener{
@@ -41,7 +44,7 @@ public class PotionSwap extends Gamemode implements Listener{
 	private int timer;
 	
 	private Set<UUID> latePotionPlayers = new HashSet<UUID>();
-
+	private Map<UUID, PotionEffect> potionOfPlayer = new HashMap<UUID, PotionEffect>();
 	
 	public PotionSwap(UHC plugin, TeamManager teamM, BoardManager boardM) {
 		super("Potion Swap","PotionSwap", "Every 5 minutes, players will receive a new potion effect.");
@@ -65,7 +68,7 @@ public class PotionSwap extends Gamemode implements Listener{
 	}
 	
 	private int getInterval(){
-		return 2*60;
+		return 5*60;
 	}
 
 	private void startTimer(){
@@ -107,11 +110,18 @@ public class PotionSwap extends Gamemode implements Listener{
 		}
 	}
 	private void giveAPlayerARandomPotion(Player p){
-		for(PotionEffect effect : p.getActivePotionEffects()){
-			p.removePotionEffect(effect.getType());
+		if(potionOfPlayer.containsKey(p.getUniqueId())){
+			for(PotionEffect playerEffects : p.getActivePotionEffects()){
+				if(PlayerUtils.arePotionsSimilar(playerEffects, potionOfPlayer.get(p.getUniqueId()))){
+					p.removePotionEffect(playerEffects.getType());
+				}
+			}
 		}
-		p.addPotionEffect(new PotionEffect(getRandomPotion(), Integer.MAX_VALUE, 0));
+		
+		PotionEffect effect = new PotionEffect(getRandomPotion(), Integer.MAX_VALUE, 0);
+		p.addPotionEffect(effect, false);
 		p.getWorld().playEffect(p.getLocation(), Effect.POTION_BREAK, 10);
+		potionOfPlayer.put(p.getUniqueId(), effect);
 	}
 
 	public void removePlayerFromLateGive(Player p){
@@ -134,12 +144,14 @@ public class PotionSwap extends Gamemode implements Listener{
 			PotionEffectType.WEAKNESS,
 			PotionEffectType.INVISIBILITY
 			);
+	
 	private PotionEffectType getRandomPotion(){
 		List<PotionEffectType> toReturn = new ArrayList<PotionEffectType>();
 		toReturn.addAll(ValidPotions);
 		int index = random.nextInt(toReturn.size());
 		return toReturn.get(index);
 	}
+	
 
 	@EventHandler
 	public void on(PlayerItemConsumeEvent e){

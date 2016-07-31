@@ -33,7 +33,7 @@ public class InfoCommand extends UHCCommand{
 				}
 			}
 			else{
-				MessageSender.send(sender, ChatColor.RED + "No gamemodes currently enabled. Please use /info [gamemode]");
+				MessageSender.send(sender, ChatColor.RED + "No gamemodes currently enabled. Please use /info [scenario]");
 			}
 
 			return true;
@@ -55,7 +55,7 @@ public class InfoCommand extends UHCCommand{
 	private List<String> getMessage(){
 		List<String> toReturn = new LinkedList<String>();
 		if(gamemodeM.getEnabledGamemodes().isEmpty()==false){
-			toReturn.add(ChatColor.GOLD + "Enabled Gamemodes: ");
+			toReturn.add(ChatColor.GOLD + "Enabled Scenarios: ");
 			for(Gamemode game : gamemodeM.getEnabledGamemodes()){
 				toReturn.add(ChatColor.AQUA + game.getProperName() + ": " + ChatColor.DARK_AQUA + game.getDescription());
 			}

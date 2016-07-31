@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -46,6 +45,7 @@ import com.goldornetwork.uhc.managers.world.customevents.TeleportTeamEvent;
 import com.goldornetwork.uhc.managers.world.customevents.UHCEnterMapEvent;
 import com.goldornetwork.uhc.managers.world.listeners.MoveListener;
 import com.goldornetwork.uhc.utils.CoordXZ;
+import com.goldornetwork.uhc.utils.LocationUtils;
 import com.goldornetwork.uhc.utils.Medic;
 import com.goldornetwork.uhc.utils.MessageSender;
 import com.google.common.collect.ImmutableSet;
@@ -296,14 +296,9 @@ public class ScatterManager implements Listener{
 		Bukkit.getPluginManager().callEvent(new TeleportTeamEvent());
 	}
 
-	private CoordXZ randomLocation(World world, int initialRadius){
-		Random random = new Random();
+	public CoordXZ randomLocation(World world, int initialRadius){
 		int radius = (initialRadius - BUFFER_BLOCKS);
-		int x = random.nextInt(radius * 2) - radius;
-		int z = random.nextInt(radius * 2) - radius;
-		x = x + worldM.getCenter().getBlockX();
-		z = z + worldM.getCenter().getBlockZ();
-		return new CoordXZ(x, z);
+		return LocationUtils.locationInRadius(worldM.getCenter().getBlockX(), worldM.getCenter().getBlockZ(), radius);
 	}
 
 	private boolean validate(Location loc){

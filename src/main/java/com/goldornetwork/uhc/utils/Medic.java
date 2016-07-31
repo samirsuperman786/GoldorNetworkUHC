@@ -26,7 +26,7 @@ public class Medic implements Listener {
 		this.plugin=plugin;
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.teamM=teamM;
-		timeTillHeal=20;
+		timeTillHeal=60;
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -48,7 +48,7 @@ public class Medic implements Listener {
 					cancel();
 				}
 				else if(timeTillHeal>0){
-					if(timeTillHeal<=5 && timeTillHeal>1){
+					if(timeTillHeal<=3 && timeTillHeal>1){
 						MessageSender.broadcast(ChatColor.DARK_AQUA + "Final heal in " + ChatColor.DARK_RED + timeTillHeal + ChatColor.DARK_AQUA + " seconds.");
 					}
 					else if(timeTillHeal==1){

@@ -102,7 +102,7 @@ public class TabManager implements Listener{
 			prefix = ChatColor.GREEN.toString();
 		}
 		else{
-			prefix = ChatColor.GOLD.toString();
+			prefix = ChatColor.DARK_RED.toString();
 		}
 		return prefix + timeString;
 	}
@@ -144,7 +144,7 @@ public class TabManager implements Listener{
 									"",
 									ChatColor.DARK_AQUA + "Online Players: " + ChatColor.WHITE + plugin.getServer().getOnlinePlayers().size() + ChatColor.GRAY + "/" + ChatColor.WHITE + slots,
 									"", 
-									ChatColor.DARK_AQUA + "Enabled Gamemodes: " + ChatColor.AQUA + msg);
+									ChatColor.DARK_AQUA + "Enabled Scenarios: " + ChatColor.AQUA + msg);
 						}
 					}
 				}

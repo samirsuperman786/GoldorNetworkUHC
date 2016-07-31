@@ -47,8 +47,8 @@ commands:
       usage: /<command> [team]
       aliases: [l]
    info:
-      description: Use this to learn the gamemodes.
-      usage: /<command> [gamemode] 
+      description: Use this to learn the Scenarios.
+      usage: /<command> [scenario] 
    pmc:
       description: Use this to message your coordinates.
       usage: /<command>

@@ -86,7 +86,7 @@ public class Announcer {
 		boolean valid = true;
 		
 		if(lastMessage!=null){
-			if(lastMessage==text){
+			if(lastMessage.equalsIgnoreCase(text)){
 				valid = false;
 			}
 			else{
@@ -109,7 +109,7 @@ public class Announcer {
 				String msg = ChatColor.DARK_AQUA + getMsg();
 				MessageSender.broadcastNoPrefix(prefix + msg);
 			}
-		}.runTaskTimer(plugin, 6000L, 6000L);
+		}.runTaskTimer(plugin, 4800L, 4800L);
 	}
 
 }

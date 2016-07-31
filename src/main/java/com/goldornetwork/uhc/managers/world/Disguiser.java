@@ -135,6 +135,7 @@ public class Disguiser implements Listener{
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	private void hideAllFrom(Player target, String team){
 		hidden.add(target.getUniqueId());
 		for(Player online : Bukkit.getOnlinePlayers()){
@@ -162,6 +163,6 @@ public class Disguiser implements Listener{
 			public void run() {
 				cooldown.remove(u);
 			}
-		}.runTaskLater(plugin, 100L);
+		}.runTaskLater(plugin, 60L);
 	}
 }

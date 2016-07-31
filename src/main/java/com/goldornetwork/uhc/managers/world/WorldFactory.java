@@ -2,13 +2,13 @@ package com.goldornetwork.uhc.managers.world;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.Random;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
@@ -20,15 +20,17 @@ import org.bukkit.event.world.WorldInitEvent;
 
 import com.goldornetwork.uhc.UHC;
 
+import net.minecraft.server.v1_8_R3.BiomeBase;
+
 public class WorldFactory implements Listener{
 
-	
+
 	private UHC plugin;
 	private File dir;
 	private World Lobby;
 	private Random random = new Random();
 
-	
+
 	public WorldFactory(UHC plugin) {
 		this.plugin=plugin;
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -75,6 +77,21 @@ public class WorldFactory implements Listener{
 				}
 			}
 		}
+		Field biomesField = null;
+		try{
+			biomesField = BiomeBase.class.getDeclaredField("biomes");
+			biomesField.setAccessible(true);
+			if(biomesField.get(null) instanceof BiomeBase[]){
+				BiomeBase[] biomes = (BiomeBase[])biomesField.get(null);
+				biomes[BiomeBase.DEEP_OCEAN.id] = BiomeBase.PLAINS;
+				biomes[BiomeBase.OCEAN.id] = BiomeBase.FOREST;
+				biomes[BiomeBase.SWAMPLAND.id] = BiomeBase.FOREST;
+				biomes[BiomeBase.FROZEN_OCEAN.id] = BiomeBase.FOREST;
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
 	}
 
 	public World getLobby(){
@@ -87,7 +104,7 @@ public class WorldFactory implements Listener{
 			Lobby.setThundering(false);
 			Lobby.setStorm(false);
 			Lobby.setSpawnFlags(false, false);
-			
+
 			for(Entity entity : Lobby.getEntities()){
 				if(!(entity instanceof Player)){
 					entity.remove();

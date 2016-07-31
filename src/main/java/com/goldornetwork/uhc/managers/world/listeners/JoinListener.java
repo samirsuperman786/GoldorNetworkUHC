@@ -2,18 +2,14 @@ package com.goldornetwork.uhc.managers.world.listeners;
 
 import java.util.Random;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 import com.goldornetwork.uhc.UHC;
@@ -21,6 +17,8 @@ import com.goldornetwork.uhc.managers.TeamManager;
 import com.goldornetwork.uhc.managers.GameModeManager.State;
 import com.goldornetwork.uhc.managers.world.WorldManager;
 import com.goldornetwork.uhc.managers.world.customevents.UHCJoinEvent;
+import com.goldornetwork.uhc.utils.CoordXZ;
+import com.goldornetwork.uhc.utils.LocationUtils;
 import com.goldornetwork.uhc.utils.Medic;
 import com.goldornetwork.uhc.utils.MessageSender;
 
@@ -63,7 +61,8 @@ public class JoinListener implements Listener{
 			p.setExp(0L);
 			p.getInventory().setArmorContents(null);
 			Location lobby = worldM.getLobby().getSpawnLocation();
-			Location toTeleport = lobby.clone().add(random.nextInt(1), 0, random.nextInt(1));
+			CoordXZ variation = LocationUtils.locationInRadius(2);
+			Location toTeleport = lobby.clone().add(variation.x, 0, variation.z);
 			p.teleport(toTeleport);
 			Medic.heal(p);
 		}

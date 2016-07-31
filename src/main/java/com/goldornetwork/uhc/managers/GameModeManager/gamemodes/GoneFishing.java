@@ -28,12 +28,19 @@ public class GoneFishing extends Gamemode implements Listener {
 	private TeamManager teamM;
 
 	private Set<UUID> lateGoneFishing = new HashSet<UUID>();
-
+	private final ItemStack rod;
 
 	public GoneFishing(TeamManager teamM) {
-		super("Gone Fishing", "GoneFishing", "Players spawn with infinite levels, 20 anvils, a fishing rod with:"
+		super("Gone Fishing", "GoneFishing", "Players spawn with infinite levels, 64 anvils, a fishing rod with:"
 				+ " Luck of the Sea 100, Lure 100, and Unbreaking 100. Caution: Enchantment tables are disabled.");
 		this.teamM=teamM;
+		this.rod = new ItemStack(Material.FISHING_ROD, 1);
+		ItemMeta meta = rod.getItemMeta();
+		meta.addEnchant(Enchantment.DURABILITY, 100, true);
+		meta.addEnchant(Enchantment.LURE, 100, true);
+		meta.addEnchant(Enchantment.LUCK, 100, true);
+		meta.setDisplayName(ChatColor.AQUA + "Fish Slapper 100");
+		rod.setItemMeta(meta);
 	}
 
 	@Override
@@ -71,17 +78,11 @@ public class GoneFishing extends Gamemode implements Listener {
 	}
 
 	private void giveAPlayerGoneFishingItems(Player p){
-		ItemStack given = new ItemStack(Material.FISHING_ROD, 1);
-		ItemMeta im = given.getItemMeta();
-		im.addEnchant(Enchantment.LUCK, 100, true);
-		im.addEnchant(Enchantment.LURE, 100, true);
-		im.addEnchant(Enchantment.DURABILITY, 100, true);
-		im.setDisplayName(ChatColor.AQUA + "Fish Slapper 100");
-		given.setItemMeta(im);
-		p.getInventory().addItem(new ItemStack(Material.ANVIL, 20));
-		p.getInventory().addItem(given);
+		p.getInventory().addItem(new ItemStack(Material.ANVIL, 64));
+		p.getInventory().addItem(rod);
 		p.setLevel(Integer.MAX_VALUE);
 	}
+	
 	private void distributeItems(){
 
 		for(UUID u : teamM.getPlayersInGame()){

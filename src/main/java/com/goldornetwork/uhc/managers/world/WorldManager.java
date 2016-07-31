@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -17,9 +18,9 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftFirework;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -48,11 +49,15 @@ import com.goldornetwork.uhc.managers.world.customevents.GameEndEvent;
 import com.goldornetwork.uhc.managers.world.customevents.GameStartEvent;
 import com.goldornetwork.uhc.managers.world.customevents.MeetupEvent;
 import com.goldornetwork.uhc.managers.world.customevents.PVPEnableEvent;
+import com.goldornetwork.uhc.utils.CoordXZ;
+import com.goldornetwork.uhc.utils.LocationUtils;
 import com.goldornetwork.uhc.utils.Medic;
 import com.goldornetwork.uhc.utils.MessageSender;
 import com.goldornetwork.uhc.utils.PlayerUtils;
+import com.google.common.collect.ImmutableSet;
 
 import net.minecraft.server.v1_8_R3.MinecraftServer;
+import net.minecraft.server.v1_8_R3.NBTTagCompound;
 
 public class WorldManager implements Listener{
 
@@ -66,7 +71,30 @@ public class WorldManager implements Listener{
 	private int timer;
 	private int radius;
 	private World uhcWorld;
-
+	private static final Set<FireworkEffect> effects = ImmutableSet.of(
+			
+			FireworkEffect.builder()
+			.with(FireworkEffect.Type.BURST)
+			.withColor(Color.BLUE)
+			.build(),
+			
+			FireworkEffect.builder()
+			.with(FireworkEffect.Type.BURST)
+			.withColor(Color.RED)
+			.build(),
+			
+			FireworkEffect.builder()
+			.with(FireworkEffect.Type.BALL_LARGE)
+			.withColor(Color.BLUE)
+			.build(),
+			
+			FireworkEffect.builder()
+			.with(FireworkEffect.Type.BALL_LARGE)
+			.withColor(Color.RED)
+			.build()
+			
+			
+			);
 
 	public WorldManager(UHC plugin, TeamManager teamM, WorldFactory worldF, ChunkGenerator chunkG) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -130,7 +158,7 @@ public class WorldManager implements Listener{
 		getUHCWorld().setTime(60);
 		getUHCWorld().setThundering(false);
 		getUHCWorld().setStorm(false);
-		
+
 		new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -164,7 +192,7 @@ public class WorldManager implements Listener{
 	public void on(PlayerQuitEvent e){
 		Player target = e.getPlayer();
 		e.setQuitMessage(ChatColor.RED + "\u2717" + PlayerUtils.getPrefix(target) + teamM.getColorOfPlayer(target.getUniqueId()) + target.getName());
-		
+
 		if(teamM.isPlayerAnObserver(target.getUniqueId())){
 			teamM.removePlayerFromObservers(target);
 		}
@@ -176,7 +204,7 @@ public class WorldManager implements Listener{
 			e.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler
 	public void on(PlayerDropItemEvent e){
 		if(State.getState().equals(State.OPEN) || State.getState().equals(State.NOT_RUNNING)){
@@ -203,7 +231,8 @@ public class WorldManager implements Listener{
 
 		toBroadcast.add("Game has ended, thanks for playing.");
 		MessageSender.broadcast(toBroadcast);
-
+		fireworks(uhcWorld);
+		
 		new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -256,41 +285,56 @@ public class WorldManager implements Listener{
 					MessageSender.broadcast(ChatColor.DARK_AQUA + "Server closing in " + ChatColor.DARK_RED + timer + ChatColor.DARK_AQUA + " second.");
 				}
 				else if(timer==0){
-					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "stop");
+					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "restart");
 				}
 
 				--timer;
 			}
-		}.runTaskTimer(plugin, 0L, 20L);
+		}.runTaskTimer(plugin, 60L, 20L);
 	}
 
-	@SuppressWarnings("unused")
 	private void fireworks(World world){
 
 		new BukkitRunnable() {
+			private int timer = 0;
+			
 			@Override
 			public void run() {
+				
+				if(timer==16){
+					cancel();
+				}
 				for(Player online : Bukkit.getServer().getOnlinePlayers()){
 					Location pLoc = online.getLocation();
-					int variation = random.nextInt(10);
-					Color color = Color.RED;
-					Location fireLoc = new Location(world, pLoc.getBlockX() + variation, pLoc.getBlockY(), pLoc.getBlockZ() + variation);
-					Firework fw = (Firework) world.spawnEntity(fireLoc, EntityType.FIREWORK);
-					FireworkMeta fwMeta = fw.getFireworkMeta();
-					FireworkEffect effect = FireworkEffect.builder()
-							.flicker(false)
-							.trail(true)
-							.with(FireworkEffect.Type.STAR)
-							.withColor(color)
-							.withFade(Color.BLUE)
-							.build();
-					fwMeta.addEffect(effect);
-					fwMeta.setPower(2);
-					fw.setFireworkMeta(fwMeta);
-					fw.detonate();
+					CoordXZ coord = LocationUtils.locationInRadius(4);
+					int variationX = coord.x;
+					int variationZ = coord.z;
+					Location fireLoc = new Location(world, pLoc.getBlockX() + variationX, pLoc.getBlockY(), pLoc.getBlockZ() + variationZ);
+
+					FireworkEffect effect = getRandomFirework();
+					playFirework(fireLoc, effect);
 				}
+				timer++;
 			}
-		}.runTaskTimer(plugin, 0L, 30L);
+		}.runTaskTimer(plugin, 0L, 5L);
+	}
+
+	private FireworkEffect getRandomFirework(){
+		List<FireworkEffect> toReturn = new ArrayList<FireworkEffect>();
+		toReturn.addAll(effects);
+		int index = random.nextInt(toReturn.size());
+		return toReturn.get(index);
+	}
+	
+	private void playFirework(Location location, FireworkEffect effect){
+		final Firework firework = location.getWorld().spawn(location, Firework.class);
+		FireworkMeta meta = firework.getFireworkMeta();
+		meta.addEffect(effect);
+		firework.setFireworkMeta(meta);
+		NBTTagCompound nbtData = new NBTTagCompound();
+		nbtData.setInt("Life", 1);
+		nbtData.setInt("LifeTime", 2);
+		((CraftFirework) firework).getHandle().a(nbtData);
 	}
 
 	@EventHandler
@@ -306,7 +350,8 @@ public class WorldManager implements Listener{
 			Location pLoc = e.getTo();
 			if(pLoc.getBlockY()<=0){
 				Location lobby = getLobby().getSpawnLocation();
-				Location toTeleport = lobby.clone().add(random.nextInt(1), 0, random.nextInt(1));
+				CoordXZ variation = LocationUtils.locationInRadius(2);
+				Location toTeleport = lobby.clone().add(variation.x, 0, variation.z);
 				e.getPlayer().teleport(toTeleport);
 			}
 		}
@@ -354,10 +399,10 @@ public class WorldManager implements Listener{
 	public Location getCenter(){
 		return uhcWorld.getSpawnLocation();
 	}
-	
+
 	@EventHandler
 	public void on(BlockFromToEvent e){
-		
+
 		if(e.getBlock().getLocation().getBlockY()>100){
 			if(e.getBlock().getType().equals(Material.STATIONARY_WATER)|| e.getBlock().getType().equals(Material.STATIONARY_LAVA)){
 				e.setCancelled(true);
@@ -368,12 +413,12 @@ public class WorldManager implements Listener{
 	@EventHandler
 	public void on(PlayerInteractEvent e){
 		if(State.getState().equals(State.INGAME)==false){
-				if(e.getAction() == Action.PHYSICAL && e.getClickedBlock().getType() == Material.SOIL){
-			        e.setCancelled(true);
-			    }
+			if(e.getAction() == Action.PHYSICAL && e.getClickedBlock().getType() == Material.SOIL){
+				e.setCancelled(true);
+			}
 		}
 	}
-	
+
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void on(EntityDamageByEntityEvent e){
 		if(State.getState().equals(State.INGAME)){
@@ -398,7 +443,7 @@ public class WorldManager implements Listener{
 		Location shooterLocation = shooter.getLocation();
 		Location targetLocation = target.getLocation();
 		int distance = (int) shooterLocation.distance(targetLocation);
-		
+
 		MessageSender.send(shooter, ChatColor.GREEN + "You hit " + teamM.getColorOfPlayer(target.getUniqueId())
 		+ target.getName() + ChatColor.GREEN +  " at a distance of " + ChatColor.GRAY + distance + ChatColor.GREEN + " blocks.");
 

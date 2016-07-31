@@ -2,7 +2,6 @@ package com.goldornetwork.uhc.managers.GameModeManager;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import com.goldornetwork.uhc.UHC;
@@ -28,7 +27,6 @@ import com.google.common.collect.ImmutableList;
 public class GameModeManager {
 
 	
-	Random random = new Random();
 
 	private Set<Gamemode> gamemodes = new HashSet<Gamemode>();
 	private UHC plugin;

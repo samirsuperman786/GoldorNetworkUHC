@@ -72,8 +72,8 @@ public class UHC extends JavaPlugin {
 	private Announcer annnouncer;
 	private UBL ubl;
 	
-	public void instances(){
-
+	public void instances(){		
+		
 		worldF = new WorldFactory(plugin);
 		
 		ubl = new UBL(plugin);
@@ -108,8 +108,7 @@ public class UHC extends JavaPlugin {
 
 		teamI = new TeamInteraction(teamM);
 
-		uhcWarn = new UHCWarn();
-
+		uhcWarn = new UHCWarn();		
 		
 		annnouncer= new Announcer(plugin);
 		
@@ -204,12 +203,10 @@ public class UHC extends JavaPlugin {
 		worldF.setup();
 
 		new BukkitRunnable() {
-
 			@Override
 			public void run() {
 
 				setup();
-
 			}
 		}.runTaskLater(plugin, 20L);
 

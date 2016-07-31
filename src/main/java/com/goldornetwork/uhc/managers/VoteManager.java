@@ -3,12 +3,10 @@ package com.goldornetwork.uhc.managers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
@@ -21,8 +19,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.goldornetwork.uhc.UHC;
 import com.goldornetwork.uhc.managers.GameModeManager.GameModeManager;
 import com.goldornetwork.uhc.managers.GameModeManager.Gamemode;
-import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.SkyHigh;
-import com.goldornetwork.uhc.managers.GameModeManager.gamemodes.WetCombat;
 import com.goldornetwork.uhc.utils.MessageSender;
 
 public class VoteManager implements Listener{
@@ -72,7 +68,7 @@ public class VoteManager implements Listener{
 
 	private List<String> getMessage(){
 		List<String> toBroadcast = new LinkedList<String>();
-		toBroadcast.add("[Options] Please use /vote [option], also /info [gamemode]");
+		toBroadcast.add("[Options] Please use /vote [option], also /info [scenario]");
 
 		for(int i = 0; i<getNumberOfOptions(); i++){
 			int comma = 0;
@@ -152,7 +148,7 @@ public class VoteManager implements Listener{
 			toBroadcast.add(ChatColor.AQUA + game.getProperName() + " has been enabled.");
 		}
 		
-		MessageSender.broadcastTitle(ChatColor.AQUA + "Gamemodes have been enabled.", ChatColor.GOLD + "Use" + ChatColor.RED + " /info " + ChatColor.GOLD + "to learn them!");
+		MessageSender.broadcastTitle(ChatColor.AQUA + "Scenarios have been enabled.", ChatColor.GOLD + "Use" + ChatColor.RED + " /info " + ChatColor.GOLD + "to learn them!");
 		MessageSender.broadcast(toBroadcast);
 	}
 
